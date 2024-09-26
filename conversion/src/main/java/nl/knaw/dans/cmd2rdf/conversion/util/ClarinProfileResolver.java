@@ -40,8 +40,8 @@ public class ClarinProfileResolver implements URIResolver {
 	private static final Logger log = LoggerFactory.getLogger(ClarinProfileResolver.class);
 	private String basePath;
 	private static CacheService<Object, Object> cacheService;
-	private static final String REPLACED_REGISTRY_PROFILES = "/rest/registry/profiles/";
-	private static final String REPLACED_REGISTRY_COMPONENTS = "/rest/registry/components/";
+	private static final String REPLACED_REGISTRY_PROFILES = "/rest/registry/1.1/profiles/";
+	private static final String REPLACED_REGISTRY_COMPONENTS = "/rest/registry/1.1/components/";
 	private String registry;
 	public ClarinProfileResolver(String basePath, String registry, CacheService<Object, Object> cacheService) throws ActionException {
 		createCacheTempIfAbsent(basePath);
