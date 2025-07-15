@@ -8,6 +8,7 @@ package nl.knaw.dans.cmd2rdf.batch;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
 
 import nl.knaw.dans.cmd2rdf.config.xmlmapping.Jobs;
 
@@ -59,7 +60,8 @@ public class Launcher {
     	
         // Build an easy batch job
         Job job = new JobBuilder()
-                .reader(new XmlRecordReader("CMD2RDF", new FileInputStream(new File(args[0]))))
+                .reader(new XmlRecordReader("CMD2RDF",
+								Files.newInputStream(new File(args[0]).toPath())))
                 .mapper(new XmlRecordMapper<Jobs>(Jobs.class))
                 .processor(new JobProcessor())
                 .build();
@@ -70,22 +72,27 @@ public class Launcher {
         split.stop();
        
         // Print the job execution report
-        log.info("Start time: " + jobReport.getFormattedStartTime());
-        log.info("End time: "+ jobReport.getFormattedEndTime());
-        Period p = new Period(jobReport.getFormattedDuration());
-        log.info("Duration: " + p.getHours() + " hours, " 
-        		+ p.getMinutes() + " minutes, " + p.getSeconds() + " seconds, " + p.getMillis() + " ms.");
+        log.info("Start time: {}", jobReport.getFormattedStartTime());
+        log.info("End time: {}", jobReport.getFormattedEndTime());
+		String duration = jobReport.getFormattedDuration();
+		try {
+			Period p = new Period(Long.parseLong(duration.replace("ms", "").trim()));
+			log.info("Duration: {} hours, {} minutes, {} seconds, {} ms.", p.getHours(), p.getMinutes(),
+							p.getSeconds(), p.getMillis());
+		} catch (NumberFormatException e) {
+			// We're going to log what we got back as duration, it's better than nothing
+			log.info("Duration: {}", duration);
+		}
         Period p2 = new Period(stopwatchTotal.getLastUsage()-stopwatchTotal.getFirstUsage());
-        log.debug("Total: " + + p2.getHours() + " hours, " 
-        		+ p2.getMinutes() + " minutes, " + p2.getSeconds() + " seconds, " + p2.getMillis() + " ms.");
-        log.debug("stopwatchTotal: " + stopwatchTotal);
-        log.debug("stopwatchDb: " + stopwatchDb);
-        log.debug("stopwatchOai: " + stopwatchOai);
-        log.debug("stopwatchTrans1: " + stopwatchTrans1);
-        log.debug("stopwatchTrans2: " + stopwatchTrans2);
-        log.debug("stopwatchFS: " + stopwatchFS);
-        log.debug("stopwatchBI: " + stopwatchBI);
-
+        log.debug("Total: {} hours, {} minutes, {} seconds, {} ms.",
+						p2.getHours(), p2.getMinutes(), p2.getSeconds(), p2.getMillis());
+        log.debug("stopwatchTotal: {}", stopwatchTotal);
+        log.debug("stopwatchDb: {}", stopwatchDb);
+        log.debug("stopwatchOai: {}", stopwatchOai);
+        log.debug("stopwatchTrans1: {}", stopwatchTrans1);
+        log.debug("stopwatchTrans2: {}", stopwatchTrans2);
+        log.debug("stopwatchFS: {}", stopwatchFS);
+        log.debug("stopwatchBI: {}", stopwatchBI);
     }
 
 }
