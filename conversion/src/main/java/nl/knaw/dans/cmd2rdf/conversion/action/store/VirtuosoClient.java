@@ -12,7 +12,6 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
 import javax.xml.transform.TransformerConfigurationException;
@@ -41,8 +40,6 @@ import org.w3c.dom.Node;
  *
  */
 public class VirtuosoClient implements IAction {
-	private static final MediaType MEDIA_TYPE_APPLICATION_RDF_XML =
-										new MediaType("application", "rdf+xml");
 	private static final Logger errLog = LoggerFactory.getLogger("errorlog");
 	private static final String NAMED_GRAPH_IRI = "graph-uri";
 	private static final Logger log = LoggerFactory.getLogger(VirtuosoClient.class);
@@ -52,7 +49,6 @@ public class VirtuosoClient implements IAction {
 	private String serverURL;
     private ActionStatus act;
 	private static int n;
-	
 
 	public VirtuosoClient(){
 	}
@@ -194,7 +190,7 @@ public class VirtuosoClient implements IAction {
 				uriBuilder.queryParam(NAMED_GRAPH_IRI, gIRI);
 				WebTarget target = client.target(uriBuilder.build());
 
-				Response response = target.request().post(Entity.entity(bytes, MEDIA_TYPE_APPLICATION_RDF_XML));
+				Response response = target.request().post(Entity.entity(bytes, StoreMediaTypes.APPLICATION_RDF_XML.getMediaType()));
 				int status = response.getStatus();
 				log.info("'{}' is uploaded to virtuoso server.\nResponse status: {}",
 								path.replace(".xml", ".rdf"), status);
