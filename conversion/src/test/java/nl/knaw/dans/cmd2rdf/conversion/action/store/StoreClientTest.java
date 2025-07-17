@@ -21,6 +21,7 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(org.mockito.runners.MockitoJUnitRunner.class)
@@ -85,7 +86,7 @@ public class StoreClientTest {
     }
 
     @Test
-    public void testExecuteWithValidXmlNodeAndSuccessResponse() throws Exception {
+    public void testExecuteWithValidXmlNodeAndCreatedResponse() throws Exception {
         // Create a dummy XML Node
         Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         Element dummyElement = doc.createElement("root");
@@ -97,6 +98,42 @@ public class StoreClientTest {
         when(mockWebTarget.request()).thenReturn(mockBuilder);
         when(mockBuilder.post(any(Entity.class))).thenReturn(mockResponse);
         when(mockResponse.getStatus()).thenReturn(Response.Status.CREATED.getStatusCode());
+
+        Object result = client.execute("/path/to/files/test.xml", doc);
+        assertTrue((Boolean) result);
+    }
+
+    @Test
+    public void testExecuteWithValidXmlNodeAndOkResponse() throws Exception {
+        // Create a dummy XML Node
+        Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        Element dummyElement = doc.createElement("root");
+        dummyElement.setTextContent("test");
+        doc.appendChild(dummyElement);
+
+        // Setup mocks
+        when(mockClient.target(any(URI.class))).thenReturn(mockWebTarget);
+        when(mockWebTarget.request()).thenReturn(mockBuilder);
+        when(mockBuilder.post(any(Entity.class))).thenReturn(mockResponse);
+        when(mockResponse.getStatus()).thenReturn(Response.Status.OK.getStatusCode());
+
+        Object result = client.execute("/path/to/files/test.xml", doc);
+        assertTrue((Boolean) result);
+    }
+
+    @Test
+    public void testExecuteWithValidXmlNodeAndNoContentResponse() throws Exception {
+        // Create a dummy XML Node
+        Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+        Element dummyElement = doc.createElement("root");
+        dummyElement.setTextContent("test");
+        doc.appendChild(dummyElement);
+
+        // Setup mocks
+        when(mockClient.target(any(URI.class))).thenReturn(mockWebTarget);
+        when(mockWebTarget.request()).thenReturn(mockBuilder);
+        when(mockBuilder.post(any(Entity.class))).thenReturn(mockResponse);
+        when(mockResponse.getStatus()).thenReturn(Response.Status.NO_CONTENT.getStatusCode());
 
         Object result = client.execute("/path/to/files/test.xml", doc);
         assertTrue((Boolean) result);

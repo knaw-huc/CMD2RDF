@@ -218,13 +218,15 @@ public class StoreClient implements IAction {
         UriBuilder uriBuilder;
         try {
             uriBuilder = UriBuilder.fromUri(new URI(serverURL));
-            uriBuilder.queryParam(ClientParams.NAMED_GRAPH_IRI_QUERY_PARAM.val, getGIRI(path));
+            uriBuilder.queryParam(namedGIRIQueryParam, getGIRI(path));
             WebTarget target = client.target(uriBuilder.build());
             Response response = target.request().delete();
             int status = response.getStatus();
             LOG.info("Delete {} from store.\nResponse status: {}",
                              path.replace(".xml", ".rdf"), status);
-            if ((status == Response.Status.CREATED.getStatusCode()) || (status == Response.Status.OK.getStatusCode())) {
+            if ((status == Response.Status.CREATED.getStatusCode())
+                    || (status == Response.Status.OK.getStatusCode())
+                    || (status == Response.Status.NO_CONTENT.getStatusCode())) {
                 n++;
                 LOG.info("[{}] is DELETED.", n);
                 return true;
