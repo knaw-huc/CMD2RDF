@@ -24,10 +24,10 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
 @RunWith(org.mockito.runners.MockitoJUnitRunner.class)
-public class StoreRESTClientTest {
+public class StoreClientTest {
 
     @InjectMocks
-    private StoreRESTClient client;
+    private StoreClient client;
 
     @Mock
     private Client mockClient;
@@ -45,7 +45,7 @@ public class StoreRESTClientTest {
 
     @Before
     public void setup() throws Exception {
-        client = new StoreRESTClient();
+        client = new StoreClient();
         validVars = new HashMap<>();
         validVars.put("replacedPrefixBaseURI", "/path/to/files/");
         validVars.put("prefixBaseURI", "http://localhost:8080/cmd2rdf/graph/");
@@ -56,7 +56,7 @@ public class StoreRESTClientTest {
         validVars.put("namedGraphIRIQueryParam", "graph");
 
         client.startUp(validVars);
-        java.lang.reflect.Field clientField = StoreRESTClient.class.getDeclaredField("client");
+        java.lang.reflect.Field clientField = StoreClient.class.getDeclaredField("client");
         clientField.setAccessible(true);
         clientField.set(client, mockClient);
     }
@@ -77,11 +77,6 @@ public class StoreRESTClientTest {
     public void testStartUpWithMissingServerURL() throws Exception {
         validVars.remove("serverURL");
         client.startUp(validVars);
-    }
-
-    @Test
-    public void testName() {
-        assertEquals("nl.knaw.dans.cmd2rdf.conversion.action.store.StoreRESTClient", client.name());
     }
 
     @Test

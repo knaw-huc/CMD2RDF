@@ -40,17 +40,17 @@ import java.util.Map;
  * A linked data store REST client that makes use of a REST API to upload content to the store,
  * or delete content from the store.
  */
-public class StoreRESTClient implements IAction {
+public class StoreClient implements IAction {
 
     private static final Logger ERROR_LOG = LoggerFactory.getLogger("errorlog");
-    private static final Logger LOG = LoggerFactory.getLogger(StoreRESTClient.class);
+    private static final Logger LOG = LoggerFactory.getLogger(StoreClient.class);
     private static int n;
     private final List<String> replacedPrefixBaseURI = new ArrayList<String>();
-    private GIRIBuilder giriBuilder;
     private Client client;
     private String serverURL;
     private ActionStatus actionStatus;
     private String namedGIRIQueryParam;
+    private String prefixBaseURI;
 
     private enum ClientParams {
         REPLACED_PREFIX_BASE_URI("replacedPrefixBaseURI"),
@@ -77,6 +77,7 @@ public class StoreRESTClient implements IAction {
         String action = vars.get(ClientParams.ACTION.val);
         serverURL = vars.get(ClientParams.SERVER_URL.val);
         namedGIRIQueryParam = vars.get(ClientParams.NAMED_GRAPH_IRI_QUERY_PARAM.val);
+        prefixBaseURI = vars.get(ClientParams.PREFIX_BASE_URI.val);
         String prefixBaseURI = vars.get(ClientParams.PREFIX_BASE_URI.val);
 
         if (replacedPrefixBaseURIVar == null || replacedPrefixBaseURIVar.isEmpty()) {
@@ -107,7 +108,6 @@ public class StoreRESTClient implements IAction {
                 replacedPrefixBaseURI.add(s);
         }
 
-        giriBuilder = new GIRIBuilder(replacedPrefixBaseURI, prefixBaseURI);
         actionStatus = Misc.convertToActionStatus(action);
         client = ClientBuilder.newClient();
         HttpAuthenticationFeature authFeature = HttpAuthenticationFeature.digest(userName, password);
@@ -177,7 +177,7 @@ public class StoreRESTClient implements IAction {
 
                 UriBuilder uriBuilder = UriBuilder.fromUri(new URI(serverURL));
                 uriBuilder.queryParam(namedGIRIQueryParam,
-                        URLEncoder.encode(giriBuilder.getGIRI(path), StandardCharsets.UTF_8.toString()));
+                        URLEncoder.encode(getGIRI(path), StandardCharsets.UTF_8.toString()));
 
                 WebTarget target = client.target(uriBuilder.build());
 
@@ -218,7 +218,7 @@ public class StoreRESTClient implements IAction {
         UriBuilder uriBuilder;
         try {
             uriBuilder = UriBuilder.fromUri(new URI(serverURL));
-            uriBuilder.queryParam(ClientParams.NAMED_GRAPH_IRI_QUERY_PARAM.val, giriBuilder.getGIRI(path));
+            uriBuilder.queryParam(ClientParams.NAMED_GRAPH_IRI_QUERY_PARAM.val, getGIRI(path));
             WebTarget target = client.target(uriBuilder.build());
             Response response = target.request().delete();
             int status = response.getStatus();
@@ -233,11 +233,28 @@ public class StoreRESTClient implements IAction {
             }
         } catch (URISyntaxException e) {
             ERROR_LOG.error("ERROR: URISyntaxException, caused by {}", e.getMessage(), e);
-        } catch (IllegalArgumentException e) {
-            ERROR_LOG.error("ERROR: IllegalArgumentException, caused by {}", e.getMessage(), e);
+        } catch (ActionException e) {
+            ERROR_LOG.error("ERROR: ActionException, caused by {}", e.getMessage(), e);
         }
 
         return false;
+    }
+
+    private String getGIRI(String path) throws ActionException {
+        String gIRI = null;
+        for (String s:replacedPrefixBaseURI) {
+            if (path.startsWith(s)) {
+                gIRI = path.replace(s, this.prefixBaseURI)
+                        .replace(".xml", ".rdf")
+                        .replaceAll(" ", "_");
+                break;
+            }
+        }
+        if (gIRI==null) {
+            throw new ActionException("gIRI ERROR: " + path + " is not found as prefix in " + replacedPrefixBaseURI);
+        }
+
+        return gIRI;
     }
 
 }
