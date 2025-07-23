@@ -19,9 +19,9 @@ public class CleanDirectory implements IAction {
 
     @Override
     public void startUp(Map<String, String> vars) throws ActionException {
-        directoryToClean = vars.get("directoryToRemove");
+        directoryToClean = vars.get("directory");
         if (directoryToClean == null || directoryToClean.isEmpty()) {
-            throw new ActionException("directoryToRemove is null or empty");
+            throw new ActionException("directory is null or empty");
         }
     }
 

@@ -322,9 +322,9 @@
 						</class>
 					</action>
 					<action name="Deleting rdf output file temp">
-						<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.RemoveDirectory">
+						<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.CleanDirectory">
 							<properties>
-								<property name="directoryToRemove">{tmpOutDir}/temp</property>
+								<property name="directory">{tmpOutDir}/temp</property>
 							</properties>
 						</class>
 					</action>
