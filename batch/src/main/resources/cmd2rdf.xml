@@ -12,6 +12,7 @@
 			<property name="profilesCacheDir">{workspace}/profiles-cache</property>
 			<property name="registry">http://catalog.clarin.eu/ds/ComponentRegistry</property>
 			<property name="virtuosoHome">/opt/virtuoso-opensource</property>
+			<property name="namedGraphIRIQueryParam">graph-uri</property>
 			<property name="serverHost">http://localhost:8890</property>
 			<property name="serverURL">{serverHost}/sparql-graph-crud-auth?</property>
 			<property name="username">dba</property>
@@ -119,7 +120,7 @@
 				</action>
 				-->
 				<action>
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.VirtuosoClient">
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.StoreClient">
 						<properties>
 							<property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
 							<property name="prefixBaseURI">{prefixBaseURI}</property>
@@ -203,7 +204,7 @@
 				</action>
 				-->
 				<action>
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.VirtuosoClient">
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.StoreClient">
 						<properties>
 							<property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
 							<property name="prefixBaseURI">{prefixBaseURI}</property>
@@ -343,7 +344,7 @@
 					</class>
 				</action>
 				<action>
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.VirtuosoClient">
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.StoreClient">
 						<properties>
 							<property name="replacedPrefixBaseURI">{profilesCacheDir}</property>
 							<property name="prefixBaseURI">https://catalog.clarin.eu/ds/cmd2rdf/graph/profile</property>
