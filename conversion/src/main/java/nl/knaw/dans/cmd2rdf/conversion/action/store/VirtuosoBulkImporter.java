@@ -20,33 +20,50 @@ import org.slf4j.LoggerFactory;
  * @author Eko Indarto
  *
  */
-public class VirtuosoBulkImporter implements IAction{
+public class VirtuosoBulkImporter implements IAction {
+
 	private static final Logger ERROR_LOG = LoggerFactory.getLogger("errorlog");
 	private static final Logger log = LoggerFactory.getLogger(VirtuosoBulkImporter.class);
-	private static String VIRTUOSO_BULK_IMPORT_SH;
-	private boolean skip;
+    private boolean skip;
 	private String[] virtuosoBulkImport;
+
+	private enum ClientParams {
+		BULK_IMPORT_SHELL_PATH("bulkImportShellPath"),
+		STORE_HOME_DIR("virtuosoHomeDir"),
+		PORT("port"),
+		USERNAME("username"),
+		PASSWORD("password"),
+		RDF_DIR("rdfDir");
+
+		private final String val;
+
+		ClientParams(String val) {
+			this.val = val;
+		}
+	}
+
 	public VirtuosoBulkImporter(){
 	}
 
-	public void startUp(Map<String, String> vars)
-			throws ActionException {
-		String bulkImportShellPath = vars.get("bulkImportShellPath");
-		String virtuosoHomeDir = vars.get("virtuosoHomeDir");
-		String port = vars.get("port");
-		String username = vars.get("username");
-		String password = vars.get("password");
-		String rdfDir = vars.get("rdfDir");
-		if (bulkImportShellPath == null || bulkImportShellPath.isEmpty())
+	public void startUp(Map<String, String> vars) throws ActionException {
+		String bulkImportShellPath = vars.get(ClientParams.BULK_IMPORT_SHELL_PATH.val);
+		String virtuosoHomeDir = vars.get(ClientParams.STORE_HOME_DIR.val);
+		String port = vars.get(ClientParams.PORT.val);
+		String username = vars.get(ClientParams.USERNAME.val);
+		String password = vars.get(ClientParams.PASSWORD.val);
+		String rdfDir = vars.get(ClientParams.RDF_DIR.val);
+        String bulkImportShellFile;
+
+        if (bulkImportShellPath == null || bulkImportShellPath.isEmpty()) {
 			throw new ActionException(this.name() + ": bulkImportShellPath is null or empty");
-		else {
-			VIRTUOSO_BULK_IMPORT_SH = bulkImportShellPath.trim();
+		} else {
+			bulkImportShellFile = bulkImportShellPath.trim();
 			//Check whether the virtuoso_bulk_import.sh is executable or not.
-			File file = new File(VIRTUOSO_BULK_IMPORT_SH);
+			File file = new File(bulkImportShellFile);
 			if (!file.exists() || !file.isFile())
-				throw new ActionException(this.name() + "'" + VIRTUOSO_BULK_IMPORT_SH + "' doesn't exist or not a file.");
+				throw new ActionException(this.name() + "'" + bulkImportShellFile + "' doesn't exist or not a file.");
 			if (!file.canExecute())
-				throw new ActionException(this.name() + "'" + VIRTUOSO_BULK_IMPORT_SH + "' is not executeable file. Try: chmod a+x to the file.");
+				throw new ActionException(this.name() + "'" + bulkImportShellFile + "' is not executable file. Try: chmod a+x to the file.");
 		}
 		if (virtuosoHomeDir == null || virtuosoHomeDir.isEmpty())
 			throw new ActionException(this.name() + ": virtuosoHomeDir is null or empty");
@@ -60,13 +77,13 @@ public class VirtuosoBulkImporter implements IAction{
 		File file = new File(rdfDir);
 		if (!file.exists() || !file.isDirectory()) {
 			skip=true;
-			ERROR_LOG.error("Directory '" + rdfDir + "' doen't exist.");
+            ERROR_LOG.error("Directory '{}' does not exist.", rdfDir);
 		} 
 		
 		//"/data/cmdi2rdf/virtuoso/bin/isql 1111  dba dba exec="ld_dir_all('/data/cmdi2rdf/BIG-files/rdf-output/','*.rdf','http://eko.indarto/tst.rdf');"
 		
 		if(!skip)
-			virtuosoBulkImport = new String[]{VIRTUOSO_BULK_IMPORT_SH, virtuosoHomeDir, port, username, password, rdfDir};
+			virtuosoBulkImport = new String[]{bulkImportShellFile, virtuosoHomeDir, port, username, password, rdfDir};
 	}
 
 	public Object execute(String path, Object object) throws ActionException {
@@ -88,11 +105,11 @@ private boolean excuteBulkImport() throws ActionException {
 	boolean ok=false;
 		log.info("######## START EXCUTING BULK IMPORT ###############");
 		for (String s:virtuosoBulkImport)
-			log.info("BULK COMMAND: " + s);
+            log.info("BULK COMMAND: {}", s);
 		
 		long start = System.currentTimeMillis();
 		Collection<File> cf = FileUtils.listFiles(new File(virtuosoBulkImport[5]), new String[]{"rdf", "graph"}, true);
-		log.info("============= Trying to import '" + cf.size() + "' files.");
+    log.info("============= Trying to import '{}' files.", cf.size());
 		ok = executeIsql(virtuosoBulkImport);
 		
 		if (!ok)
@@ -105,37 +122,38 @@ private boolean excuteBulkImport() throws ActionException {
 		return ok;
 	}
 
-private boolean executeIsql(String[] args) throws ActionException {
-	boolean ok = false;
-	StringBuffer output = new StringBuffer();
-	Process process;
-	try {
-		process = Runtime.getRuntime().exec(args);
-		while (process.waitFor() != 0) {
-			log.info("process...");
+	private boolean executeIsql(String[] args) throws ActionException {
+		boolean ok = false;
+		StringBuilder output = new StringBuilder();
+		Process process;
+		try {
+			process = Runtime.getRuntime().exec(args);
+			while (process.waitFor() != 0) {
+				log.info("process...");
+			}
+
+			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			String line = "";
+			while ((line = reader.readLine())!= null) {
+				output.append(line).append("\n");
+			}
+			String outputStr = output.toString();
+			log.info(outputStr);
+			ok = outputStr.contains("Done.") && outputStr.contains("msec.");
+
+		} catch (Exception e) {
+            ERROR_LOG.error("ERROR: {}", e.getMessage(), e);
+			throw new ActionException("ERROR: " + e.getMessage());
 		}
-		
-		BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-		String line = "";			
-		while ((line = reader.readLine())!= null) {
-			output.append(line + "\n");
-		}
-		String outputstr = output.toString();
-		log.info(outputstr);
-		ok = outputstr.contains("Done.") && outputstr.contains("msec.");
- 
-	} catch (Exception e) {
-		ERROR_LOG.error("ERROR: " + e.getMessage(), e);
-		throw new ActionException("ERROR: " + e.getMessage());
+		return ok;
 	}
-	return ok;
-}
+
 	public void shutDown() throws ActionException {
 	}
 
 	@Override
 	public String name() {
-		
 		return this.getClass().getName();
 	}
+
 }
