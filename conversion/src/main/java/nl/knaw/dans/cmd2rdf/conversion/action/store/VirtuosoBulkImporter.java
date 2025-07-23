@@ -29,7 +29,7 @@ public class VirtuosoBulkImporter implements IAction {
 
 	private enum ClientParams {
 		BULK_IMPORT_SHELL_PATH("bulkImportShellPath"),
-		STORE_HOME_DIR("virtuosoHomeDir"),
+		HOST("host"),
 		PORT("port"),
 		USERNAME("username"),
 		PASSWORD("password"),
@@ -47,7 +47,7 @@ public class VirtuosoBulkImporter implements IAction {
 
 	public void startUp(Map<String, String> vars) throws ActionException {
 		String bulkImportShellPath = vars.get(ClientParams.BULK_IMPORT_SHELL_PATH.val);
-		String virtuosoHomeDir = vars.get(ClientParams.STORE_HOME_DIR.val);
+		String host = vars.get(ClientParams.HOST.val);
 		String port = vars.get(ClientParams.PORT.val);
 		String username = vars.get(ClientParams.USERNAME.val);
 		String password = vars.get(ClientParams.PASSWORD.val);
@@ -65,8 +65,8 @@ public class VirtuosoBulkImporter implements IAction {
 			if (!file.canExecute())
 				throw new ActionException(this.name() + "'" + bulkImportShellFile + "' is not executable file. Try: chmod a+x to the file.");
 		}
-		if (virtuosoHomeDir == null || virtuosoHomeDir.isEmpty())
-			throw new ActionException(this.name() + ": virtuosoHomeDir is null or empty");
+		if (host == null || host.isEmpty())
+			throw new ActionException(this.name() + ": host is null or empty");
 		if (port == null || port.isEmpty())
 			throw new ActionException(this.name() + ": port is null or empty");
 		if (username == null || username.isEmpty())
@@ -83,13 +83,13 @@ public class VirtuosoBulkImporter implements IAction {
 		//"/data/cmdi2rdf/virtuoso/bin/isql 1111  dba dba exec="ld_dir_all('/data/cmdi2rdf/BIG-files/rdf-output/','*.rdf','http://eko.indarto/tst.rdf');"
 		
 		if(!skip)
-			virtuosoBulkImport = new String[]{bulkImportShellFile, virtuosoHomeDir, port, username, password, rdfDir};
+			virtuosoBulkImport = new String[]{bulkImportShellFile, host + ":" + port, username, password, rdfDir};
 	}
 
 	public Object execute(String path, Object object) throws ActionException {
 		if (!skip) {
 			Split split = SimonManager.getStopwatch("stopwatch.bulkimport").start();
-			boolean status = excuteBulkImport();
+			boolean status = executeBulkImport();
 			split.stop();
 			if (!status) {
 				ERROR_LOG.error("FATAL ERROR, THE BULK IMPORT IS FAILED ---> SYSTEM TERMINATED.");
@@ -101,15 +101,16 @@ public class VirtuosoBulkImporter implements IAction {
 	}
 
 
-private boolean excuteBulkImport() throws ActionException {
-	boolean ok=false;
-		log.info("######## START EXCUTING BULK IMPORT ###############");
+	private boolean executeBulkImport() throws ActionException {
+		boolean ok=false;
+		log.info("######## START EXECUTING BULK IMPORT ###############");
 		for (String s:virtuosoBulkImport)
             log.info("BULK COMMAND: {}", s);
 		
 		long start = System.currentTimeMillis();
-		Collection<File> cf = FileUtils.listFiles(new File(virtuosoBulkImport[5]), new String[]{"rdf", "graph"}, true);
-    log.info("============= Trying to import '{}' files.", cf.size());
+		Collection<File> cf = FileUtils.listFiles(new File(virtuosoBulkImport[virtuosoBulkImport.length-1]),
+									new String[]{"rdf", "graph"}, true);
+    	log.info("============= Trying to import '{}' files.", cf.size());
 		ok = executeIsql(virtuosoBulkImport);
 		
 		if (!ok)
@@ -118,7 +119,7 @@ private boolean excuteBulkImport() throws ActionException {
 		long duration = System.currentTimeMillis() - start;
 		Period p = new Period(duration);
 		log.info("######## END BULK IMPORT ###############");
-		log.info("DURATION: " + p.getHours() + " hours, " + p.getMinutes() + " minutes, " + p.getSeconds() + " secs, " + p.getMillis() + " msec.");
+        log.info("DURATION: {} hours, {} minutes, {} secs, {} msec.", p.getHours(), p.getMinutes(), p.getSeconds(), p.getMillis());
 		return ok;
 	}
 
