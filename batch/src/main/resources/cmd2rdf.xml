@@ -268,7 +268,6 @@
 						</properties>
 					</class>
 				</action>
-				<!--
 				<action>
 					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
 						<properties>
@@ -277,7 +276,6 @@
 						</properties>
 					</class>
 				</action>
-				-->
 				<!--
 				<action>
 					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.TeeAction">
@@ -315,7 +313,6 @@
 						<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.VirtuosoBulkImporter">
 							<properties>
 								<property name="bulkImportShellPath">{shScriptPath}</property>
-								<!--<property name="virtuosoHomeDir">{virtuosoHome}</property>-->
 								<property name="host">virtuoso</property>
 								<property name="port">1111</property>
 								<property name="username">{username}</property>

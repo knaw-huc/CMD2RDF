@@ -1,11 +1,12 @@
 #!/bin/sh
 echo "Executing bulk loader script."
-echo "Virtuoso home directory: $1"
-echo "port: $2"
-echo "username: $3"
-echo "password: $4"
-echo "rdf directory: $5"
-$1/bin/isql $2 $3 $4 exec="ld_dir_all('$5', '*.rdf', 'http://eko.indarto/eko.rdf');"
-$1/bin/isql $2 $3 $4 exec="rdf_loader_run();"
-$1/bin/isql $2 $3 $4 exec="checkpoint;"
+echo "Host / port: $1"
+echo "username: $2"
+echo "password: $3"
+echo "rdf directory: $4"
+
+isql $1 $2 $3 exec="ld_dir_all('$4', '*.rdf', 'http://eko.indarto/eko.rdf');"
+isql $1 $2 $3 exec="rdf_loader_run();"
+isql $1 $2 $3 exec="checkpoint;"
+
 echo "Bulk loader: Finish."
