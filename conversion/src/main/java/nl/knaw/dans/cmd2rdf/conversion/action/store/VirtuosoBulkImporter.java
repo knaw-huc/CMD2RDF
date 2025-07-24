@@ -102,19 +102,26 @@ public class VirtuosoBulkImporter implements IAction {
 
 
 	private boolean executeBulkImport() throws ActionException {
-		boolean ok=false;
+		boolean ok;
 		log.info("######## START EXECUTING BULK IMPORT ###############");
-		for (String s:virtuosoBulkImport)
-            log.info("BULK COMMAND: {}", s);
+		for (String s:virtuosoBulkImport) {
+			log.info("BULK COMMAND: {}", s);
+		}
 		
 		long start = System.currentTimeMillis();
-		Collection<File> cf = FileUtils.listFiles(new File(virtuosoBulkImport[virtuosoBulkImport.length-1]),
-									new String[]{"rdf", "graph"}, true);
+		Collection<File> cf = FileUtils.listFiles(
+										new File(virtuosoBulkImport[virtuosoBulkImport.length-1]),
+										new String[]{"rdf", "graph"}, true);
+		if (cf.isEmpty()) {
+			log.info("No files found to import in '{}'", virtuosoBulkImport[virtuosoBulkImport.length-1]);
+			return true;
+		}
+
     	log.info("============= Trying to import '{}' files.", cf.size());
 		ok = executeIsql(virtuosoBulkImport);
-		
-		if (!ok)
+		if (!ok) {
 			ERROR_LOG.error("ERROR>>>>> BULK IMPORT EXECUTION IS FAILED");
+		}
 		
 		long duration = System.currentTimeMillis() - start;
 		Period p = new Period(duration);
