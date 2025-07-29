@@ -79,7 +79,7 @@
     <xsl:function name="cmd:ppath">
         <xsl:param name="id"/>
         <xsl:param name="ext"/>
-        <xsl:sequence select="concat($registry,'/rest/registry/profiles/',cmd:id($id),'/',$ext)"/>
+        <xsl:sequence select="concat($registry,'/rest/registry/1.x/profiles/',cmd:id($id),'/',$ext)"/>
     </xsl:function>
 
 	<!-- load a profile from the registry -->
@@ -92,7 +92,7 @@
     <xsl:function name="cmd:cpath">
         <xsl:param name="id"/>
         <xsl:param name="ext"/>
-        <xsl:sequence select="concat($registry,'/rest/registry/components/',cmd:id($id),'/',$ext)"/>
+        <xsl:sequence select="concat($registry,'/rest/registry/1.x/components/',cmd:id($id),'/',$ext)"/>
     </xsl:function>
     
 	<!-- load a component from the registry -->

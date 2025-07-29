@@ -14,7 +14,7 @@
     <xsl:include href="CMD2RDF.xsl"/>
 
     <!-- let's create some RDF -->
-    <xsl:template match="/CMD_ComponentSpec">
+    <xsl:template match="/ComponentSpec">
         <!-- for the output base replace the xml extension by rdf -->
         <rdf:RDF xml:base="{if (@isProfile='true') then (cmd:ppath(Header/ID,'rdf')) else (cmd:cpath(Header/ID,'rdf'))}">
             <xsl:apply-templates>
@@ -41,27 +41,27 @@
     </xsl:template>
 
     <!-- fetch the embedded component -->
-    <xsl:template match="CMD_Component[exists(@ComponentId)]">
+    <xsl:template match="Component[exists(@ComponentId)]">
     	<xsl:if test="$fetch_components='true'">
     		<!-- trigger a fetch of the embedded component, so it will be cached -->
     		<xsl:variable name="c" select="cmd:component(@ComponentId)"/>
     		<xsl:comment>
 	        	<xsl:text>External component[</xsl:text>
-	    		<xsl:value-of select="$c/CMD_ComponentSpec/Header/ID"/>
+	    		<xsl:value-of select="$c/ComponentSpec/Header/ID"/>
 	    		<xsl:text>]</xsl:text>
         	</xsl:comment>
-    		<xsl:apply-templates select="$c//CMD_Component[exists(@ComponentId)]"/>
+    		<xsl:apply-templates select="$c//Component[exists(@ComponentId)]"/>
     	</xsl:if>
     </xsl:template>
 
-    <xsl:template name="CMD_Component">
+    <xsl:template name="Component">
         <xsl:param name="context" tunnel="yes"/>
         <!-- extend the context path with this component -->
         <xsl:variable name="id" select="cmd:path($context,@name)"/>
         <!-- a component maps to an RDF class -->
         <rdfs:Class rdf:about="#{$id}">
             <xsl:choose>
-                <xsl:when test="parent::CMD_ComponentSpec/@isProfile='true'">
+                <xsl:when test="parent::ComponentSpec/@isProfile='true'">
                     <rdfs:subClassOf rdf:resource="&cmdm;Profile"/>
                 </xsl:when>
                 <xsl:otherwise>
@@ -87,15 +87,15 @@
     </xsl:template>
 
     <!-- component belonging only to the root profile/component -->
-    <xsl:template match="CMD_Component[empty(@ComponentId)]">
+    <xsl:template match="Component[empty(@ComponentId)]">
         <xsl:param name="context" tunnel="yes"/>
-        <xsl:call-template name="CMD_Component">
+        <xsl:call-template name="Component">
             <xsl:with-param name="context" tunnel="yes" select="$context"/>
         </xsl:call-template>
     </xsl:template>
 
     <!-- a CMD element -->
-    <xsl:template match="CMD_Element">
+    <xsl:template match="Element">
         <xsl:param name="context" tunnel="yes"/>
         <!-- extend the context with this element -->
         <xsl:variable name="id" select="cmd:path($context,@name)"/>
@@ -112,7 +112,7 @@
             <rdfs:domain rdf:resource="#{$id}"/>
             <xsl:choose>
                 <!-- if the value scheme is an enumeration the range consists of the labels of the values -->
-                <xsl:when test="exists(ValueScheme/enumeration)">
+                <xsl:when test="exists(ValueScheme/Vocabulary/enumeration)">
                     <rdfs:range rdf:resource="&xsd;string"/>
                 </xsl:when>
                 <!-- if the value scheme is an XSD datatype the range becomes the equivalent RDF XSD datatype -->
@@ -126,7 +126,7 @@
             </xsl:choose>
         </rdf:Property>
         <!-- if there is an value enumeration also have a hasElementEntity property -->
-        <xsl:if test="exists(ValueScheme/enumeration)">
+        <xsl:if test="exists(ValueScheme/Vocabulary/enumeration)">
             <rdf:Class rdf:about="#{$id}Entity">
                 <rdf:subClassOf rdf:resource="&cmdm;Entity"/>
             </rdf:Class>
@@ -179,7 +179,7 @@
             <rdfs:domain rdf:resource="#{$id}"/>
             <xsl:choose>
                 <!-- if the value scheme is an enumeration the range is the labels -->
-                <xsl:when test="exists(ValueScheme/enumeration)">
+                <xsl:when test="exists(ValueScheme/Vocabulary/enumeration)">
                     <rdfs:range rdf:resource="&xsd;string"/>
                 </xsl:when>
                 <!-- if the value scheme is an XSD datatype the range becomes the equivalent RDF XSD datatype -->
@@ -193,7 +193,7 @@
             </xsl:choose>
         </rdf:Property>
         <!-- if there is an value enumeration also have a hasAttributeEntity property -->
-        <xsl:if test="exists(ValueScheme/enumeration)">
+        <xsl:if test="exists(ValueScheme/Vocabulary/enumeration)">
             <rdf:Class rdf:about="#{$id}Entity">
                 <rdf:subClassOf rdf:resource="&cmdm;Entity"/>
             </rdf:Class>
