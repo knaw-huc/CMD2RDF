@@ -6,6 +6,7 @@ import nl.knaw.dans.cmd2rdf.conversion.action.IAction;
 import nl.knaw.dans.cmd2rdf.conversion.util.Misc;
 import org.apache.commons.io.FileUtils;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
+import org.glassfish.jersey.filter.LoggingFilter;
 import org.javasimon.SimonManager;
 import org.javasimon.Split;
 import org.joda.time.Period;
@@ -111,6 +112,7 @@ public class StoreClient implements IAction {
             HttpAuthenticationFeature authFeature = HttpAuthenticationFeature.digest(userName, password);
             client.register(authFeature);
         }
+        client.register(new BodyLoggingFilter());
 
         LOG.debug("StoreClient variables: ");
         LOG.debug("replacedPrefixBaseURI: {}", replacedPrefixBaseURI);
