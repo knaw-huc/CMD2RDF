@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="2.0" xmlns:dcr="http://www.isocat.org/ns/dcr.rdf#"
-	xmlns:cmd="http://www.clarin.eu/cmd/" xmlns:vlo="http://www.clarin.eu/vlo/"
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0" xmlns:dcr="http://www.isocat.org/ns/dcr.rdf#"
+	xmlns:cmd0="http://www.clarin.eu/cmd/" xmlns:cmd1="http://www.clarin.eu/cmd/1" xmlns:vlo="http://www.clarin.eu/vlo/"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema"
 	xmlns:sx="java:nl.knaw.dans.saxon"
 	xmlns:functx="http://www.functx.com"
-	exclude-result-prefixes="xsl dcr xsi xs sx functx vlo cmd">
+	exclude-result-prefixes="xsl dcr xsi xs sx functx vlo cmd0 cmd1">
 
 	<xsl:output method="xml" encoding="UTF-8"/>
 	
@@ -35,13 +35,13 @@
 	<!-- get the profile id -->
 	<xsl:variable name="profileId">
 		<xsl:choose>
-			<xsl:when test="exists(/cmd:CMD/cmd:Header/cmd:MdProfile)">
+			<xsl:when test="exists((/cmd0:CMD/cmd0:Header/cmd0:MdProfile,/cmd1:CMD/cmd1:Header/cmd1:MdProfile))">
 				<!-- and ignore if there are multiple MdProfile and just take the first!! 
                          although probably this more a case for the schema validation!  -->
-				<xsl:sequence select="cmd:id((/cmd:CMD/cmd:Header/cmd:MdProfile)[1])"/>
+				<xsl:sequence select="cmd0:id((/cmd0:CMD/cmd0:Header/cmd0:MdProfile,/cmd1:CMD/cmd1:Header/cmd1:MdProfile)[1])"/>
 			</xsl:when>
-			<xsl:when test="exists(/cmd:CMD/@xsi:schemaLocation)">
-				<xsl:sequence select="cmd:id(/cmd:CMD/@xsi:schemaLocation)"/>
+			<xsl:when test="exists(/(cmd0:CMD|cmd1:CMD)/@xsi:schemaLocation)">
+				<xsl:sequence select="cmd0:id(/(cmd0:CMD|cmd1:CMD)/@xsi:schemaLocation)"/>
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:message terminate="yes">
@@ -52,16 +52,32 @@
 	</xsl:variable>
 	
 	<!-- load the profile -->
-	<xsl:variable name="profile" select="cmd:profile($profileId)"/>
+	<xsl:variable name="profile" select="cmd0:profile($profileId)"/>
 	
 	<!-- the CMD record -->
 	<xsl:variable name="rec" select="/"/>
 	
 	<!-- namespaces -->
-	<xsl:variable name="ns">
-		<cmd:ns xmlns:cmd="http://www.clarin.eu/cmd/" xmlns:cmdp="http://www.clarin.eu/cmd/" cmdp:foo="bar"/>
+	<xsl:variable name="cmdi_version" select="$rec/*:CMD/@CMDVersion"/>
+	<xsl:variable name="cmd-ns" select="
+		if ($cmdi_version = '1.2')  then
+		'http://www.clarin.eu/cmd/1'
+		else
+		'http://www.clarin.eu/cmd/'"/>
+	<xsl:variable name="cmdp-ns" select="
+		if ($cmdi_version = '1.2')  then
+		concat('http://www.clarin.eu/cmd/1/profiles/',$profileId)
+		else
+		'http://www.clarin.eu/cmd/'"/>              
+
+	<xsl:variable name="NS" as="element()">
+		<xsl:element namespace="{$cmd-ns}" name="cmd:ns">
+			<xsl:if test="exists($cmdp-ns)">
+				<xsl:namespace name="cmdp" select="$cmdp-ns"/>
+			</xsl:if>
+		</xsl:element>
 	</xsl:variable>
-        
+	
         <xsl:template match="/">
             <!-- <xsl:message>INF: Welcome to addVLOFacets.xsl</xsl:message> -->
             <xsl:apply-templates/>
@@ -82,9 +98,9 @@
 			<xsl:choose>
 				<xsl:when test="$multiple">
 					<xpath>
-						<xsl:text>distinct-values(/cmd:CMD/cmd:Components/(cmd:</xsl:text>
+						<xsl:text>distinct-values(/cmd:CMD/cmd:Components/(cmdp:</xsl:text>
 						<xsl:for-each select="$paths">
-							<xsl:value-of select="string-join(ancestor-or-self::*/@name,'/cmd:')"/>
+							<xsl:value-of select="string-join(ancestor-or-self::*/@name,'/cmdp:')"/>
 							<xsl:text>/text()</xsl:text>
 							<xsl:if test="position()!=last()">
 								<xsl:text>,</xsl:text>
@@ -96,8 +112,8 @@
 				<xsl:otherwise>
 					<xsl:for-each select="$paths">
 						<xpath>
-							<xsl:text>/cmd:CMD/cmd:Components/cmd:</xsl:text>
-							<xsl:value-of select="string-join(ancestor-or-self::*/@name,'/cmd:')"/>
+							<xsl:text>/cmd:CMD/cmd:Components/cmdp:</xsl:text>
+							<xsl:value-of select="string-join(ancestor-or-self::*/@name,'/cmdp:')"/>
 							<xsl:text>/text()</xsl:text>
 						</xpath>
 					</xsl:for-each>
@@ -106,7 +122,7 @@
 		</xsl:if>
 	</xsl:function>
 	
-	<xsl:template match="/cmd:CMD">
+	<xsl:template match="/cmd0:CMD|/cmd1:CMD">
 		<xsl:copy>
 			<xsl:attribute name="xml:base" select="base-uri()"/>
 			<xsl:apply-templates select="@*"/>
@@ -119,7 +135,10 @@
 							<xsl:variable name="pos" select="position()"/>
 							<xsl:variable name="xp" select="."/>
 							<!--<xsl:message>DBG: facet concept path[<xsl:value-of select="$xp"/>]</xsl:message>-->
-							<xsl:for-each select="sx:evaluate($rec,$xp,$ns/*)">
+							<xsl:variable name="vals">
+								<xsl:evaluate context-item="$rec" xpath="$xp" namespace-context="$NS" as="xs:string*"/>
+							</xsl:variable>
+							<xsl:for-each select="$vals">
 								<value pos="{$pos}">
 									<xsl:value-of select="."/>
 								</value>
@@ -147,26 +166,34 @@
 								<xsl:for-each select="pattern">
 									<xsl:variable name="pos" select="position()"/>
 									<xsl:variable name="xp" select="."/>
-									<!--<xsl:message>DBG: facet pattern path[<xsl:value-of select="$xp"/>]</xsl:message>--> 
-									<xsl:for-each select="sx:evaluate($rec,$xp,$ns/*)">
+									<xsl:message>DBG: facet pattern path[<xsl:value-of select="$xp"/>]</xsl:message> 
+									<xsl:variable name="vals">
+										<xsl:evaluate context-item="$rec" xpath="$xp" namespace-context="$NS" as="xs:string*"/>
+									</xsl:variable>
+									<xsl:for-each select="$vals">
 										<value pos="{$pos}">
 											<xsl:value-of select="."/>
 										</value>
 									</xsl:for-each>
 								</xsl:for-each>
 							</xsl:variable>
-							<!-- <xsl:message>DBG: facet values[<xsl:value-of select="count($facetValues/*)"/>]</xsl:message>
+							 <xsl:message>DBG: facet values[<xsl:value-of select="count($facetValues/*)"/>]</xsl:message>
 							<xsl:for-each select="$facetValues/*">
 								<xsl:message>[<xsl:value-of select="position()"/>] <xsl:value-of select="."/></xsl:message>
-							</xsl:for-each> -->
+							</xsl:for-each> 
 							<xsl:for-each-group select="$facetValues/*" group-by="@pos">
-								<xsl:if test="position()=1 or empty($facet/@allowMultipleValues) or ($facet/@allowMultipleValues='true')">
-									<xsl:for-each select="current-group()[normalize-space(.)!='']">
-										<xsl:element name="vlo:hasFacet{functx:capitalize-first($facet/@name)}">
-											<xsl:value-of select="."/>
-										</xsl:element>
-									</xsl:for-each>
-								</xsl:if>
+								<xsl:choose>
+									<xsl:when test="position()=1 or empty($facet/@allowMultipleValues) or ($facet/@allowMultipleValues='true')">
+										<xsl:for-each select="current-group()[normalize-space(.)!='']">
+											<xsl:element name="vlo:hasFacet{functx:capitalize-first($facet/@name)}">
+												<xsl:value-of select="."/>
+											</xsl:element>
+										</xsl:for-each>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:message>ERR: no output!</xsl:message>
+									</xsl:otherwise>
+								</xsl:choose>
 							</xsl:for-each-group>
 						</xsl:otherwise>
 					</xsl:choose>
