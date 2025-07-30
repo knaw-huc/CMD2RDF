@@ -3,13 +3,7 @@ package nl.knaw.dans.cmd2rdf.conversion.action.transform;
 import java.io.File;
 import java.util.Map;
 
-import javax.xml.transform.Source;
-import javax.xml.transform.Templates;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.URIResolver;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
@@ -28,13 +22,13 @@ import org.w3c.dom.Node;
  * @author Eko Indarto
  *
  */
-public class XsltTransformer implements IAction{
-    /** 
-     * Simple transformation method. 
-     * @param sourcePath - Absolute path to source xml file. 
-     * @param xsltPath - Absolute path to xslt file. 
-     * @param resultDir - Directory where you want to put resulting files. 
-     */  
+public class XsltTransformer implements IAction {
+    /**
+     * Simple transformation method.
+     * @param sourcePath - Absolute path to source xml file.
+     * @param xsltPath - Absolute path to xslt file.
+     * @param resultDir - Directory where you want to put resulting files.
+     */
 	private static final Logger errLog = LoggerFactory.getLogger("errorlog");
 	private static final Logger log = LoggerFactory.getLogger(XsltTransformer.class);
 	private static CacheService<Object, Object> cacheService;
@@ -43,87 +37,105 @@ public class XsltTransformer implements IAction{
 	private String profilesCacheDir;
 	private String registry;
 	private Map<String, String> params;
-		
-	public XsltTransformer(CacheService<Object, Object> cacheService){
+
+	private enum ClientParams {
+		XSLT_SOURCE("xsltSource"),
+		PROFILES_CACHE_DIR("profilesCacheDir"),
+		REGISTRY("registry");
+
+		private final String name;
+
+		ClientParams(String name) {
+			this.name = name;
+		}
+	}
+
+	public XsltTransformer(CacheService<Object, Object> cacheService) {
 		XsltTransformer.cacheService = cacheService;
-		log.debug("++++++++++++XsltTransformer.cacheService.entries: " + XsltTransformer.cacheService.entries());
+        log.debug("++++++++++++XsltTransformer.cacheService.entries: {}", XsltTransformer.cacheService.entries());
 	}
 	
-	public void startUp(Map<String, String> vars)
-			throws ActionException {
+	public void startUp(Map<String, String> vars) throws ActionException {
 		params = vars;
 		checkRequiredVariables();
-		//startUpCacheService();
+		// startUpCacheService();
 		TransformerFactory transFact = new net.sf.saxon.TransformerFactoryImpl();
-		try {
-                        ExtensionFunctions.registerAll(transFact);
-		} catch (Exception e) {
-			log.error("ERROR: Exception, caused by: " + e.getMessage());
-		}
 		Source src = new StreamSource(xsltSource);
 		try {
 			this.cachedXSLT = transFact.newTemplates(src);
 		} catch (TransformerConfigurationException e) {
-			log.error("ERROR: TransformerConfigurationException, caused by: " + e.getMessage());
+            log.error("ERROR: TransformerConfigurationException, caused by: {}", e.getMessage());
 		}
 	}
 
 	private void checkRequiredVariables() throws ActionException {
-		this.xsltSource = params.get("xsltSource");
-		this.profilesCacheDir = params.get("profilesCacheDir");
-		this.registry = params.get("registry");
-		if (xsltSource == null || xsltSource.isEmpty())
+		this.xsltSource = params.get(ClientParams.XSLT_SOURCE.name);
+		this.profilesCacheDir = params.get(ClientParams.PROFILES_CACHE_DIR.name);
+		this.registry = params.get(ClientParams.REGISTRY.name);
+
+		if (xsltSource == null || xsltSource.isEmpty()) {
 			throw new ActionException("xsltSource is null or empty");
-		if (profilesCacheDir == null || profilesCacheDir.isEmpty())
+		}
+		if (profilesCacheDir == null || profilesCacheDir.isEmpty()) {
 			throw new ActionException("profilesCacheDir is null or empty");
-//		if (registry == null || registry.isEmpty())
-//			throw new ActionException("registry is null or empty");
+		}
+
+		// if (registry == null || registry.isEmpty())
+		//	throw new ActionException("registry is null or empty");
 	}
 	
 	public Object execute(String p,Object o) throws ActionException {
 		Source input = null;
 		DOMResult output = null;
+
 		// prepare input
 		if (o instanceof File) {
 			File file = (File)o;
-			log.debug("Converting '" + file.getAbsolutePath() + "'." );
+            log.debug("Converting '{}'.", file.getAbsolutePath());
 			input = new StreamSource(file);
 		} else if (o instanceof Node) {
 			Node node = (Node)o;
 			input = new DOMSource(node);
-		} else
-			throw new ActionException("Unknown input ("+p+", "+o+")");
+		} else {
+			throw new ActionException("Unknown input (" + p + ", " + o + ")");
+		}
+
 		Split split = null;
 		try {
-			
-			if (xsltSource.endsWith(".xsl"))
+			if (xsltSource.endsWith(".xsl")) {
 				split = SimonManager.getStopwatch("stopwatch.trans1").start();
-			else 
+			} else {
 				split = SimonManager.getStopwatch("stopwatch.trans2").start();
+			}
+
 			URIResolver resolver = (URIResolver) new ClarinProfileResolver(profilesCacheDir, registry, cacheService);
 			Transformer transformer = cachedXSLT.newTransformer();	
 			transformer.setURIResolver(resolver);
+
 			// set parameters
 			for (String param : params.keySet()) {
 				transformer.setParameter(param, params.get(param));
 			}
-			//transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+
+			log.info("Transforming with '{}'.", xsltSource);
+			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			long start = System.currentTimeMillis();
 			output = new DOMResult();
-			transformer.transform(input,  
-					 output);
+			transformer.transform(input, output);
 			long end = System.currentTimeMillis();
-//			log.info("Duration of transformation " + ((end-start)) + " milliseconds");
+
+			log.info("Duration of transformation {} milliseconds", end - start);
 			return output.getNode();
 		} catch (TransformerConfigurationException e) {
-			errLog.error("ERROR: TransformerConfigurationException, caused by: " + e.getCause(), e);
+            errLog.error("ERROR: TransformerConfigurationException, caused by: {}", e.getCause(), e);
 		} catch (TransformerException e) {
-			errLog.error("ERROR: TransformerException, caused by: " + e.getCause(), e);
+            errLog.error("ERROR: TransformerException, caused by: {}", e.getCause(), e);
 		} catch (ActionException e) {
-			errLog.error("ERROR: ConverterException, caused by: " + e.getCause(), e);
+            errLog.error("ERROR: ConverterException, caused by: {}", e.getCause(), e);
 		} finally {
-			if (split != null)
+			if (split != null) {
 				split.stop();
+			}
 		}
 		return false;    
     }     
@@ -133,7 +145,7 @@ public class XsltTransformer implements IAction{
 
 	@Override
 	public String name() {
-		
 		return this.getClass().getName();
 	}
+
 }  
