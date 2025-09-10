@@ -2,12 +2,12 @@
 <CMD2RDF xmlns:xi="http://www.w3.org/2003/XInclude">
 	<config version="1.0">
 		<properties>
-			<property name="homedir">/Users/listj</property>
-			<property name="workspace">{homedir}/Clarin.Work</property>
-			<property name="gitrepo">{homedir}/IdeaProjects/CMD2RDF-SSH</property>
+			<property name="homedir">/app</property>
+			<property name="workspace">{homedir}/work</property>
+			<property name="gitrepo">{homedir}/src/CMD2RDF</property>
 			<property name="harvestedProfilesDir">{workspace}/harvester</property>
 			<property name="xsltSourceDir">{gitrepo}/conversion/src/main/resources/xsl</property>
-			<property name="xmlSourceDir">{homedir}/Clarin.Data/TI_Small</property>
+			<property name="xmlSourceDir">/app/data/clarin/results/cmdi-1_1</property>
 			<property name="urlDB">{workspace}/db/DB_CMD_CHECKSUM</property>
 			<property name="profilesCacheDir">{workspace}/profiles-cache</property>
 			<property name="registry">http://catalog.clarin.eu/ds/ComponentRegistry</property>
