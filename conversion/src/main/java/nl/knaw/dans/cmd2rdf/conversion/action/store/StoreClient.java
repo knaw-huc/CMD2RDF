@@ -180,7 +180,7 @@ public class StoreClient implements IAction {
 
                 // Build named / context IRI
                 UriBuilder uriBuilder = UriBuilder.fromUri(new URI(serverURL));
-                uriBuilder.queryParam(namedGIRIQueryParam, URLEncoder.encode("<" + getGIRI(path) + ">",
+                uriBuilder.queryParam(namedGIRIQueryParam, URLEncoder.encode(getGIRI(path),
                         StandardCharsets.UTF_8.toString()));
                 WebTarget target = client.target(uriBuilder.build());
 
