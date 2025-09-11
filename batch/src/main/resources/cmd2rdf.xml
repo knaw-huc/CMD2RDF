@@ -12,9 +12,9 @@
 			<property name="profilesCacheDir">{workspace}/profiles-cache</property>
 			<property name="registry">http://catalog.clarin.eu/ds/ComponentRegistry</property>
 			<property name="virtuosoHome">/opt/virtuoso-opensource</property>
-			<property name="namedGraphIRIQueryParam">graph-uri</property>
+			<property name="namedGraphIRIQueryParam">context</property>
 			<property name="serverHost">http://localhost:8890</property>
-			<property name="serverURL">{serverHost}/sparql-graph-crud-auth?</property>
+			<property name="serverURL">{serverHost}/repositories/cmd2rdf/statements</property>
 			<property name="username">dba</property>
 			<property name="password">dba</property>
 			<property name="prefixBaseURI">http://localhost:8080/cmd2rdf/graph</property>
