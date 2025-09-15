@@ -19,7 +19,7 @@
     <xsl:param name="vloOutputDir" select="'.'"/>
     
     <xsl:template match="/rdf:RDF">
-        <xsl:message>DBG: out[<xsl:value-of select="concat($vloOutputDir,'/',replace(@xml:base,'.*/graph/',''))"/>]</xsl:message>
+        <!--<xsl:message>DBG: out[<xsl:value-of select="concat($vloOutputDir,'/',replace(@xml:base,'.*/graph/',''))"/>]</xsl:message>-->
         <xsl:result-document href="{resolve-uri(concat($vloOutputDir, '/', replace(@xml:base,'.*/graph/','')))}">
             <xsl:copy>
                 <xsl:apply-templates/>

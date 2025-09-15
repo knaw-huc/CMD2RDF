@@ -24,7 +24,7 @@
 
     <!-- let's create some RDF -->
     <xsl:template match="/(cmd0:CMD|cmd1:CMD)">
-        <xsl:message expand-text="yes">DBG: base[{$base}] base-strip[{$base_strip}] about[{$about}]</xsl:message>
+        <!--<xsl:message expand-text="yes">DBG: base[{$base}] base-strip[{$base_strip}] about[{$about}]</xsl:message>-->
         <rdf:RDF>
             <xsl:attribute name="xml:base" select="$about"/>
         	<rdf:Description rdf:about="{$about}">

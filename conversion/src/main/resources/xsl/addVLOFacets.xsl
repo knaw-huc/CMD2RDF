@@ -166,7 +166,7 @@
 								<xsl:for-each select="pattern">
 									<xsl:variable name="pos" select="position()"/>
 									<xsl:variable name="xp" select="."/>
-									<xsl:message>DBG: facet pattern path[<xsl:value-of select="$xp"/>]</xsl:message> 
+									<!--<xsl:message>DBG: facet pattern path[<xsl:value-of select="$xp"/>]</xsl:message>-->
 									<xsl:variable name="vals">
 										<xsl:evaluate context-item="$rec" xpath="$xp" namespace-context="$NS" as="xs:string*"/>
 									</xsl:variable>
@@ -177,10 +177,10 @@
 									</xsl:for-each>
 								</xsl:for-each>
 							</xsl:variable>
-							 <xsl:message>DBG: facet values[<xsl:value-of select="count($facetValues/*)"/>]</xsl:message>
+						    <!--<xsl:message>DBG: facet values[<xsl:value-of select="count($facetValues/*)"/>]</xsl:message>
 							<xsl:for-each select="$facetValues/*">
 								<xsl:message>[<xsl:value-of select="position()"/>] <xsl:value-of select="."/></xsl:message>
-							</xsl:for-each> 
+							</xsl:for-each>-->
 							<xsl:for-each-group select="$facetValues/*" group-by="@pos">
 								<xsl:choose>
 									<xsl:when test="position()=1 or empty($facet/@allowMultipleValues) or ($facet/@allowMultipleValues='true')">
