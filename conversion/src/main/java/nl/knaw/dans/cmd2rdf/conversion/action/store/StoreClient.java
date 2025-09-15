@@ -52,6 +52,7 @@ public class StoreClient implements IAction {
     private String serverURL;
     private ActionStatus actionStatus;
     private String namedGIRIQueryParam;
+    private boolean namedGIRIEncloseWithBrackets = false;
     private String prefixBaseURI;
 
     private enum ClientParams {
@@ -62,7 +63,8 @@ public class StoreClient implements IAction {
         USER_NAME("username"),
         PASSWORD("password"),
         ACTION("action"),
-        DEBUG_STORE_HTTP_REQUEST_RESPONSE("debugStoreHttpRequestResponse");
+        DEBUG_STORE_HTTP_REQUEST_RESPONSE("debugStoreHttpRequestResponse"),
+        NAMED_GRAPH_IRI_ENCLOSE_WITH_BRACKETS("namedGraphIRIEncloseWithBrackets");
 
         private final String val;
 
@@ -79,6 +81,7 @@ public class StoreClient implements IAction {
         password = vars.get(ClientParams.PASSWORD.val);
         serverURL = vars.get(ClientParams.SERVER_URL.val);
         namedGIRIQueryParam = vars.get(ClientParams.NAMED_GRAPH_IRI_QUERY_PARAM.val);
+        namedGIRIEncloseWithBrackets = Boolean.parseBoolean(vars.get(ClientParams.NAMED_GRAPH_IRI_ENCLOSE_WITH_BRACKETS.val));
         prefixBaseURI = vars.get(ClientParams.PREFIX_BASE_URI.val);
         String prefixBaseURI = vars.get(ClientParams.PREFIX_BASE_URI.val);
 
@@ -177,10 +180,9 @@ public class StoreClient implements IAction {
                 // Build named / context IRI
                 UriBuilder uriBuilder = UriBuilder.fromUri(new URI(serverURL));
                 String giri = getGIRI(path);
-                if (namedGIRIQueryParam != null && !namedGIRIQueryParam.isEmpty()) {
-                    uriBuilder.queryParam(namedGIRIQueryParam,
-                                          URLEncoder.encode(giri, StandardCharsets.UTF_8.toString()));
-                }
+                uriBuilder.queryParam(namedGIRIQueryParam, URLEncoder.encode(
+                        namedGIRIEncloseWithBrackets ? "<" + giri + ">" : giri,
+                        StandardCharsets.UTF_8.toString()));
                 WebTarget target = client.target(uriBuilder.build());
 
                 // Do request
