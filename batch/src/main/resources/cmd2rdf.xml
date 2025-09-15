@@ -13,6 +13,7 @@
 			<property name="registry">http://catalog.clarin.eu/ds/ComponentRegistry</property>
 			<property name="virtuosoHome">/opt/virtuoso-opensource</property>
 			<property name="namedGraphIRIQueryParam">context</property>
+			<property name="namedGraphIRIEncloseWithBrackets">true</property>
 			<property name="serverHost">http://graphdb:7200</property>
 			<property name="serverURL">{serverHost}/repositories/cmd2rdf/statements</property>
 			<property name="username">dba</property>
