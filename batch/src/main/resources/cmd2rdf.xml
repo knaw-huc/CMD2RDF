@@ -7,7 +7,7 @@
 			<property name="gitrepo">{homedir}/src/CMD2RDF</property>
 			<property name="harvestedProfilesDir">{workspace}/harvester</property>
 			<property name="xsltSourceDir">{gitrepo}/conversion/src/main/resources/xsl</property>
-			<property name="xmlSourceDir">/app/data/clarin/results/cmdi</property>
+            <property name="xmlSourceDir">/app/data/clarin/results/cmdi</property>
 			<property name="urlDB">{workspace}/db/DB_CMD_CHECKSUM</property>
 			<property name="profilesCacheDir">{workspace}/profiles-cache</property>
 			<property name="registry">http://catalog.clarin.eu/ds/ComponentRegistry</property>
@@ -35,6 +35,16 @@
 					</properties>
 				</class>
 			</action>
+			<!--<action name="fetch">
+				<class name="nl.knaw.dans.cmd2rdf.conversion.action.harvester.OaipmhHarvester">
+					<properties>
+						<property name="oaipmhBaseURL">https://openskos.meertens.knaw.nl/oai-pmh</property>
+						<property name="prefix">oai_rdf</property>
+						<property name="set">meertens:VLO-orgs</property>
+						<property name="outputFile">{harvestedProfilesDir}/meertens-VLO-orgs.rdf</property>
+					</properties>
+				</class>
+			</action>-->
 			<action>
 				<class name="nl.knaw.dans.cmd2rdf.conversion.action.db.MD5ChecksumDBAction">
 					<properties>
@@ -47,80 +57,34 @@
 	</prepare>
 	<records>
 		<!-- xml size > 0 and <= 10K -->
-		<record desc="xml size greater than 0 and smaller or equals 10K" filter="NEW UPDATE"
-				nThreads="32" xmlLimitSizeMax="10240" xmlSource="{urlDB}">
+		<record desc="xml size greater than 0 and smaller or equals 10K" filter="NEW UPDATE" nThreads="32" xmlLimitSizeMax="10240" xmlSource="{urlDB}">
 			<actions>
-				<action name="addVLOFacetsTransform">
+				<action name="transform">
 					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
 						<properties>
 							<property name="xsltSource">{xsltSourceDir}/addVLOFacets.xsl</property>
 						</properties>
 					</class>
 				</action>
-				<action name="cmdRecord2RdfTransform">
+				<action name="transform">
 					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
 						<properties>
-							<property name="xsltSource">{xsltSourceDir}/CMDRecord2RDF.xsl</property>
-							<property name="base_strip">{xmlSourceDir}</property>
-							<property name="base_add">{prefixBaseURI}</property>
+							<property name="xsltSource">{xsltSourceDir}/addOST.xsl</property>
 						</properties>
 					</class>
 				</action>
-				<action name="addOrganisationEntityTransform">
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
-						<properties>
-							<property name="xsltSource">{xsltSourceDir}/addOrganisationEntity.xsl</property>
-							<property name="VLO-orgs">{harvestedProfilesDir}/meertens-VLO-orgs.rdf</property>
-						</properties>
-					</class>
-				</action>
-				<action name="addLanguageEntityTransform">
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
-						<properties>
-							<property name="xsltSource">{xsltSourceDir}/addLanguageEntity.xsl</property>
-						</properties>
-					</class>
-				</action>
-				<action name="saveVLOTransform">
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
-						<properties>
-							<property name="xsltSource">{xsltSourceDir}/saveVLO.xsl</property>
-							<property name="vloOutputDir">{homedir}/vlo</property>
-						</properties>
-					</class>
-				</action>
-				<action name="storeRDF">
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.StoreClient">
+				<!--
+				<action>
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.TeeAction">
 						<properties>
 							<property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
 							<property name="prefixBaseURI">{prefixBaseURI}</property>
-							<property name="action">POST</property>
+							<property name="teeOutputDir">{homedir}/tee/xml</property>
 						</properties>
 					</class>
 				</action>
-				<action name="md5Checksum">
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.db.MD5ChecksumDBAction">
-						<properties>
-							<property name="urlDB">{urlDB}</property>
-							<property name="action">UPDATE</property>
-							<property name="status">DONE</property>
-						</properties>
-					</class>
-				</action>
-			</actions>
-		</record>
-		<!-- xml size > 10K and <= 100K -->
-		<record desc="xml size greater than 10 and smaller or equals 100K" filter="NEW UPDATE"
-				nThreads="16" xmlLimitSizeMin="10241" xmlLimitSizeMax="102400" xmlSource="{urlDB}">
-			<actions>
-				<action name="addVLOFacetsTransform">
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
-						<properties>
-							<property name="xsltSource">{xsltSourceDir}/addVLOFacets.xsl</property>
-						</properties>
-					</class>
-				</action>
-				<action name="cmdRecord2RdfTransform">
+				-->
+				<action name="transform">
 					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
 						<properties>
 							<property name="xsltSource">{xsltSourceDir}/CMDRecord2RDF.xsl</property>
@@ -129,73 +93,7 @@
 						</properties>
 					</class>
 				</action>
-				<action name="addOrganisationEntityTransform">
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
-						<properties>
-							<property name="xsltSource">{xsltSourceDir}/addOrganisationEntity.xsl</property>
-							<property name="VLO-orgs">{harvestedProfilesDir}/meertens-VLO-orgs.rdf</property>
-						</properties>
-					</class>
-				</action>
-				<action name="addLanguageEntityTransform">
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
-						<properties>
-							<property name="xsltSource">{xsltSourceDir}/addLanguageEntity.xsl</property>
-						</properties>
-					</class>
-				</action>
-				<action name="saveVLOTransform">
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
-						<properties>
-							<property name="xsltSource">{xsltSourceDir}/saveVLO.xsl</property>
-							<property name="vloOutputDir">{homedir}/vlo</property>
-						</properties>
-					</class>
-				</action>
-				<action name="storeRDF">
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.StoreClient">
-						<properties>
-							<property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
-							<property name="prefixBaseURI">{prefixBaseURI}</property>
-							<property name="action">POST</property>
-						</properties>
-					</class>
-				</action>
-				<action name="md5Checksum">
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.db.MD5ChecksumDBAction">
-						<properties>
-							<property name="urlDB">{urlDB}</property>
-							<property name="action">UPDATE</property>
-							<property name="status">DONE</property>
-						</properties>
-					</class>
-				</action>
-			</actions>
-		</record>
-		<!-- xml size > 100K -->
-		<record desc="xml size greater than 100K" filter="NEW UPDATE" nThreads="1" xmlLimitSizeMin="102401"
-				xmlSource="{urlDB}">
-			<actions>
-				<action name="addVLOFacets">
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
-						<properties>
-							<property name="xsltSource">{xsltSourceDir}/addVLOFacets.xsl</property>
-						</properties>
-					</class>
-				</action>
-				<action name="cmdRecord2RdfTransform">
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
-						<properties>
-							<property name="xsltSource">{xsltSourceDir}/CMDRecord2RDF.xsl</property>
-							<!-- Is this file: prefix really needed??? It turns out this causes xml:base generation
-							     to go wrong in CMDRecord2RDF.xsl - it turns up empty. -->
-							<!-- <property name="base_strip">file:{xmlSourceDir}</property> -->
-							<property name="base_strip">{xmlSourceDir}</property>
-							<property name="base_add">{prefixBaseURI}</property>
-						</properties>
-					</class>
-				</action>
-				<action name="addOrganisationEntityTransform">
+				<action>
 					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
 						<properties>
 							<property name="xsltSource">{xsltSourceDir}/addOrganisationEntity.xsl</property>
@@ -210,7 +108,7 @@
 						</properties>
 					</class>
 				</action>
-				<action name="saveVLOTransform">
+				<action>
 					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
 						<properties>
 							<property name="xsltSource">{xsltSourceDir}/saveVLO.xsl</property>
@@ -218,7 +116,18 @@
 						</properties>
 					</class>
 				</action>
-				<action name="storeRDF">
+				<!--
+				<action>
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.TeeAction">
+						<properties>
+							<property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
+							<property name="prefixBaseURI">{prefixBaseURI}</property>
+							<property name="teeOutputDir">{homedir}/tee/rdf</property>
+						</properties>
+					</class>
+				</action>
+				-->
+				<action>
 					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.StoreClient">
 						<properties>
 							<property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
@@ -227,7 +136,178 @@
 						</properties>
 					</class>
 				</action>
-				<action name="md5Checksum">
+				<action>
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.db.MD5ChecksumDBAction">
+						<properties>
+							<property name="urlDB">{urlDB}</property>
+							<property name="action">UPDATE</property>
+							<property name="status">DONE</property>
+						</properties>
+					</class>
+				</action>
+			</actions>
+		</record>
+		<!-- xml size > 10K and <= 100K -->
+		<record desc="xml size greater than 10 and smaller or equals 100K" filter="NEW UPDATE" nThreads="16" xmlLimitSizeMin="10241" xmlLimitSizeMax="102400" xmlSource="{urlDB}">
+			<actions>
+				<action name="transform">
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
+						<properties>
+							<property name="xsltSource">{xsltSourceDir}/addVLOFacets.xsl</property>
+						</properties>
+					</class>
+				</action>
+				<!--
+				<action>
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.TeeAction">
+						<properties>
+							<property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
+							<property name="prefixBaseURI">{prefixBaseURI}</property>
+							<property name="teeOutputDir">{homedir}/tee/xml</property>
+						</properties>
+					</class>
+				</action>
+				-->
+				<action name="transform">
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
+						<properties>
+							<property name="xsltSource">{xsltSourceDir}/CMDRecord2RDF.xsl</property>
+							<property name="base_strip">{xmlSourceDir}</property>
+							<property name="base_add">{prefixBaseURI}</property>
+						</properties>
+					</class>
+				</action>
+				<action>
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
+						<properties>
+							<property name="xsltSource">{xsltSourceDir}/addOrganisationEntity.xsl</property>
+							<property name="VLO-orgs">{harvestedProfilesDir}/meertens-VLO-orgs.rdf</property>
+						</properties>
+					</class>
+				</action>
+				<action>
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
+						<properties>
+							<property name="xsltSource">{xsltSourceDir}/addLanguageEntity.xsl</property>
+						</properties>
+					</class>
+				</action>
+				<action>
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
+						<properties>
+							<property name="xsltSource">{xsltSourceDir}/saveVLO.xsl</property>
+							<property name="vloOutputDir">{homedir}/vlo</property>
+						</properties>
+					</class>
+				</action>
+				<!--
+				<action>
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.TeeAction">
+						<properties>
+							<property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
+							<property name="prefixBaseURI">{prefixBaseURI}</property>
+							<property name="teeOutputDir">{homedir}/tee/rdf</property>
+						</properties>
+					</class>
+				</action>
+				-->
+				<action>
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.StoreClient">
+						<properties>
+							<property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
+							<property name="prefixBaseURI">{prefixBaseURI}</property>
+							<property name="action">POST</property>
+						</properties>
+					</class>
+				</action>
+				<action>
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.db.MD5ChecksumDBAction">
+						<properties>
+							<property name="urlDB">{urlDB}</property>
+							<property name="action">UPDATE</property>
+							<property name="status">DONE</property>
+						</properties>
+					</class>
+				</action>
+			</actions>
+		</record>
+		<!-- xml size > 100K -->
+		<record desc="xml size greater than 100K" filter="NEW UPDATE" nThreads="1" xmlLimitSizeMin="102401" xmlSource="{urlDB}">
+			<actions>
+				<action name="transform">
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
+						<properties>
+							<property name="xsltSource">{xsltSourceDir}/addVLOFacets.xsl</property>
+						</properties>
+					</class>
+				</action>
+				<!--
+				<action>
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.TeeAction">
+						<properties>
+							<property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
+							<property name="prefixBaseURI">{prefixBaseURI}</property>
+							<property name="teeOutputDir">{homedir}/tee/xml</property>
+						</properties>
+					</class>
+				</action>
+				-->
+				<action name="transform">
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
+						<properties>
+							<property name="xsltSource">{xsltSourceDir}/CMDRecord2RDF.xsl</property>
+							<!-- Is this file: prefix really needed??? It turns out this causes xml:base generation
+							     to go wrong in CMDRecord2RDF.xsl - it turns up empty. -->
+							<!-- <property name="base_strip">file:{xmlSourceDir}</property> -->
+							<property name="base_strip">{xmlSourceDir}</property>
+							<property name="base_add">{prefixBaseURI}</property>
+						</properties>
+					</class>
+				</action>
+				<action>
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
+						<properties>
+							<property name="xsltSource">{xsltSourceDir}/addOrganisationEntity.xsl</property>
+							<property name="VLO-orgs">{harvestedProfilesDir}/meertens-VLO-orgs.rdf</property>
+						</properties>
+					</class>
+				</action>
+				<action>
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
+						<properties>
+							<property name="xsltSource">{xsltSourceDir}/addLanguageEntity.xsl</property>
+						</properties>
+					</class>
+				</action>
+				<action>
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
+						<properties>
+							<property name="xsltSource">{xsltSourceDir}/saveVLO.xsl</property>
+							<property name="vloOutputDir">{homedir}/vlo</property>
+						</properties>
+					</class>
+				</action>
+				<!--
+				<action>
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.TeeAction">
+						<properties>
+							<property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
+							<property name="prefixBaseURI">{prefixBaseURI}</property>
+							<property name="teeOutputDir">{homedir}/tee/rdf</property>
+						</properties>
+					</class>
+				</action>
+				-->
+                <action>
+                    <class name="nl.knaw.dans.cmd2rdf.conversion.action.store.StoreClient">
+                        <properties>
+                            <property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
+                            <property name="prefixBaseURI">{prefixBaseURI}</property>
+                            <property name="action">POST</property>
+                        </properties>
+                    </class>
+                </action>
+				<action>
 					<class name="nl.knaw.dans.cmd2rdf.conversion.action.db.MD5ChecksumDBAction">
 						<properties>
 							<property name="urlDB">{urlDB}</property>
@@ -266,18 +346,16 @@
 	</records>
 	<profiles>
 		<!-- convert all the profiles we encountered into RDF -->
-		<profile desc="Convert all the profiles we encountered into RDF"
-				 xmlSource="{profilesCacheDir}"
-				 filter="clarin.eu_cr1_p_*.xml">
+		<profile desc="Convert all the profiles we encountered into RDF" xmlSource="{profilesCacheDir}" filter="clarin.eu_cr1_p_*.xml">
 			<actions>
-				<action name="component2RdfTransform">
+				<action name="transform">
 					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
 						<properties>
 							<property name="xsltSource">{xsltSourceDir}/Component2RDF.xsl</property>
 						</properties>
 					</class>
 				</action>
-				<action name="storeRDF">
+				<action>
 					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.StoreClient">
 						<properties>
 							<property name="replacedPrefixBaseURI">{profilesCacheDir}</property>
@@ -291,11 +369,9 @@
 	</profiles>
 	<components>
 		<!-- convert all the components we encountered into RDF -->
-		<component desc="Convert all the components we encountered into RDF"
-				   xmlSource="{profilesCacheDir}"
-				   filter="clarin.eu_cr1_c_*.xml">
+		<component desc="Convert all the components we encountered into RDF" xmlSource="{profilesCacheDir}" filter="clarin.eu_cr1_c_*.xml">
 			<actions>
-				<action name="component2RdfTransform">
+				<action name="transform">
 					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
 						<properties>
 							<property name="xsltSource">{xsltSourceDir}/Component2RDF.xsl</property>
@@ -303,7 +379,7 @@
 						</properties>
 					</class>
 				</action>
-				<action name="storeRDF">
+				<action>
 					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.StoreClient">
 						<properties>
 							<property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
@@ -317,7 +393,7 @@
 	</components>
 	<cleanup>
 		<actions>
-			<action name="md5Checksum">
+			<action>
 				<class name="nl.knaw.dans.cmd2rdf.conversion.action.db.MD5ChecksumDBAction">
 					<properties>
 						<property name="urlDB">{urlDB}</property>
