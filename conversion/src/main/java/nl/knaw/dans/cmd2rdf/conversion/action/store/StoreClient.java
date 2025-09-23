@@ -26,12 +26,9 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -105,6 +102,7 @@ public class StoreClient implements IAction {
         }
 
         actionStatus = Misc.convertToActionStatus(action);
+
         client = ClientBuilder.newClient();
         if (credentialsProvided()) {
             LOG.info("Using provided credentials for user '{}' for HTTP authentication", userName);
@@ -180,9 +178,7 @@ public class StoreClient implements IAction {
                 // Build named / context IRI
                 UriBuilder uriBuilder = UriBuilder.fromUri(new URI(serverURL));
                 String giri = getGIRI(path);
-                uriBuilder.queryParam(namedGIRIQueryParam, URLEncoder.encode(
-                        namedGIRIEncloseWithBrackets ? "<" + giri + ">" : giri,
-                        StandardCharsets.UTF_8.toString()));
+                uriBuilder.queryParam(namedGIRIQueryParam, namedGIRIEncloseWithBrackets ? "<" + giri + ">" : giri);
                 WebTarget target = client.target(uriBuilder.build());
 
                 // Do request
@@ -212,10 +208,7 @@ public class StoreClient implements IAction {
                 ERROR_LOG.error("ERROR: URISyntaxException, caused by {}", e.getMessage(), e);
             } catch (IllegalArgumentException e) {
                 ERROR_LOG.error("ERROR: IllegalArgumentException, caused by {}", e.getMessage(), e);
-            } catch (UnsupportedEncodingException e) {
-                ERROR_LOG.error("ERROR: UnsupportedEncodingException, caused by {}", e.getMessage(), e);
             }
-        } else {
             throw new ActionException("Unknown input (" + path + ", " + object + ")");
         }
 
