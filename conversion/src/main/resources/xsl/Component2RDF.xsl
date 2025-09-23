@@ -15,8 +15,15 @@
 
     <!-- let's create some RDF -->
     <xsl:template match="/ComponentSpec">
+        <xsl:variable name="baseUri"
+                      select="if (@isProfile='true')
+                then cmd:ppath(Header/ID,'rdf')
+                else cmd:cpath(Header/ID,'rdf')" />
         <!-- for the output base replace the xml extension by rdf -->
-        <rdf:RDF xml:base="{if (@isProfile='true') then (cmd:ppath(Header/ID,'rdf')) else (cmd:cpath(Header/ID,'rdf'))}">
+        <rdf:RDF>
+            <xsl:attribute name="xml:base">
+                <xsl:value-of select="$baseUri"/>
+            </xsl:attribute>
             <xsl:apply-templates>
                 <xsl:with-param name="context" tunnel="yes" select="''"/>
             </xsl:apply-templates>

@@ -12,6 +12,7 @@
 			<property name="profilesCacheDir">{workspace}/profiles-cache</property>
 			<property name="registry">http://catalog.clarin.eu/ds/ComponentRegistry</property>
 			<property name="virtuosoHome">/opt/virtuoso-opensource</property>
+			<property name="namedGraphIRIQueryParam">graph-uri</property>
 			<property name="serverHost">http://localhost:8890</property>
 			<property name="serverURL">{serverHost}/sparql-graph-crud-auth?</property>
 			<property name="username">dba</property>
@@ -126,7 +127,7 @@
 				</action>
 				-->
 				<action>
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.VirtuosoClient">
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.StoreClient">
 						<properties>
 							<property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
 							<property name="prefixBaseURI">{prefixBaseURI}</property>
@@ -210,7 +211,7 @@
 				</action>
 				-->
 				<action>
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.VirtuosoClient">
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.StoreClient">
 						<properties>
 							<property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
 							<property name="prefixBaseURI">{prefixBaseURI}</property>
@@ -254,7 +255,10 @@
 					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
 						<properties>
 							<property name="xsltSource">{xsltSourceDir}/CMDRecord2RDF.xsl</property>
-							<property name="base_strip">file:{xmlSourceDir}</property>
+							<!-- Is this file: prefix really needed??? It turns out this causes xml:base generation
+							     to go wrong in CMDRecord2RDF.xsl - it turns up empty. -->
+							<!-- <property name="base_strip">file:{xmlSourceDir}</property> -->
+							<property name="base_strip">{xmlSourceDir}</property>
 							<property name="base_add">{prefixBaseURI}</property>
 						</properties>
 					</class>
@@ -319,7 +323,7 @@
 						<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.VirtuosoBulkImporter">
 							<properties>
 								<property name="bulkImportShellPath">{shScriptPath}</property>
-								<property name="virtuosoHomeDir">{virtuosoHome}</property>
+								<property name="host">virtuoso</property>
 								<property name="port">1111</property>
 								<property name="username">{username}</property>
 								<property name="password">{password}</property>
@@ -328,9 +332,9 @@
 						</class>
 					</action>
 					<action name="Deleting rdf output file temp">
-						<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.RemoveDirectory">
+						<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.CleanDirectory">
 							<properties>
-								<property name="directoryToRemove">{tmpOutDir}/temp</property>
+								<property name="directory">{tmpOutDir}/temp</property>
 							</properties>
 						</class>
 					</action>
@@ -350,7 +354,7 @@
 					</class>
 				</action>
 				<action>
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.VirtuosoClient">
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.StoreClient">
 						<properties>
 							<property name="replacedPrefixBaseURI">{profilesCacheDir}</property>
 							<property name="prefixBaseURI">https://catalog.clarin.eu/ds/cmd2rdf/graph/profile</property>
