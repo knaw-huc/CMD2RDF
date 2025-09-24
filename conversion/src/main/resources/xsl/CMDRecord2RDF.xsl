@@ -6,7 +6,7 @@
     <!ENTITY cmdm 'http://www.clarin.eu/cmd/general.rdf#'>
     <!ENTITY oa 'http://www.w3.org/ns/oa#'>
 ]>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0" xmlns:dcr="http://www.isocat.org/ns/dcr.rdf#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:cmd0="http://www.clarin.eu/cmd/" xmlns:cmd1="http://www.clarin.eu/cmd/1" xmlns:cmdm="http://www.clarin.eu/cmd/general.rdf#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:oa="http://www.w3.org/ns/oa#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:vlo="http://www.clarin.eu/vlo/"  xmlns:cmdi="http://www.clarin.eu/cmdi/">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0" xmlns:dcr="http://www.isocat.org/ns/dcr.rdf#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:cmd0="http://www.clarin.eu/cmd/" xmlns:cmd1="http://www.clarin.eu/cmd/1" xmlns:cmdm="http://www.clarin.eu/cmd/general.rdf#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:oa="http://www.w3.org/ns/oa#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:vlo="http://www.clarin.eu/vlo/"  xmlns:cmdi="http://www.clarin.eu/cmdi/" xmlns:ost="https://ostrails.eu/">
 
     <xsl:output method="xml" encoding="UTF-8"/>
 
@@ -69,6 +69,9 @@
             <xsl:apply-templates select="(cmd0:Header|cmd1:Header)"/>
         	<rdf:Description rdf:about="{$about}">
         		<xsl:apply-templates select="vlo:*"/>
+        	    <ost:hasSKG>
+        	        <xsl:copy-of select="OST/*"/>
+        	    </ost:hasSKG>
         	</rdf:Description>
         </rdf:RDF>
     </xsl:template>

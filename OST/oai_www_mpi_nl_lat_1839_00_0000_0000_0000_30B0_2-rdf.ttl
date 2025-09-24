@@ -1,0 +1,728 @@
+@prefix cmd0: <http://www.clarin.eu/cmd/> .
+@prefix cmd1: <http://www.clarin.eu/cmd/1> .
+@prefix cmdi: <http://www.clarin.eu/cmdi/> .
+@prefix cmdm: <http://www.clarin.eu/cmd/general.rdf#> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix dcr: <http://www.isocat.org/ns/dcr.rdf#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix oa: <http://www.w3.org/ns/oa#> .
+@prefix ore: <http://www.openarchives.org/ore/terms/> .
+@prefix ost: <https://ostrails.eu/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vlo: <http://www.clarin.eu/vlo/> .
+@prefix xsi: <http://www.w3.org/2001/XMLSchema-instance> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml> cmdi:inRepository <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml> ;
+	rdfs:label "Barbsch L1 ()" ;
+	a oa:Annotation ;
+	oa:hasTarget <https://hdl.handle.net/1839/00-0000-0000-0000-37EE-3> .
+
+<https://hdl.handle.net/1839/00-0000-0000-0000-37EE-3> a cmdm:Resource .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml> oa:hasTarget <https://hdl.handle.net/1839/00-0000-0000-0000-37EF-1> .
+
+<https://hdl.handle.net/1839/00-0000-0000-0000-37EF-1> a cmdm:Resource .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml> oa:hasTarget <https://hdl.handle.net/1839/00-0000-0000-0000-37F0-C> .
+
+<https://hdl.handle.net/1839/00-0000-0000-0000-37F0-C> a cmdm:Resource ;
+	cmdm:hasMimeType "text/html" .
+@prefix : <http://catalog.clarin.eu/ds/ComponentRegistry/rest/registry/1.x/profiles/clarin.eu:cr1:p_1407745712064/rdf#> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml> oa:hasBody <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> a :lat-corpus ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e578> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e578> a :lat-corpus_History ;
+	:lat-corpus_hasHistoryElementValue """NAME:imdi2cmdi.xslt
+              DATE:2016-09-09T16:04:50.512+02:00."""^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e580> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e580> a :lat-corpus_Name ;
+	:lat-corpus_hasNameElementValue "Barbsch L1"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e582> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e582> a :lat-corpus_Title ;
+	:lat-corpus_hasTitleElementValue "Barbsch L1"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e584> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e584> a :lat-corpus_InfoLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e586> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e586> a :lat-corpus_InfoLink_Description ;
+	:lat-corpus_InfoLink_hasDescriptionElementValue """MPI Project Temporality -
+                  Experiment description"""^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e589> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e589> a :lat-corpus_InfoLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e591> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e591> a :lat-corpus_InfoLink_Description ;
+	:lat-corpus_InfoLink_hasDescriptionElementValue """MPI Project Temporality -
+                  Legend"""^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e595> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e595> a :lat-corpus_InfoLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e597> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e597> a :lat-corpus_InfoLink_Description ;
+	:lat-corpus_InfoLink_hasDescriptionElementValue "Stimuli"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e600> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e600> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e602> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e602> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind01_VAN"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e605> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e605> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e607> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e607> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind02_MAI"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e610> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e610> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e612> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e612> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind03_TIM"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e615> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e615> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e617> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e617> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind04_BART"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e620> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e620> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e622> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e622> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind05_DAN"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e626> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e626> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e628> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e628> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind06_KLAAS"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e631> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e631> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e633> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e633> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind07_LIS"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e636> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e636> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e638> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e638> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind08_MEI"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e641> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e641> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e643> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e643> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind09_ANSO"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e646> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e646> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e648> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e648> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind10_HEN"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e651> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e651> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e653> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e653> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind11_JAN"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e657> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e657> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e659> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e659> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind12_HAN"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e662> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e662> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e664> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e664> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind13_JUST"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e667> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e667> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e669> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e669> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind14_ELI"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e672> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e672> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e674> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e674> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind15_AND"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e677> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e677> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e679> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e679> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind16_STEF"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e682> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e682> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e684> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e684> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind17_MARV"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e688> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e688> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e690> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e690> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind17b_LOR"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e693> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e693> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e695> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e695> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind18_ANDNI"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e698> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e698> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e700> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e700> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind18b_SAR"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e703> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e703> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e705> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e705> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind19_NICK"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e708> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e708> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e710> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e710> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind20_FE"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e713> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e713> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e715> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e715> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind21_ISA"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e719> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e719> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e721> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e721> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind22_JON"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e724> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e724> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e726> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e726> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind23_MAR"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e729> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e729> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e731> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e731> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind24_LARI"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e734> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e734> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e736> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e736> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind25_JOH"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e739> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e739> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e741> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e741> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind26_KERM"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e744> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e744> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e746> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e746> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind27_NIC"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e750> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e750> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e752> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e752> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind28_ANN"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e755> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e755> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e757> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e757> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind29_DORK"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e760> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e760> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e762> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e762> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind30_CED"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e765> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e765> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e767> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e767> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind31_LEV"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e770> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e770> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e772> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e772> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind32_NIN"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e775> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e775> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e777> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e777> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind33_VER"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e781> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e781> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e783> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e783> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind34_JUL"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e786> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e786> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e788> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e788> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind35_NICZ"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e791> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e791> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e793> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e793> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind36_CHRIS"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e796> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e796> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e798> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e798> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind37_KATR"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e801> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e801> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e803> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e803> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind38_MAIZ"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e806> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e806> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e808> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e808> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind39_RAF"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e812> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e812> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e814> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e814> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind40_REN"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e817> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e817> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e819> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e819> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind41_MAART"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e822> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e822> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e824> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e824> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind42_ANIK"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e827> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e827> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e829> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e829> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind43_MICH"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e832> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e832> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e834> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e834> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind43b_JULI"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e837> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e837> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e839> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e839> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind44_SVEN"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e843> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e843> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e845> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e845> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind44b_MIL"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e848> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e848> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e850> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e850> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind45_CIR_bil"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e853> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e853> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e855> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e855> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind45b_BIENE"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e858> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e858> a :lat-corpus_CorpusLink ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e860> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e860> a :lat-corpus_CorpusLink_Name ;
+	:lat-corpus_CorpusLink_hasNameElementValue "Kind46_RIO"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e863> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e863> a :lat-corpus_Catalogue ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e865> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e865> a :lat-corpus_Catalogue_descriptions ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e867> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e867> a :lat-corpus_Catalogue_descriptions_Description ;
+	:lat-corpus_Catalogue_descriptions_hasDescriptionElementValue """Description of the \"Lamp\" experiment Children were asked to carry out two
+                      tasks: 1. To watch a short clip on a laptop, which shows lamps being switched
+                      on and off in a particular temporal constellation (see stimuli) 2. After
+                      watching the clip, childern had to act-out the clip by using real lamps
+                      standing on a table in front of them. 3. The last task was to verbalize the
+                      temporal constellation in the movie shown to them. The order of tasks number
+                      (2) and (3) were counterbalanced. That is, half of the children acted-out
+                      before they retold the stimulus and half of the children first verbalized the
+                      content of the clip and then acted-out. In all cases, children were watching
+                      the stimulus together with the chief investigator and acted-out and retold it
+                      to an assistant who was also present in the room. The assistant, however, did
+                      not watch the stimulus. The child was asked to inform the assistant about the
+                      content of the clip so that she could imagine what it was about. In this
+                      manner, the child was motivated to be as specific as
+                      possible."""^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e863> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e871> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e871> a :lat-corpus_Catalogue_Document_Languages ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e873> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e873> a :lat-corpus_Catalogue_Document_Languages_Document_Language ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e875> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e875> a :lat-corpus_Catalogue_Document_Languages_Document_Language_Id ;
+	:lat-corpus_Catalogue_Document_Languages_Document_Language_hasIdElementValue "ISO639-3:eng"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e873> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e877> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e877> a :lat-corpus_Catalogue_Document_Languages_Document_Language_Name ;
+	:lat-corpus_Catalogue_Document_Languages_Document_Language_hasNameElementValue ""^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e863> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e881> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e881> a :lat-corpus_Catalogue_Subject_Languages ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e883> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e883> a :lat-corpus_Catalogue_Subject_Languages_Subject_Language ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e885> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e885> a :lat-corpus_Catalogue_Subject_Languages_Subject_Language_Id ;
+	:lat-corpus_Catalogue_Subject_Languages_Subject_Language_hasIdElementValue "ISO639-3:deu"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e883> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e887> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e887> a :lat-corpus_Catalogue_Subject_Languages_Subject_Language_Name ;
+	:lat-corpus_Catalogue_Subject_Languages_Subject_Language_hasNameElementValue "German"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e883> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e889> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e889> a :lat-corpus_Catalogue_Subject_Languages_Subject_Language_Dominant ;
+	:lat-corpus_Catalogue_Subject_Languages_Subject_Language_hasDominantElementValue "Unknown"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	:lat-corpus_Catalogue_Subject_Languages_Subject_Language_DominantElementEntity :lat-corpus_Catalogue_Subject_Languages_Subject_Language_DominantValueScheme_Unknown .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e883> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e891> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e891> a :lat-corpus_Catalogue_Subject_Languages_Subject_Language_SourceLanguage ;
+	:lat-corpus_Catalogue_Subject_Languages_Subject_Language_hasSourceLanguageElementValue "Unknown"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	:lat-corpus_Catalogue_Subject_Languages_Subject_Language_SourceLanguageElementEntity :lat-corpus_Catalogue_Subject_Languages_Subject_Language_SourceLanguageValueScheme_Unknown .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e883> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e893> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e893> a :lat-corpus_Catalogue_Subject_Languages_Subject_Language_TargetLanguage ;
+	:lat-corpus_Catalogue_Subject_Languages_Subject_Language_hasTargetLanguageElementValue "Unknown"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	:lat-corpus_Catalogue_Subject_Languages_Subject_Language_TargetLanguageElementEntity :lat-corpus_Catalogue_Subject_Languages_Subject_Language_TargetLanguageValueScheme_Unknown .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e863> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e897> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e897> a :lat-corpus_Catalogue_Location ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e899> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e899> a :lat-corpus_Catalogue_Location_Continent ;
+	:lat-corpus_Catalogue_Location_hasContinentElementValue "Europe"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	:lat-corpus_Catalogue_Location_ContinentElementEntity :lat-corpus_Catalogue_Location_ContinentValueScheme_Europe .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e897> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e901> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e901> a :lat-corpus_Catalogue_Location_Country ;
+	:lat-corpus_Catalogue_Location_hasCountryElementValue "Germany"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e897> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e903> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e903> a :lat-corpus_Catalogue_Location_Region ;
+	:lat-corpus_Catalogue_Location_hasRegionElementValue ""^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e897> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e905> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e905> a :lat-corpus_Catalogue_Location_Address ;
+	:lat-corpus_Catalogue_Location_hasAddressElementValue ""^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e863> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e908> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e908> a :lat-corpus_Catalogue_Format ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e910> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e910> a :lat-corpus_Catalogue_Format_Text ;
+	:lat-corpus_Catalogue_Format_hasTextElementValue "x-eaf+xml"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e908> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e912> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e912> a :lat-corpus_Catalogue_Format_Text ;
+	:lat-corpus_Catalogue_Format_hasTextElementValue "application/mediatagger"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e908> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e914> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e914> a :lat-corpus_Catalogue_Format_Video ;
+	:lat-corpus_Catalogue_Format_hasVideoElementValue "video/x-mpeg1"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e863> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e918> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e918> a :lat-corpus_Catalogue_Project ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e920> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e920> a :lat-corpus_Catalogue_Project_Name ;
+	:lat-corpus_Catalogue_Project_hasNameElementValue "Kleve_sim_child_L1/L2/L3/L11"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e918> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e922> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e922> a :lat-corpus_Catalogue_Project_Title ;
+	:lat-corpus_Catalogue_Project_hasTitleElementValue ""^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e918> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e924> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e924> a :lat-corpus_Catalogue_Project_Id ;
+	:lat-corpus_Catalogue_Project_hasIdElementValue ""^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e918> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e926> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e926> a :lat-corpus_Catalogue_Project_Contact .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e918> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e928> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e928> a :lat-corpus_Catalogue_Project_descriptions ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e930> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e930> a :lat-corpus_Catalogue_Project_descriptions_Description ;
+	:lat-corpus_Catalogue_Project_descriptions_hasDescriptionElementValue """MPI Project
+                          Temporality - Language Acquisition
+                          Group"""^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e863> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e934> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e934> a :lat-corpus_Catalogue_Keys ;
+	cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e936> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e936> a :lat-corpus_Catalogue_Keys_Key ;
+	:lat-corpus_Catalogue_Keys_hasKeyElementValue "http://corpus1.mpi.nl/qfs1/media-archive/acqui_data/ac-barbsch-l1/Corpusstructure/1.imdi"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e934> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e939> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e939> a :lat-corpus_Catalogue_Keys_Key ;
+	:lat-corpus_Catalogue_Keys_hasKeyElementValue "http://corpus1.mpi.nl/ds/imdi_browser/?openpath=MPI12464%23"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e934> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e942> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e942> a :lat-corpus_Catalogue_Keys_Key ;
+	:lat-corpus_Catalogue_Keys_hasKeyElementValue "hdl:1839/00-0000-0000-0000-30B0-2"^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e934> cmdm:contains <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e945> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e945> a :lat-corpus_Catalogue_Keys_Key ;
+	:lat-corpus_Catalogue_Keys_hasKeyElementValue """MPI corpora:
+                      Acquisition: L1 Acquisition: Barbsch
+                      L1"""^^<http://www.w3.org/2001/XMLSchema#string> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml> oa:motivatedBy oa:describing ;
+	cmdm:hasLandingPage <https://archive.mpi.nl/islandora/object/lat%3A1839_00_0000_0000_0000_30B0_2#> ;
+	a ore:ResourceMap ;
+	ore:describes _:node1j5tb221lx1 .
+
+_:node1j5tb221lx1 a ore:Aggregation ;
+	ore:aggregates <https://hdl.handle.net/1839/00-0000-0000-0000-30B1-D> , <https://hdl.handle.net/1839/00-0000-0000-0000-30DA-3> , <https://hdl.handle.net/1839/00-0000-0000-0000-3102-D> , <https://hdl.handle.net/1839/00-0000-0000-0000-3124-9> , <https://hdl.handle.net/1839/00-0000-0000-0000-314C-9> , <https://hdl.handle.net/1839/00-0000-0000-0000-3174-C> , <https://hdl.handle.net/1839/00-0000-0000-0000-3199-6> , <https://hdl.handle.net/1839/00-0000-0000-0000-31C2-E> , <https://hdl.handle.net/1839/00-0000-0000-0000-31DB-9> , <https://hdl.handle.net/1839/00-0000-0000-0000-3203-1> , <https://hdl.handle.net/1839/00-0000-0000-0000-322C-C> , <https://hdl.handle.net/1839/00-0000-0000-0000-3251-6> , <https://hdl.handle.net/1839/00-0000-0000-0000-3279-B> , <https://hdl.handle.net/1839/00-0000-0000-0000-32A1-A> , <https://hdl.handle.net/1839/00-0000-0000-0000-32C9-6> , <https://hdl.handle.net/1839/00-0000-0000-0000-32F1-1> , <https://hdl.handle.net/1839/00-0000-0000-0000-32F8-7> , <https://hdl.handle.net/1839/00-0000-0000-0000-3314-6> , <https://hdl.handle.net/1839/00-0000-0000-0000-333C-7> , <https://hdl.handle.net/1839/00-0000-0000-0000-3358-9> , <https://hdl.handle.net/1839/00-0000-0000-0000-3380-3> , <https://hdl.handle.net/1839/00-0000-0000-0000-339A-2> , <https://hdl.handle.net/1839/00-0000-0000-0000-33C2-3> , <https://hdl.handle.net/1839/00-0000-0000-0000-33EA-7> , <https://hdl.handle.net/1839/00-0000-0000-0000-340F-C> , <https://hdl.handle.net/1839/00-0000-0000-0000-3437-7> , <https://hdl.handle.net/1839/00-0000-0000-0000-345F-2> , <https://hdl.handle.net/1839/00-0000-0000-0000-3487-B> , <https://hdl.handle.net/1839/00-0000-0000-0000-34AF-3> , <https://hdl.handle.net/1839/00-0000-0000-0000-34D8-F> , <https://hdl.handle.net/1839/00-0000-0000-0000-3503-2> , <https://hdl.handle.net/1839/00-0000-0000-0000-352B-3> , <https://hdl.handle.net/1839/00-0000-0000-0000-3553-C> , <https://hdl.handle.net/1839/00-0000-0000-0000-357B-1> , <https://hdl.handle.net/1839/00-0000-0000-0000-3594-7> , <https://hdl.handle.net/1839/00-0000-0000-0000-35BC-4> , <https://hdl.handle.net/1839/00-0000-0000-0000-35E4-7> , <https://hdl.handle.net/1839/00-0000-0000-0000-360C-F> , <https://hdl.handle.net/1839/00-0000-0000-0000-3634-E> , <https://hdl.handle.net/1839/00-0000-0000-0000-365C-D> , <https://hdl.handle.net/1839/00-0000-0000-0000-3684-A> , <https://hdl.handle.net/1839/00-0000-0000-0000-36AC-8> , <https://hdl.handle.net/1839/00-0000-0000-0000-36BF-A> , <https://hdl.handle.net/1839/00-0000-0000-0000-36E7-C> , <https://hdl.handle.net/1839/00-0000-0000-0000-3700-1> , <https://hdl.handle.net/1839/00-0000-0000-0000-371F-2> , <https://hdl.handle.net/1839/00-0000-0000-0000-3735-8> , <https://hdl.handle.net/1839/00-0000-0000-0000-3754-6> , <https://hdl.handle.net/1839/00-0000-0000-0000-377C-1> , <https://hdl.handle.net/1839/00-0000-0000-0000-37A4-4> , <https://hdl.handle.net/1839/00-0000-0000-0000-37CC-9> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml#d2e576> dc:creator "corpman" ;
+	dc:created "2004-10-18" ;
+	dc:identifier "https://hdl.handle.net/1839/00-0000-0000-0000-30B0-2" .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml> vlo:hasFacetProjectNameElementValue "Kleve_sim_child_L1/L2/L3/L11"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	vlo:hasFacetNameElementValue """Barbsch
+      L1"""^^<http://www.w3.org/2001/XMLSchema#string> ;
+	vlo:hasFacetContinentElementValue "Europe"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	vlo:hasFacetCountryElementValue "Germany"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	vlo:hasFacetLanguageCodeElementValue "ISO639-3:deu"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	vlo:hasFacetISO6393ElementValue "deu"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	vlo:hasFacetSubjectElementValue """Unknown
+      Europe"""^^<http://www.w3.org/2001/XMLSchema#string> ;
+	vlo:hasFacetDescriptionElementValue """MPI
+      Project Temporality - Experiment description MPI Project Temporality - Legend Stimuli
+      Description of the \"Lamp\" experiment Children were asked to carry out two tasks: 1. To watch a
+      short clip on a laptop, which shows lamps being switched on and off in a particular temporal
+      constellation (see stimuli) 2. After watching the clip, childern had to act-out the clip by
+      using real lamps standing on a table in front of them. 3. The last task was to verbalize the
+      temporal constellation in the movie shown to them. The order of tasks number (2) and (3) were
+      counterbalanced. That is, half of the children acted-out before they retold the stimulus and
+      half of the children first verbalized the content of the clip and then acted-out. In all
+      cases, children were watching the stimulus together with the chief investigator and acted-out
+      and retold it to an assistant who was also present in the room. The assistant, however, did
+      not watch the stimulus. The child was asked to inform the assistant about the content of the
+      clip so that she could imagine what it was about. In this manner, the child was motivated to
+      be as specific as possible. MPI Project Temporality - Language Acquisition
+      Group"""^^<http://www.w3.org/2001/XMLSchema#string> .
+@prefix cmdp: <http://www.clarin.eu/cmd/1/profiles/clarin.eu:cr1:p_1407745712064> .
+@prefix datacite: <http://purl.org/spar/datacite/> .
+@prefix fabio: <http://purl.org/spar/fabio/> .
+@prefix silvio: <http://www.essepuntato.it/2010/06/literalreification/> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml> ost:hasSKG <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2.rdf> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2.rdf> a fabio:Dataset .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2-rdf.xml> ost:hasSKG <file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2.rdf> .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2.rdf> a fabio:Work ;
+	datacite:hasIdentifier _:node1j5tb221lx2 .
+
+_:node1j5tb221lx2 a datacite:Identifier ;
+	datacite:usesIdentifierScheme datacite:handle ;
+	silvio:hasLiteralValue "https://hdl.handle.net/1839/00-0000-0000-0000-30B0-2" .
+
+<file:/Users/menzowi/Documents/GitHub/CMD2RDF-OST/OST/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2.rdf> dcterms:abstract """MPI Project Temporality - Experiment description MPI Project Temporality -
+          Legend Stimuli Description of the \"Lamp\" experiment Children were asked to carry out two
+          tasks: 1. To watch a short clip on a laptop, which shows lamps being switched on and off
+          in a particular temporal constellation (see stimuli) 2. After watching the clip, childern
+          had to act-out the clip by using real lamps standing on a table in front of them. 3. The
+          last task was to verbalize the temporal constellation in the movie shown to them. The
+          order of tasks number (2) and (3) were counterbalanced. That is, half of the children
+          acted-out before they retold the stimulus and half of the children first verbalized the
+          content of the clip and then acted-out. In all cases, children were watching the stimulus
+          together with the chief investigator and acted-out and retold it to an assistant who was
+          also present in the room. The assistant, however, did not watch the stimulus. The child
+          was asked to inform the assistant about the content of the clip so that she could imagine
+          what it was about. In this manner, the child was motivated to be as specific as possible.
+          MPI Project Temporality - Language Acquisition Group""" ;
+	dcterms:title "Barbsch L1" .
