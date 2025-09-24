@@ -69,6 +69,7 @@
             <xsl:apply-templates select="(cmd0:Header|cmd1:Header)"/>
         	<rdf:Description rdf:about="{$about}">
         		<xsl:apply-templates select="vlo:*"/>
+        	    <xsl:copy-of select="OST/*"/>
         	</rdf:Description>
         </rdf:RDF>
     </xsl:template>
