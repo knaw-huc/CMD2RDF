@@ -178,9 +178,9 @@
 								</xsl:for-each>
 							</xsl:variable>
 							<!--<xsl:message>DBG: facet values[<xsl:value-of select="count($facetValues/*)"/>]</xsl:message>-->
-							<xsl:for-each select="$facetValues/*">
+							<!--<xsl:for-each select="$facetValues/*">
 								<xsl:message>[<xsl:value-of select="position()"/>] <xsl:value-of select="."/></xsl:message>
-							</xsl:for-each> 
+							</xsl:for-each>-->
 							<xsl:for-each-group select="$facetValues/*" group-by="@pos">
 								<xsl:choose>
 									<xsl:when test="position()=1 or empty($facet/@allowMultipleValues) or ($facet/@allowMultipleValues='true')">
