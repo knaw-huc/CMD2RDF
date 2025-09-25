@@ -2,24 +2,24 @@
 <CMD2RDF xmlns:xi="http://www.w3.org/2003/XInclude">
 	<config version="1.0">
 		<properties>
-			<property name="homedir">/app</property>
-			<property name="workspace">{homedir}/work</property>
-			<property name="gitrepo">{homedir}/src/CMD2RDF</property>
+			<property name="homedir">/Users/listj</property>
+			<property name="workspace">{homedir}/Clarin.Work</property>
+			<property name="gitrepo">{homedir}/IdeaProjects/CMD2RDF-SSH</property>
 			<property name="harvestedProfilesDir">{workspace}/harvester</property>
 			<property name="xsltSourceDir">{gitrepo}/conversion/src/main/resources/xsl</property>
-            <property name="xmlSourceDir">/app/data/clarin/results/cmdi</property>
+			<property name="xmlSourceDir">{homedir}/Clarin.Data/TI_Total</property>
 			<property name="urlDB">{workspace}/db/DB_CMD_CHECKSUM</property>
 			<property name="profilesCacheDir">{workspace}/profiles-cache</property>
 			<property name="registry">http://catalog.clarin.eu/ds/ComponentRegistry</property>
 			<property name="virtuosoHome">/opt/virtuoso-opensource</property>
 			<property name="namedGraphIRIQueryParam">context</property>
 			<property name="namedGraphIRIEncloseWithBrackets">true</property>
-			<property name="serverHost">http://graphdb:7200</property>
+			<property name="serverHost">http://localhost:7200</property>
 			<property name="serverURL">{serverHost}/repositories/cmd2rdf/statements</property>
 			<property name="username">dba</property>
 			<property name="password">dba</property>
 			<property name="prefixBaseURI">http://localhost:8080/cmd2rdf/graph</property>
-			<property name="shScriptPath">{gitrepo}/batch/src/main/resources/virtuoso_bulk_import.sh</property>
+			<property name="shScriptPath">{gitrepo}/batch/src/main/resources/virtuoso_bulk_import.sh</property>q
 			<property name="tmpOutDir">{workspace}/rdf-output</property>
 			<property name="dirDownloadPwd">Put here a strong password!</property>
 		</properties>
@@ -35,16 +35,6 @@
 					</properties>
 				</class>
 			</action>
-			<!--<action name="fetch">
-				<class name="nl.knaw.dans.cmd2rdf.conversion.action.harvester.OaipmhHarvester">
-					<properties>
-						<property name="oaipmhBaseURL">https://openskos.meertens.knaw.nl/oai-pmh</property>
-						<property name="prefix">oai_rdf</property>
-						<property name="set">meertens:VLO-orgs</property>
-						<property name="outputFile">{harvestedProfilesDir}/meertens-VLO-orgs.rdf</property>
-					</properties>
-				</class>
-			</action>-->
 			<action>
 				<class name="nl.knaw.dans.cmd2rdf.conversion.action.db.MD5ChecksumDBAction">
 					<properties>
