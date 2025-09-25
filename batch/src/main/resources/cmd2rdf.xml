@@ -157,6 +157,13 @@
 						</properties>
 					</class>
 				</action>
+				<action name="transform">
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
+						<properties>
+							<property name="xsltSource">{xsltSourceDir}/addOST.xsl</property>
+						</properties>
+					</class>
+				</action>
 				<!--
 				<action>
 					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.TeeAction">
@@ -238,6 +245,13 @@
 					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
 						<properties>
 							<property name="xsltSource">{xsltSourceDir}/addVLOFacets.xsl</property>
+						</properties>
+					</class>
+				</action>
+				<action name="transform">
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
+						<properties>
+							<property name="xsltSource">{xsltSourceDir}/addOST.xsl</property>
 						</properties>
 					</class>
 				</action>
