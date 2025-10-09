@@ -6,7 +6,6 @@ import nl.knaw.dans.cmd2rdf.conversion.action.IAction;
 import nl.knaw.dans.cmd2rdf.conversion.util.Misc;
 import org.apache.commons.io.FileUtils;
 import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
-import org.glassfish.jersey.filter.LoggingFilter;
 import org.javasimon.SimonManager;
 import org.javasimon.Split;
 import org.joda.time.Period;
@@ -27,12 +26,9 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;
-import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -98,9 +94,6 @@ public class StoreClient implements IAction {
         if (action == null || action.isEmpty()) {
             throw new ActionException("action is null or empty");
         }
-        if (namedGIRIQueryParam == null || namedGIRIQueryParam.isEmpty()) {
-            throw new ActionException("namedGraphIRIParam is null or empty");
-        }
 
         String[] replacedPrefixBaseURIVars = replacedPrefixBaseURIVar.split(",");
         for (String s : replacedPrefixBaseURIVars) {
@@ -109,6 +102,7 @@ public class StoreClient implements IAction {
         }
 
         actionStatus = Misc.convertToActionStatus(action);
+
         client = ClientBuilder.newClient();
         if (credentialsProvided()) {
             LOG.info("Using provided credentials for user '{}' for HTTP authentication", userName);
@@ -126,7 +120,7 @@ public class StoreClient implements IAction {
             LOG.debug("password: {}", password);
         }
         LOG.debug("action: {}", action);
-        LOG.debug("namedGIRIParam: {}", namedGIRIQueryParam);
+        LOG.debug("namedGIRIParam: {}", namedGIRIQueryParam != null ? namedGIRIQueryParam : "N/A");
         LOG.debug("Start StoreRESTClient....");
     }
 
@@ -184,14 +178,13 @@ public class StoreClient implements IAction {
                 // Build named / context IRI
                 UriBuilder uriBuilder = UriBuilder.fromUri(new URI(serverURL));
                 String giri = getGIRI(path);
-                uriBuilder.queryParam(namedGIRIQueryParam, URLEncoder.encode(
-                        namedGIRIEncloseWithBrackets ? "<" + giri + ">" : giri,
-                        StandardCharsets.UTF_8.toString()));
+                uriBuilder.queryParam(namedGIRIQueryParam, namedGIRIEncloseWithBrackets ? "<" + giri + ">" : giri);
                 WebTarget target = client.target(uriBuilder.build());
 
                 // Do request
-                Response response = target.request().post(Entity.entity(bytes,
-                        StoreMediaTypes.APPLICATION_RDF_XML.getMediaType()));
+                Response response = target.request().post(
+                        Entity.entity(bytes, StoreMediaTypes.APPLICATION_RDF_XML.getMediaType()));
+
                 int status = response.getStatus();
                 LOG.info("'{}' is uploaded to store.\nResponse status: {}",
                         path.replace(".xml", ".rdf"), status);
@@ -215,10 +208,7 @@ public class StoreClient implements IAction {
                 ERROR_LOG.error("ERROR: URISyntaxException, caused by {}", e.getMessage(), e);
             } catch (IllegalArgumentException e) {
                 ERROR_LOG.error("ERROR: IllegalArgumentException, caused by {}", e.getMessage(), e);
-            } catch (UnsupportedEncodingException e) {
-                ERROR_LOG.error("ERROR: UnsupportedEncodingException, caused by {}", e.getMessage(), e);
             }
-        } else {
             throw new ActionException("Unknown input (" + path + ", " + object + ")");
         }
 

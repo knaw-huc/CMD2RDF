@@ -25,8 +25,8 @@
 
 cmd:cmd2rdf-lda a api:API 
 	; rdfs:label "CMD2RDF LDA API -- browse "@en
-	; api:base "http://192.168.99.100:8080/cmd2rdf-lda/"
-	; api:sparqlEndpoint <http://192.168.99.100:8080/cmd2rdf/sparql?format=application/atom+xml>
+	; api:base "http://localhost:8080/cmd2rdf-lda/"
+	; api:sparqlEndpoint <http://localhost:8080/cmd2rdf/sparql?format=application/atom+xml>
 	# ; api:defaultViewer api:labelledDescribeViewer
 	;api:defaultViewer api:cmdViewer
 	# the page size can't be set higher than this 

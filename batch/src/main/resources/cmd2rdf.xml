@@ -7,14 +7,15 @@
 			<property name="gitrepo">{homedir}/src/CMD2RDF</property>
 			<property name="harvestedProfilesDir">{workspace}/harvester</property>
 			<property name="xsltSourceDir">{gitrepo}/conversion/src/main/resources/xsl</property>
-			<property name="xmlSourceDir">/app/data/clarin/results/cmdi-1_1</property>
+			<property name="xmlSourceDir">/app/data/clarin/results/cmdi</property>
 			<property name="urlDB">{workspace}/db/DB_CMD_CHECKSUM</property>
 			<property name="profilesCacheDir">{workspace}/profiles-cache</property>
 			<property name="registry">http://catalog.clarin.eu/ds/ComponentRegistry</property>
 			<property name="virtuosoHome">/opt/virtuoso-opensource</property>
-			<property name="namedGraphIRIQueryParam">graph-uri</property>
-			<property name="serverHost">http://localhost:8890</property>
-			<property name="serverURL">{serverHost}/sparql-graph-crud-auth?</property>
+			<property name="namedGraphIRIQueryParam">context</property>
+			<property name="namedGraphIRIEncloseWithBrackets">true</property>
+			<property name="serverHost">http://graphdb:7200</property>
+			<property name="serverURL">{serverHost}/repositories/cmd2rdf/statements</property>
 			<property name="username">dba</property>
 			<property name="password">dba</property>
 			<property name="prefixBaseURI">http://localhost:8080/cmd2rdf/graph</property>
@@ -34,16 +35,6 @@
 					</properties>
 				</class>
 			</action>
-			<!--<action name="fetch">
-				<class name="nl.knaw.dans.cmd2rdf.conversion.action.harvester.OaipmhHarvester">
-					<properties>
-						<property name="oaipmhBaseURL">https://openskos.meertens.knaw.nl/oai-pmh</property>
-						<property name="prefix">oai_rdf</property>
-						<property name="set">meertens:VLO-orgs</property>
-						<property name="outputFile">{harvestedProfilesDir}/meertens-VLO-orgs.rdf</property>
-					</properties>
-				</class>
-			</action>-->
 			<action>
 				<class name="nl.knaw.dans.cmd2rdf.conversion.action.db.MD5ChecksumDBAction">
 					<properties>
@@ -156,6 +147,13 @@
 						</properties>
 					</class>
 				</action>
+				<action name="transform">
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
+						<properties>
+							<property name="xsltSource">{xsltSourceDir}/addOST.xsl</property>
+						</properties>
+					</class>
+				</action>
 				<!--
 				<action>
 					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.TeeAction">
@@ -240,6 +238,13 @@
 						</properties>
 					</class>
 				</action>
+				<action name="transform">
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
+						<properties>
+							<property name="xsltSource">{xsltSourceDir}/addOST.xsl</property>
+						</properties>
+					</class>
+				</action>
 				<!--
 				<action>
 					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.TeeAction">
@@ -297,16 +302,15 @@
 					</class>
 				</action>
 				-->
-				<action>
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.FileStore">
-						<properties>
-							<property name="xmlSourceDir">{xmlSourceDir}</property>
-							<property name="rdfDir">{tmpOutDir}/temp</property>
-							<property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
-							<property name="prefixBaseURI">{prefixBaseURI}</property>
-						</properties>
-					</class>
-				</action>
+                <action>
+                    <class name="nl.knaw.dans.cmd2rdf.conversion.action.store.StoreClient">
+                        <properties>
+                            <property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
+                            <property name="prefixBaseURI">{prefixBaseURI}</property>
+                            <property name="action">POST</property>
+                        </properties>
+                    </class>
+                </action>
 				<action>
 					<class name="nl.knaw.dans.cmd2rdf.conversion.action.db.MD5ChecksumDBAction">
 						<properties>
@@ -319,6 +323,7 @@
 			</actions>
 			<cleanup>
 				<actions>
+					<!--
 					<action name="EXECUTE BULK IMPORT temp">
 						<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.VirtuosoBulkImporter">
 							<properties>
@@ -331,6 +336,7 @@
 							</properties>
 						</class>
 					</action>
+					-->
 					<action name="Deleting rdf output file temp">
 						<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.CleanDirectory">
 							<properties>
@@ -378,10 +384,10 @@
 					</class>
 				</action>
 				<action>
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.VirtuosoClient">
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.StoreClient">
 						<properties>
-							<property name="replacedPrefixBaseURI">{profilesCacheDir}</property>
-							<property name="prefixBaseURI">https://catalog.clarin.eu/ds/cmd2rdf/graph/component</property>
+							<property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
+							<property name="prefixBaseURI">{prefixBaseURI}</property>
 							<property name="action">POST</property>
 						</properties>
 					</class>
