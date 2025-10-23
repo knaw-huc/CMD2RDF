@@ -105,8 +105,8 @@ public class StoreClient implements IAction {
 
         client = ClientBuilder.newClient();
         if (credentialsProvided()) {
-            LOG.info("Using provided credentials for user '{}' for HTTP authentication", userName);
-            HttpAuthenticationFeature authFeature = HttpAuthenticationFeature.digest(userName, password);
+            LOG.info("Using provided credentials for user '{}' for HTTP Basic authentication", userName);
+            HttpAuthenticationFeature authFeature = HttpAuthenticationFeature.basic(userName, password);
             client.register(authFeature);
         }
         client.register(new BodyLoggingFilter());
