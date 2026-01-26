@@ -1,0 +1,18 @@
+@prefix cmd0:     <http://www.clarin.eu/cmd/> .
+@prefix cmd1:     <http://www.clarin.eu/cmd/1> .
+@prefix datacite: <http://purl.org/spar/datacite/> .
+@prefix dc:       <http://purl.org/dc/terms/> .
+@prefix fabio:    <http://purl.org/spar/fabio/> .
+@prefix rdf:      <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix silvio:   <http://www.essepuntato.it/2010/06/literalreification/> .
+@prefix vlo:      <http://www.clarin.eu/vlo/> .
+
+<file:///app/oai_www_mpi_nl_lat_1839_00_0000_0000_0000_30B0_2.rdf>
+        rdf:type                fabio:Dataset , fabio:Work ;
+        dc:abstract             "MPI Project Temporality - Experiment description MPI Project Temporality -\n                Legend Stimuli Description of the \"Lamp\" experiment Children were asked to carry out\n                two tasks: 1. To watch a short clip on a laptop, which shows lamps being switched on\n                and off in a particular temporal constellation (see stimuli) 2. After watching the\n                clip, childern had to act-out the clip by using real lamps standing on a table in\n                front of them. 3. The last task was to verbalize the temporal constellation in the\n                movie shown to them. The order of tasks number (2) and (3) were counterbalanced.\n                That is, half of the children acted-out before they retold the stimulus and half of\n                the children first verbalized the content of the clip and then acted-out. In all\n                cases, children were watching the stimulus together with the chief investigator and\n                acted-out and retold it to an assistant who was also present in the room. The\n                assistant, however, did not watch the stimulus. The child was asked to inform the\n                assistant about the content of the clip so that she could imagine what it was about.\n                In this manner, the child was motivated to be as specific as possible. MPI Project\n                Temporality - Language Acquisition Group" ;
+        dc:title                "Barbsch L1" ;
+        datacite:hasIdentifier  [ rdf:type                       datacite:Identifier ;
+                                  datacite:usesIdentifierScheme  datacite:handle ;
+                                  silvio:hasLiteralValue         "https://hdl.handle.net/1839/00-0000-0000-0000-30B0-2"
+                                ] .
