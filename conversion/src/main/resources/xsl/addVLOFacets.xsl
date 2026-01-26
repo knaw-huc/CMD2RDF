@@ -6,7 +6,7 @@
 	xmlns:functx="http://www.functx.com"
 	exclude-result-prefixes="xsl dcr xsi xs sx functx vlo cmd0 cmd1">
 
-	<xsl:output method="xml" encoding="UTF-8"/>
+	<xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 	
 	<xsl:include href="CMD2RDF.xsl"/>
 	
