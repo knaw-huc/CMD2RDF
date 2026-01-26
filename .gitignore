@@ -41,5 +41,3 @@ hs_err_pid*
 *.log
 /target/
 
-#Ignore Cmd2RdfPageHeader.properties file sinds it is generated.
-webapps/src/main/java/nl/knaw/dans/cmd2rdf/webapps/ui/Cmd2RdfPageHeader.properties
