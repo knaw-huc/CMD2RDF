@@ -15,7 +15,7 @@
 			<property name="namedGraphIRIQueryParam">context</property>
 			<property name="namedGraphIRIEncloseWithBrackets">true</property>
 			<property name="serverHost">http://graphdb:7200</property>
-			<property name="serverURL">{serverHost}/repositories/cmd2rdf/statements</property>
+			<property name="serverURL">{serverHost}/repositories/ost-clarin-skg/statements</property>
 			<property name="username">dba</property>
 			<property name="password">dba</property>
 			<property name="prefixBaseURI">http://localhost:8080/cmd2rdf/graph</property>
