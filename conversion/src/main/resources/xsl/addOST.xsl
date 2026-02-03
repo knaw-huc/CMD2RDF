@@ -8,6 +8,7 @@
     xmlns:dc="http://purl.org/dc/terms/"
     xmlns:fabio="http://purl.org/spar/fabio/"
     xmlns:datacite="http://purl.org/spar/datacite/"
+    xmlns:silvio="http://www.essepuntato.it/2010/06/literalreification/"
     xmlns:literal="http://www.essepuntato.it/2010/06/literalreification/"
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
@@ -51,7 +52,7 @@
         <xsl:variable name="versions" select="distinct-values(vlo:hasFacetVersion[normalize-space(.)!=''])"/>
         <xsl:variable name="distributionMedium" select="distinct-values(vlo:hasFacetDistributionMedium[normalize-space(.)!=''])"/>
 
-        <!-- Extract provider: try MdCollectionDisplayName first, fall back to repository from path -->
+        <!-- Extract provider : try MdCollectionDisplayName first, fall back to repository from path -->
         <xsl:variable name="provider">
             <xsl:choose>
                 <xsl:when test="normalize-space(/cmd0:CMD/cmd0:Header/cmd0:MdCollectionDisplayName | /cmd1:CMD/cmd1:Header/cmd1:MdCollectionDisplayName) != ''">
@@ -88,9 +89,9 @@
                                         <datacite:usesIdentifierScheme rdf:resource="http://purl.org/spar/datacite/doi"/>
                                     </xsl:when>
                                 </xsl:choose>
-                                <literal:hasLiteralValue>
+                                <silvio:hasLiteralValue>
                                     <xsl:value-of select="$pid"/>
-                                </literal:hasLiteralValue>
+                                </silvio:hasLiteralValue>
                             </datacite:Identifier>
                         </datacite:hasIdentifier>
                     </xsl:if>
@@ -250,7 +251,7 @@
                     </foaf:Organization>
                 </xsl:for-each>
 
-                <!-- Provider organisation (type: archive/repository) -->
+                <!-- Provider organisation (type: archive) -->
                 <xsl:if test="normalize-space($provider) != ''">
                     <foaf:Organization rdf:about="{concat($skg-base, ost:slugify($provider))}">
                         <foaf:name><xsl:value-of select="$provider"/></foaf:name>
