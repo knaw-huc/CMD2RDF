@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                xmlns:math="http://www.w3.org/2005/xpath-functions/math"
-                xmlns:cmd0="http://www.clarin.eu/cmd/"
-                xmlns:cmd1="http://www.clarin.eu/cmd/1"
-                xmlns:vlo="http://www.clarin.eu/vlo/"
-                xmlns:dcterms="http://purl.org/dc/terms/"
-                xmlns:fabio="http://purl.org/spar/fabio/"
-                xmlns:datacite="http://purl.org/spar/datacite/"
-                xmlns:literal="http://www.essepuntato.it/2010/06/literalreification/"
-                xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-                xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-                xmlns:foaf="http://xmlns.com/foaf/0.1/"
-                xmlns:frbr="http://purl.org/vocab/frbr/core#"
-                xmlns:prism="http://prismstandard.org/namespaces/basic/2.0/"
-                xmlns:pso="http://purl.org/spar/pso/"
-                xmlns:ost="https://ostrails.eu/"
-                exclude-result-prefixes="xs math ost"
-                version="3.0">
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+    xmlns:cmd0="http://www.clarin.eu/cmd/"
+    xmlns:cmd1="http://www.clarin.eu/cmd/1"
+    xmlns:vlo="http://www.clarin.eu/vlo/"
+    xmlns:dc="http://purl.org/dc/terms/"
+    xmlns:fabio="http://purl.org/spar/fabio/"
+    xmlns:datacite="http://purl.org/spar/datacite/"
+    xmlns:literal="http://www.essepuntato.it/2010/06/literalreification/"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+    xmlns:foaf="http://xmlns.com/foaf/0.1/"
+    xmlns:frbr="http://purl.org/vocab/frbr/core#"
+    xmlns:prism="http://prismstandard.org/namespaces/basic/2.0/"
+    xmlns:pso="http://purl.org/spar/pso/"
+    xmlns:ost="https://ostrails.eu/"
+    exclude-result-prefixes="xs math ost"
+    version="3.0">
 
     <xsl:output method="xml" indent="yes" />
 
@@ -97,16 +97,16 @@
 
                     <!-- Description from VLO facet -->
                     <xsl:if test="normalize-space(vlo:hasFacetDescription)!=''">
-                        <dcterms:abstract>
+                        <dc:abstract>
                             <xsl:value-of select="normalize-space(vlo:hasFacetDescription)"/>
-                        </dcterms:abstract>
+                        </dc:abstract>
                     </xsl:if>
 
                     <!-- Title from VLO facet -->
                     <xsl:if test="normalize-space(vlo:hasFacetName)!=''">
-                        <dcterms:title>
+                        <dc:title>
                             <xsl:value-of select="normalize-space(vlo:hasFacetName)"/>
-                        </dcterms:title>
+                        </dc:title>
                     </xsl:if>
 
                     <!-- Link to manifestations via FRBR chain: Work → Expression → Manifestation (embodiment?) -->
@@ -120,7 +120,7 @@
 
                     <!-- Link to organisations (relevant_organisations in SKG-IF) -->
                     <xsl:for-each select="$orgs">
-                        <dcterms:relation rdf:resource="{concat($skg-base, ost:slugify(.))}"/>
+                        <dc:relation rdf:resource="{concat($skg-base, ost:slugify(.))}"/>
                     </xsl:for-each>
                 </fabio:Work>
 
@@ -169,9 +169,9 @@
 
                         <!-- Format/media type from mimetype attribute -->
                         <xsl:if test="$mimeType != ''">
-                            <dcterms:format>
+                            <dc:format>
                                 <xsl:value-of select="$mimeType"/>
-                            </dcterms:format>
+                            </dc:format>
                         </xsl:if>
 
                         <!-- License from VLO facets -->
@@ -179,13 +179,13 @@
                             <xsl:choose>
                                 <!-- If it looks like a URL, use rdf:resource -->
                                 <xsl:when test="starts-with(., 'http://') or starts-with(., 'https://')">
-                                    <dcterms:license rdf:resource="{.}"/>
+                                    <dc:license rdf:resource="{.}"/>
                                 </xsl:when>
                                 <!-- Otherwise use literal value -->
                                 <xsl:otherwise>
-                                    <dcterms:license>
+                                    <dc:license>
                                         <xsl:value-of select="."/>
-                                    </dcterms:license>
+                                    </dc:license>
                                 </xsl:otherwise>
                             </xsl:choose>
                         </xsl:for-each>
