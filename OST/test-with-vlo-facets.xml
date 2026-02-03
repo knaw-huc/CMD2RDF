@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Test file simulating output after addVLOFacets.xsl transformation -->
-<!-- Use this to test addOST.xsl organisation entity generation -->
+<!-- Use this to test addOST.xsl SKG-IF manifestation and organisation entity generation -->
 <cmd:CMD xmlns:cmd="http://www.clarin.eu/cmd/1"
          xmlns:cmdp="http://www.clarin.eu/cmd/1/profiles/clarin.eu:cr1:p_1407745712064"
          xmlns:vlo="http://www.clarin.eu/vlo/"
@@ -9,7 +9,7 @@
          xml:base="file:///Users/listj/IdeaProjects/CMD2RDF/OST/test-with-vlo-facets.xml"
          xsi:schemaLocation="http://www.clarin.eu/cmd/1 https://infra.clarin.eu/CMDI/1.x/xsd/cmd-envelop.xsd">
 
-    <!-- Added test VLO facets -->
+    <!-- VLO facets for Work/Product -->
     <vlo:hasFacetName>Barbsch L1</vlo:hasFacetName>
     <vlo:hasFacetDescription>Description of the "Lamp" experiment - Children were asked to carry out tasks involving lamps.</vlo:hasFacetDescription>
     <vlo:hasFacetOrganisation>Bavarian Archive for Speech Signals</vlo:hasFacetOrganisation>
@@ -17,6 +17,11 @@
     <vlo:hasFacetLanguageCode>ISO639-3:deu</vlo:hasFacetLanguageCode>
     <vlo:hasFacetCountry>Germany</vlo:hasFacetCountry>
     <vlo:hasFacetResourceClass>corpus</vlo:hasFacetResourceClass>
+
+    <!-- VLO facets for Manifestations (SKG-IF) -->
+    <vlo:hasFacetLicense>https://creativecommons.org/licenses/by/4.0/</vlo:hasFacetLicense>
+    <vlo:hasFacetAvailability>PUB</vlo:hasFacetAvailability>
+    <vlo:hasFacetVersion>1.0</vlo:hasFacetVersion>
 
     <cmd:Header>
         <cmd:MdCreator>corpman</cmd:MdCreator>
@@ -28,9 +33,25 @@
 
     <cmd:Resources>
         <cmd:ResourceProxyList>
+            <!-- Test: Resource type with mimetype → fabio:DigitalManifestation -->
             <cmd:ResourceProxy id="res1">
-                <cmd:ResourceType>Resource</cmd:ResourceType>
+                <cmd:ResourceType mimetype="audio/x-wav">Resource</cmd:ResourceType>
                 <cmd:ResourceRef>https://hdl.handle.net/1839/00-0000-0000-0000-37EE-3</cmd:ResourceRef>
+            </cmd:ResourceProxy>
+            <!-- Test: Metadata type → fabio:MetadataDocument -->
+            <cmd:ResourceProxy id="res2">
+                <cmd:ResourceType mimetype="application/xml">Metadata</cmd:ResourceType>
+                <cmd:ResourceRef>https://hdl.handle.net/1839/00-0000-0000-0000-37EE-4</cmd:ResourceRef>
+            </cmd:ResourceProxy>
+            <!-- Test: LandingPage type → fabio:WebPage -->
+            <cmd:ResourceProxy id="res3">
+                <cmd:ResourceType mimetype="text/html">LandingPage</cmd:ResourceType>
+                <cmd:ResourceRef>https://archive.mpi.nl/tla/islandora/object/tla%3A1839_00_0000_0000_0000_30B0_2</cmd:ResourceRef>
+            </cmd:ResourceProxy>
+            <!-- Test: SearchService type → fabio:WebService -->
+            <cmd:ResourceProxy id="res4">
+                <cmd:ResourceType>SearchService</cmd:ResourceType>
+                <cmd:ResourceRef>https://archive.mpi.nl/ds/annex/search</cmd:ResourceRef>
             </cmd:ResourceProxy>
         </cmd:ResourceProxyList>
         <cmd:JournalFileProxyList/>
