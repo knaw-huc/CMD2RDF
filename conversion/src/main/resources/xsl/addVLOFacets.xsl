@@ -12,7 +12,8 @@
 	<xsl:include href="CMD2RDF.xsl"/>
 	
 	<!-- load the VLO facet mapping -->
-	<xsl:param name="beta-vlo-url" select="'https://beta-vlo.clarin.eu/api/facets?q=id:'"/>
+	<xsl:param name="beta-vlo-facets-url" select="'https://beta-vlo.clarin.eu/api/facets?q=id:'"/>
+	<xsl:param name="beta-vlo-record-url" select="'https://beta-vlo.clarin.eu/api/records/'" />
 	<xsl:param name="vloFacetMapping" select="'https://raw.githubusercontent.com/clarin-eric/VLO-mapping/master/mapping/facetConcepts.xml'"/>
 	<xsl:variable name="fm" select="document($vloFacetMapping)"/>
 	
@@ -131,28 +132,52 @@
 	
 	<xsl:template match="text()" mode="beta-vlo"/>
 	
-	<xsl:template match="js:map" mode="beta-vlo">
+	<xsl:template match="js:map" mode="beta-vlo-facets">
 		<xsl:variable name="f" select="."/>
+		<xsl:if test="not($f/js:string[@key='name']=$skipVLOFacets)">
 		<xsl:for-each select="$f/js:array[@key='values']/js:map/js:string[@key='value'][normalize-space(.)!='']">
 			<xsl:element name="vlo:hasFacet{functx:capitalize-first($f/js:string[@key='name'])}">
 				<xsl:value-of select="."/>
 			</xsl:element>
 		</xsl:for-each>
+		</xsl:if>
 	</xsl:template>
-	
+
+	<xsl:template match="js:map" mode="beta-vlo-record">
+		<xsl:param name="facets-from-beta" as="xs:string*" tunnel="yes" select="()"/>
+		<xsl:for-each select="js:map[@key='fields']/js:array[not(@key=($skipVLOFacets,$facets-from-beta))][not(starts-with(@key,'_'))]">
+			<xsl:variable name="facetName" select="@key"/>
+			<xsl:for-each select="js:string[normalize-space(.)!='']">
+				<xsl:element name="vlo:hasFacet{functx:capitalize-first($facetName)}">
+					<xsl:value-of select="."/>
+				</xsl:element>
+			</xsl:for-each>
+		</xsl:for-each>
+	</xsl:template>
+
 	<xsl:template match="/cmd0:CMD|/cmd1:CMD">
 		<xsl:copy>
 			<xsl:attribute name="xml:base" select="base-uri()"/>
 			<xsl:apply-templates select="@*"/>
-			<xsl:variable name="url" select="concat($beta-vlo-url,vlo:encodeId(.//*:MdSelfLink))"/>
-			<xsl:message>DBG: beta-vlo[<xsl:value-of select="$url"/>]</xsl:message>
+			<xsl:variable name="facets-url" select="concat($beta-vlo-facets-url,vlo:encodeId(.//*:MdSelfLink))"/>
+			<xsl:variable name="record-url" select="concat($beta-vlo-record-url,vlo:encodeId(.//*:MdSelfLink))"/>
+			<xsl:message>DBG: beta-vlo-facets[<xsl:value-of select="$facets-url" />]</xsl:message>
+			<xsl:message>DBG: beta-vlo-record[<xsl:value-of select="$record-url" />]</xsl:message>
+			<xsl:variable name="beta-vlo-facets-json" select="if (unparsed-text-available($facets-url)) then json-to-xml(unparsed-text($facets-url)) else ()"/>
+			<xsl:variable name="facets-from-beta" as="xs:string*"
+				select="$beta-vlo-facets-json//js:map[not(js:string[@key='name']=$skipVLOFacets)][js:array[@key='values']/js:map/js:string[@key='value'][normalize-space(.)!='']]/js:string[@key='name']/string(.)"/>
 			<xsl:variable name="vlo">
-				<xsl:choose>
-					<xsl:when test="unparsed-text-available($url)">
-						<xsl:variable name="vlo-beta" select="json-to-xml(unparsed-text($url))"/>
-						<xsl:apply-templates select="$vlo-beta" mode="beta-vlo"/>
-					</xsl:when>
-					<xsl:otherwise>
+				<xsl:if test="exists($beta-vlo-facets-json)">
+					<xsl:apply-templates select="$beta-vlo-facets-json" mode="beta-vlo-facets"/>
+				</xsl:if>
+				<xsl:if test="unparsed-text-available($record-url)">
+					<xsl:variable name="vlo-record" select="json-to-xml(unparsed-text($record-url))"/>
+					<xsl:apply-templates select="$vlo-record" mode="beta-vlo-record">
+						<xsl:with-param name="facets-from-beta" select="$facets-from-beta" tunnel="yes"/>
+					</xsl:apply-templates>
+				</xsl:if>
+				<xsl:if test="not(exists($beta-vlo-facets-json)) and not(unparsed-text-available($record-url))">
+					<xsl:message>WRN: neither facets-url nor record-url available, falling back to local facet mapping</xsl:message>
 						<xsl:for-each select="$fm//facetConcept[not(@name=$skipVLOFacets)]">
 							<xsl:variable name="facet" select="."/>
 							<!--<xsl:message>DBG: facet[<xsl:value-of select="$facet/@name"/>]</xsl:message>-->
@@ -172,9 +197,9 @@
 								</xsl:for-each>
 							</xsl:variable>
 							<!--<xsl:message>DBG: facet values[<xsl:value-of select="count($facetValues/*)"/>]</xsl:message>
-					<xsl:for-each select="$facetValues/*">
-						<xsl:message>[<xsl:value-of select="position()"/>] <xsl:value-of select="."/></xsl:message>
-					</xsl:for-each>-->
+							<xsl:for-each select="$facetValues/*">
+								<xsl:message>[<xsl:value-of select="position()"/>] <xsl:value-of select="."/></xsl:message>
+							</xsl:for-each>-->
 							<xsl:choose>
 								<xsl:when test="exists($facetValues/*)">
 									<xsl:for-each-group select="$facetValues/*" group-by="@pos">
@@ -224,8 +249,7 @@
 								</xsl:otherwise>
 							</xsl:choose>
 						</xsl:for-each>
-					</xsl:otherwise>
-				</xsl:choose>
+				</xsl:if>
 			</xsl:variable>
 			<xsl:apply-templates select="$vlo"/>
 			<xsl:apply-templates select="node()"/>
