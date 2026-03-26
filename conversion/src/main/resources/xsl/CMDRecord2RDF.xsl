@@ -274,7 +274,7 @@
                     <!-- if there is enum we also have an entity property -->
                     <xsl:if test="exists($profile/ValueScheme/Vocabulary/enumeration)">
                         <xsl:element name="{$id}ElementEntity" namespace="{$ns}">
-                            <xsl:attribute name="rdf:resource" select="concat($ns,$id,'ValueScheme',$STEP,replace(.,'\s',''))"/>
+                            <xsl:attribute name="rdf:resource" select="concat($ns,$id,'ValueScheme',$STEP,encode-for-uri(replace(.,'\s','')))"/>
                         </xsl:element>
                     </xsl:if>
                     <!-- switch back from the instance to the profile to handle the attributes -->
@@ -311,7 +311,7 @@
                     </xsl:element>
                     <xsl:if test="exists($profile/ValueScheme/Vocabulary/enumeration)">
                         <xsl:element name="{$has}Entity" namespace="{$ns}">
-                            <xsl:attribute name="rdf:resource" select="concat($ns,$id,'ValueScheme',$STEP,replace(.,'\s',''))"/>
+                            <xsl:attribute name="rdf:resource" select="concat($ns,$id,'ValueScheme',$STEP,encode-for-uri(replace(.,'\s','')))"/>
                         </xsl:element>
                     </xsl:if>
                 </xsl:element>
