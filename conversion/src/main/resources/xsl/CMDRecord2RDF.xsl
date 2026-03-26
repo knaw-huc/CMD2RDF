@@ -11,7 +11,7 @@
     <xsl:output method="xml" encoding="UTF-8"/>
 
 	<xsl:param name="base" select="if (exists(/*/@xml:base)) then (/*/@xml:base) else (base-uri())"/>
-	
+
     <!-- allow to rewrite the urls -->
     <xsl:param name="base_strip" select="'/Users/menzowi/Documents/Projects/OSTrails/SKG/test/'"/>
     <xsl:param name="base_add" select="''"/>
@@ -274,7 +274,7 @@
                     <!-- if there is enum we also have an entity property -->
                     <xsl:if test="exists($profile/ValueScheme/Vocabulary/enumeration)">
                         <xsl:element name="{$id}ElementEntity" namespace="{$ns}">
-                            <xsl:attribute name="rdf:resource" select="concat($ns,$id,'ValueScheme',$STEP,replace(.,'\s',''))"/>
+                            <xsl:attribute name="rdf:resource" select="concat($ns,$id,'ValueScheme',$STEP,encode-for-uri(replace(.,'\s','')))"/>
                         </xsl:element>
                     </xsl:if>
                     <!-- switch back from the instance to the profile to handle the attributes -->
@@ -311,20 +311,20 @@
                     </xsl:element>
                     <xsl:if test="exists($profile/ValueScheme/Vocabulary/enumeration)">
                         <xsl:element name="{$has}Entity" namespace="{$ns}">
-                            <xsl:attribute name="rdf:resource" select="concat($ns,$id,'ValueScheme',$STEP,replace(.,'\s',''))"/>
+                            <xsl:attribute name="rdf:resource" select="concat($ns,$id,'ValueScheme',$STEP,encode-for-uri(replace(.,'\s','')))"/>
                         </xsl:element>
                     </xsl:if>
                 </xsl:element>
             </cmdm:containsAttribute>
         </xsl:for-each>
     </xsl:template>
-	
-	<!-- a VLO facet -->
-	<xsl:template match="vlo:*">
-		<xsl:element name="vlo:{local-name()}ElementValue">
-			<xsl:attribute name="rdf:datatype" select="'&xsd;string'"/>
-			<xsl:value-of select="."/>
-		</xsl:element>
-	</xsl:template>
+
+    <!-- a VLO facet -->
+    <xsl:template match="vlo:*">
+        <xsl:element name="vlo:{local-name()}ElementValue">
+            <xsl:attribute name="rdf:datatype" select="'&xsd;string'"/>
+            <xsl:value-of select="."/>
+        </xsl:element>
+    </xsl:template>
 
 </xsl:stylesheet>

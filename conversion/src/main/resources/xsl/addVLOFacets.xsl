@@ -1,42 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0" xmlns:dcr="http://www.isocat.org/ns/dcr.rdf#"
-	xmlns:cmd0="http://www.clarin.eu/cmd/" xmlns:cmd1="http://www.clarin.eu/cmd/1" xmlns:vlo="http://www.clarin.eu/vlo/"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema"
-	xmlns:sx="java:nl.knaw.dans.saxon"
-	xmlns:functx="http://www.functx.com"
-	exclude-result-prefixes="xsl dcr xsi xs sx functx vlo cmd0 cmd1">
+				xmlns:cmd0="http://www.clarin.eu/cmd/" xmlns:cmd1="http://www.clarin.eu/cmd/1" xmlns:vlo="http://www.clarin.eu/vlo/"
+				xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+				xmlns:sx="java:nl.knaw.dans.saxon"
+				xmlns:functx="http://www.functx.com"
+				xmlns:js="http://www.w3.org/2005/xpath-functions"
+				exclude-result-prefixes="xsl dcr xsi xs sx functx vlo cmd0 cmd1 js">
 
 	<xsl:output method="xml" encoding="UTF-8" indent="yes"/>
-	
+
 	<xsl:include href="CMD2RDF.xsl"/>
-	
+
 	<!-- load the VLO facet mapping -->
+	<xsl:param name="beta-vlo-facets-url" select="'https://beta-vlo.clarin.eu/api/facets?q=id:'"/>
+	<xsl:param name="beta-vlo-record-url" select="'https://beta-vlo.clarin.eu/api/records/'" />
 	<xsl:param name="vloFacetMapping" select="'https://raw.githubusercontent.com/clarin-eric/VLO-mapping/master/mapping/facetConcepts.xml'"/>
 	<xsl:variable name="fm" select="document($vloFacetMapping)"/>
-	
+
 	<!-- skip some facets -->
 	<xsl:param name="skipVLOFacets" select="('id','_selfLink','text','_componentProfile')"/>
-	
+
 	<!-- SIL to ISO 639 -->
 	<xsl:variable name="lang-top" select="document('sil_to_iso6393.xml')/languages"/>
 	<xsl:key name="iso-lookup" match="lang" use="sil"/>
-	
+
 	<!-- helper -->
 	<xsl:function name="functx:capitalize-first" as="xs:string?">
 		<xsl:param name="arg" as="xs:string?"/>
-		
+
 		<xsl:sequence select="
 			concat(upper-case(substring($arg,1,1)),
 			substring($arg,2))
 			"/>
-		
+
 	</xsl:function>
-	
+
 	<!-- get the profile id -->
 	<xsl:variable name="profileId">
 		<xsl:choose>
 			<xsl:when test="exists((/cmd0:CMD/cmd0:Header/cmd0:MdProfile,/cmd1:CMD/cmd1:Header/cmd1:MdProfile))">
-				<!-- and ignore if there are multiple MdProfile and just take the first!! 
+				<!-- and ignore if there are multiple MdProfile and just take the first!!
                          although probably this more a case for the schema validation!  -->
 				<xsl:sequence select="cmd0:id((/cmd0:CMD/cmd0:Header/cmd0:MdProfile,/cmd1:CMD/cmd1:Header/cmd1:MdProfile)[1])"/>
 			</xsl:when>
@@ -50,13 +53,13 @@
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:variable>
-	
+
 	<!-- load the profile -->
 	<xsl:variable name="profile" select="cmd0:profile($profileId)"/>
-	
+
 	<!-- the CMD record -->
 	<xsl:variable name="rec" select="/"/>
-	
+
 	<!-- namespaces -->
 	<xsl:variable name="cmdi_version" select="$rec/*:CMD/@CMDVersion"/>
 	<xsl:variable name="cmd-ns" select="
@@ -68,7 +71,7 @@
 		if ($cmdi_version = '1.2')  then
 		concat('http://www.clarin.eu/cmd/1/profiles/',$profileId)
 		else
-		'http://www.clarin.eu/cmd/'"/>              
+		'http://www.clarin.eu/cmd/'"/>
 
 	<xsl:variable name="NS" as="element()">
 		<xsl:element namespace="{$cmd-ns}" name="cmd:ns">
@@ -77,19 +80,19 @@
 			</xsl:if>
 		</xsl:element>
 	</xsl:variable>
-	
-        <xsl:template match="/">
-            <!-- <xsl:message>INF: Welcome to addVLOFacets.xsl</xsl:message> -->
-            <xsl:apply-templates/>
-        </xsl:template>
-	
+
+	<xsl:template match="/">
+		<!-- <xsl:message>INF: Welcome to addVLOFacets.xsl</xsl:message> -->
+		<xsl:apply-templates/>
+	</xsl:template>
+
 	<!-- identity copy -->
 	<xsl:template match="@*|node()">
 		<xsl:copy>
 			<xsl:apply-templates select="@*|node()"/>
 		</xsl:copy>
 	</xsl:template>
-	
+
 	<xsl:function name="vlo:findConceptPaths">
 		<xsl:param name="concepts"/>
 		<xsl:param name="multiple" as="xs:boolean"/>
@@ -121,89 +124,138 @@
 			</xsl:choose>
 		</xsl:if>
 	</xsl:function>
-	
+
+	<xsl:function name="vlo:encodeId">
+		<xsl:param name="id"/>
+		<xsl:sequence select="replace(replace($id,':','_58_'),'/','_47_')"></xsl:sequence>
+	</xsl:function>
+
+	<xsl:template match="text()" mode="beta-vlo"/>
+
+	<xsl:template match="js:map" mode="beta-vlo-facets">
+		<xsl:variable name="f" select="."/>
+		<xsl:if test="not($f/js:string[@key='name']=$skipVLOFacets)">
+			<xsl:for-each select="$f/js:array[@key='values']/js:map/js:string[@key='value'][normalize-space(.)!='']">
+				<xsl:element name="vlo:hasFacet{functx:capitalize-first($f/js:string[@key='name'])}">
+					<xsl:value-of select="."/>
+				</xsl:element>
+			</xsl:for-each>
+		</xsl:if>
+	</xsl:template>
+
+	<xsl:template match="js:map" mode="beta-vlo-record">
+		<xsl:param name="facets-from-beta" as="xs:string*" tunnel="yes" select="()"/>
+		<xsl:for-each select="js:map[@key='fields']/js:array[not(@key=($skipVLOFacets,$facets-from-beta))][not(starts-with(@key,'_'))]">
+			<xsl:variable name="facetName" select="@key"/>
+			<xsl:for-each select="js:string[normalize-space(.)!='']">
+				<xsl:element name="vlo:hasFacet{functx:capitalize-first($facetName)}">
+					<xsl:value-of select="."/>
+				</xsl:element>
+			</xsl:for-each>
+		</xsl:for-each>
+	</xsl:template>
+
 	<xsl:template match="/cmd0:CMD|/cmd1:CMD">
 		<xsl:copy>
 			<xsl:attribute name="xml:base" select="base-uri()"/>
 			<xsl:apply-templates select="@*"/>
+			<xsl:variable name="facets-url" select="concat($beta-vlo-facets-url,vlo:encodeId(.//*:MdSelfLink))"/>
+			<xsl:variable name="record-url" select="concat($beta-vlo-record-url,vlo:encodeId(.//*:MdSelfLink))"/>
+			<xsl:message>DBG: beta-vlo-facets[<xsl:value-of select="$facets-url" />]</xsl:message>
+			<xsl:message>DBG: beta-vlo-record[<xsl:value-of select="$record-url" />]</xsl:message>
+			<xsl:variable name="beta-vlo-facets-json" select="if (unparsed-text-available($facets-url)) then json-to-xml(unparsed-text($facets-url)) else ()"/>
+			<xsl:variable name="facets-from-beta" as="xs:string*"
+						  select="$beta-vlo-facets-json//js:map[not(js:string[@key='name']=$skipVLOFacets)][js:array[@key='values']/js:map/js:string[@key='value'][normalize-space(.)!='']]/js:string[@key='name']/string(.)"/>
 			<xsl:variable name="vlo">
-				<xsl:for-each select="$fm//facetConcept[not(@name=$skipVLOFacets)]">
-					<xsl:variable name="facet" select="."/>
-					<!--<xsl:message>DBG: facet[<xsl:value-of select="$facet/@name"/>]</xsl:message>-->
-					<xsl:variable name="facetValues">
-						<xsl:for-each select="vlo:findConceptPaths(concept,empty(@allowMultipleValues) or (@allowMultipleValues='true'))">
-							<xsl:variable name="pos" select="position()"/>
-							<xsl:variable name="xp" select="."/>
-							<!--<xsl:message>DBG: facet concept path[<xsl:value-of select="$xp"/>]</xsl:message>-->
-							<xsl:variable name="vals">
-								<xsl:evaluate context-item="$rec" xpath="$xp" namespace-context="$NS" as="xs:string*"/>
-							</xsl:variable>
-							<xsl:for-each select="$vals">
-								<value pos="{$pos}">
-									<xsl:value-of select="."/>
-								</value>
-							</xsl:for-each>
-						</xsl:for-each>
-					</xsl:variable>
-					<!--<xsl:message>DBG: facet values[<xsl:value-of select="count($facetValues/*)"/>]</xsl:message>
-					<xsl:for-each select="$facetValues/*">
-						<xsl:message>[<xsl:value-of select="position()"/>] <xsl:value-of select="."/></xsl:message>
-					</xsl:for-each>-->
-					<xsl:choose>
-						<xsl:when test="exists($facetValues/*)">
-							<xsl:for-each-group select="$facetValues/*" group-by="@pos">
-								<xsl:if test="position()=1">
-									<xsl:for-each select="current-group()[normalize-space(.)!='']">
-										<xsl:element name="vlo:hasFacet{functx:capitalize-first($facet/@name)}">
-											<xsl:value-of select="."/>
-										</xsl:element>
-									</xsl:for-each>
-								</xsl:if>
-							</xsl:for-each-group>
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:variable name="facetValues">
-								<xsl:for-each select="pattern">
-									<xsl:variable name="pos" select="position()"/>
-									<xsl:variable name="xp" select="."/>
-									<!--<xsl:message>DBG: facet pattern path[<xsl:value-of select="$xp"/>]</xsl:message>-->
-									<xsl:variable name="vals">
-										<xsl:evaluate context-item="$rec" xpath="$xp" namespace-context="$NS" as="xs:string*"/>
-									</xsl:variable>
-									<xsl:for-each select="$vals">
-										<value pos="{$pos}">
-											<xsl:value-of select="."/>
-										</value>
-									</xsl:for-each>
+				<xsl:if test="exists($beta-vlo-facets-json)">
+					<xsl:apply-templates select="$beta-vlo-facets-json" mode="beta-vlo-facets"/>
+				</xsl:if>
+				<xsl:if test="unparsed-text-available($record-url)">
+					<xsl:variable name="vlo-record" select="json-to-xml(unparsed-text($record-url))"/>
+					<xsl:apply-templates select="$vlo-record" mode="beta-vlo-record">
+						<xsl:with-param name="facets-from-beta" select="$facets-from-beta" tunnel="yes"/>
+					</xsl:apply-templates>
+				</xsl:if>
+				<xsl:if test="not(exists($beta-vlo-facets-json)) and not(unparsed-text-available($record-url))">
+					<xsl:message>WRN: neither facets-url nor record-url available, falling back to local facet mapping</xsl:message>
+					<xsl:for-each select="$fm//facetConcept[not(@name=$skipVLOFacets)]">
+						<xsl:variable name="facet" select="."/>
+						<!--<xsl:message>DBG: facet[<xsl:value-of select="$facet/@name"/>]</xsl:message>-->
+						<xsl:variable name="facetValues">
+							<xsl:for-each select="vlo:findConceptPaths(concept,empty(@allowMultipleValues) or (@allowMultipleValues='true'))">
+								<xsl:variable name="pos" select="position()"/>
+								<xsl:variable name="xp" select="."/>
+								<!--<xsl:message>DBG: facet concept path[<xsl:value-of select="$xp"/>]</xsl:message>-->
+								<xsl:variable name="vals">
+									<xsl:evaluate context-item="$rec" xpath="$xp" namespace-context="$NS" as="xs:string*"/>
+								</xsl:variable>
+								<xsl:for-each select="$vals">
+									<value pos="{$pos}">
+										<xsl:value-of select="."/>
+									</value>
 								</xsl:for-each>
-							</xsl:variable>
-							<!--<xsl:message>DBG: facet values[<xsl:value-of select="count($facetValues/*)"/>]</xsl:message>-->
-							<!--<xsl:for-each select="$facetValues/*">
-								<xsl:message>[<xsl:value-of select="position()"/>] <xsl:value-of select="."/></xsl:message>
-							</xsl:for-each>-->
-							<xsl:for-each-group select="$facetValues/*" group-by="@pos">
-								<xsl:choose>
-									<xsl:when test="position()=1 or empty($facet/@allowMultipleValues) or ($facet/@allowMultipleValues='true')">
+							</xsl:for-each>
+						</xsl:variable>
+						<!--<xsl:message>DBG: facet values[<xsl:value-of select="count($facetValues/*)"/>]</xsl:message>
+                        <xsl:for-each select="$facetValues/*">
+                            <xsl:message>[<xsl:value-of select="position()"/>] <xsl:value-of select="."/></xsl:message>
+                        </xsl:for-each>-->
+						<xsl:choose>
+							<xsl:when test="exists($facetValues/*)">
+								<xsl:for-each-group select="$facetValues/*" group-by="@pos">
+									<xsl:if test="position()=1">
 										<xsl:for-each select="current-group()[normalize-space(.)!='']">
 											<xsl:element name="vlo:hasFacet{functx:capitalize-first($facet/@name)}">
 												<xsl:value-of select="."/>
 											</xsl:element>
 										</xsl:for-each>
-									</xsl:when>
-									<xsl:otherwise>
-										<xsl:message>ERR: no output!</xsl:message>
-									</xsl:otherwise>
-								</xsl:choose>
-							</xsl:for-each-group>
-						</xsl:otherwise>
-					</xsl:choose>
-				</xsl:for-each>
+									</xsl:if>
+								</xsl:for-each-group>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:variable name="facetValues">
+									<xsl:for-each select="pattern">
+										<xsl:variable name="pos" select="position()"/>
+										<xsl:variable name="xp" select="."/>
+										<!--<xsl:message>DBG: facet pattern path[<xsl:value-of select="$xp"/>]</xsl:message>-->
+										<xsl:variable name="vals">
+											<xsl:evaluate context-item="$rec" xpath="$xp" namespace-context="$NS" as="xs:string*"/>
+										</xsl:variable>
+										<xsl:for-each select="$vals">
+											<value pos="{$pos}">
+												<xsl:value-of select="."/>
+											</value>
+										</xsl:for-each>
+									</xsl:for-each>
+								</xsl:variable>
+								<!--<xsl:message>DBG: facet values[<xsl:value-of select="count($facetValues/*)"/>]</xsl:message>-->
+								<!--<xsl:for-each select="$facetValues/*">
+                            <xsl:message>[<xsl:value-of select="position()"/>] <xsl:value-of select="."/></xsl:message>
+                        </xsl:for-each>-->
+								<xsl:for-each-group select="$facetValues/*" group-by="@pos">
+									<xsl:choose>
+										<xsl:when test="position()=1 or empty($facet/@allowMultipleValues) or ($facet/@allowMultipleValues='true')">
+											<xsl:for-each select="current-group()[normalize-space(.)!='']">
+												<xsl:element name="vlo:hasFacet{functx:capitalize-first($facet/@name)}">
+													<xsl:value-of select="."/>
+												</xsl:element>
+											</xsl:for-each>
+										</xsl:when>
+										<xsl:otherwise>
+											<xsl:message>ERR: no output!</xsl:message>
+										</xsl:otherwise>
+									</xsl:choose>
+								</xsl:for-each-group>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:for-each>
+				</xsl:if>
 			</xsl:variable>
 			<xsl:apply-templates select="$vlo"/>
 			<xsl:apply-templates select="node()"/>
 		</xsl:copy>
 	</xsl:template>
-	
+
 	<xsl:template match="vlo:hasFacetLanguageCode">
 		<xsl:copy>
 			<xsl:apply-templates select="@*|node()"/>

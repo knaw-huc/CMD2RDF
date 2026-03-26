@@ -1,61 +1,282 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Test file simulating output after addVLOFacets.xsl transformation -->
-<!-- Use this to test addOST.xsl organisation entity generation -->
 <cmd:CMD xmlns:cmd="http://www.clarin.eu/cmd/1"
-         xmlns:cmdp="http://www.clarin.eu/cmd/1/profiles/clarin.eu:cr1:p_1407745712064"
-         xmlns:vlo="http://www.clarin.eu/vlo/"
+         xmlns:cmdp="http://www.clarin.eu/cmd/1/profiles/clarin.eu:cr1:p_1407745712035"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         CMDVersion="1.2"
-         xml:base="file:///Users/listj/IdeaProjects/CMD2RDF/OST/test-with-vlo-facets.xml"
-         xsi:schemaLocation="http://www.clarin.eu/cmd/1 https://infra.clarin.eu/CMDI/1.x/xsd/cmd-envelop.xsd">
-
-    <!-- Added test VLO facets -->
-    <vlo:hasFacetName>Barbsch L1</vlo:hasFacetName>
-    <vlo:hasFacetDescription>Description of the "Lamp" experiment - Children were asked to carry out tasks involving lamps.</vlo:hasFacetDescription>
-    <vlo:hasFacetOrganisation>Bavarian Archive for Speech Signals</vlo:hasFacetOrganisation>
-    <vlo:hasFacetOrganisation>Max Planck Institute for Psycholinguistics</vlo:hasFacetOrganisation>
-    <vlo:hasFacetLanguageCode>ISO639-3:deu</vlo:hasFacetLanguageCode>
-    <vlo:hasFacetCountry>Germany</vlo:hasFacetCountry>
-    <vlo:hasFacetResourceClass>corpus</vlo:hasFacetResourceClass>
-
+         xml:base="file:/Users/listj/Clarin.Data/results/cmdi/AdWHH/1176340.xml"
+         CMDVersion="1.2">
+    <vlo:hasFacetLanguageCode xmlns:vlo="http://www.clarin.eu/vlo/">code:deu</vlo:hasFacetLanguageCode>
+    <vlo:hasFacetISO6393 xmlns:vlo="http://www.clarin.eu/vlo/">und</vlo:hasFacetISO6393>
+    <vlo:hasFacetLanguageCode xmlns:vlo="http://www.clarin.eu/vlo/">code:eng</vlo:hasFacetLanguageCode>
+    <vlo:hasFacetISO6393 xmlns:vlo="http://www.clarin.eu/vlo/">und</vlo:hasFacetISO6393>
+    <vlo:hasFacetLanguageCode xmlns:vlo="http://www.clarin.eu/vlo/">code:gsg</vlo:hasFacetLanguageCode>
+    <vlo:hasFacetISO6393 xmlns:vlo="http://www.clarin.eu/vlo/">und</vlo:hasFacetISO6393>
+    <vlo:hasFacetLanguageCode xmlns:vlo="http://www.clarin.eu/vlo/">name:Deutsche Gebärdensprache</vlo:hasFacetLanguageCode>
+    <vlo:hasFacetISO6393 xmlns:vlo="http://www.clarin.eu/vlo/">und</vlo:hasFacetISO6393>
+    <vlo:hasFacetCollection xmlns:vlo="http://www.clarin.eu/vlo/">Public DGS Corpus</vlo:hasFacetCollection>
+    <vlo:hasFacetModality xmlns:vlo="http://www.clarin.eu/vlo/">gestures; pointing-gestures; signs; eye-gaze; facial-expressions</vlo:hasFacetModality>
+    <vlo:hasFacetFormat xmlns:vlo="http://www.clarin.eu/vlo/">application/x-subrip</vlo:hasFacetFormat>
+    <vlo:hasFacetFormat xmlns:vlo="http://www.clarin.eu/vlo/">text/html</vlo:hasFacetFormat>
+    <vlo:hasFacetFormat xmlns:vlo="http://www.clarin.eu/vlo/">text/x-eaf+xml</vlo:hasFacetFormat>
+    <vlo:hasFacetFormat xmlns:vlo="http://www.clarin.eu/vlo/">text/x-ilex+xml</vlo:hasFacetFormat>
+    <vlo:hasFacetFormat xmlns:vlo="http://www.clarin.eu/vlo/">video/mp4</vlo:hasFacetFormat>
+    <vlo:hasFacetGenre xmlns:vlo="http://www.clarin.eu/vlo/">discourse</vlo:hasFacetGenre>
+    <vlo:hasFacetCountry xmlns:vlo="http://www.clarin.eu/vlo/">Germany</vlo:hasFacetCountry>
+    <vlo:hasFacetOrganisation xmlns:vlo="http://www.clarin.eu/vlo/">Universität Hamburg</vlo:hasFacetOrganisation>
     <cmd:Header>
-        <cmd:MdCreator>corpman</cmd:MdCreator>
-        <cmd:MdCreationDate>2004-10-18</cmd:MdCreationDate>
-        <cmd:MdSelfLink>https://hdl.handle.net/1839/00-0000-0000-0000-30B0-2</cmd:MdSelfLink>
-        <cmd:MdProfile>clarin.eu:cr1:p_1407745712064</cmd:MdProfile>
-        <cmd:MdCollectionDisplayName>The Language Archive</cmd:MdCollectionDisplayName>
+        <cmd:MdCreator>ilex2cmdi</cmd:MdCreator>
+        <cmd:MdSelfLink>https://www.sign-lang.uni-hamburg.de/meinedgs/cmdi/1176340.cmdi</cmd:MdSelfLink>
+        <cmd:MdProfile>clarin.eu:cr1:p_1407745712035</cmd:MdProfile>
+        <cmd:MdCollectionDisplayName>Public DGS Corpus</cmd:MdCollectionDisplayName>
     </cmd:Header>
-
     <cmd:Resources>
         <cmd:ResourceProxyList>
-            <cmd:ResourceProxy id="res1">
-                <cmd:ResourceType>Resource</cmd:ResourceType>
-                <cmd:ResourceRef>https://hdl.handle.net/1839/00-0000-0000-0000-37EE-3</cmd:ResourceRef>
+            <cmd:ResourceProxy id="ref_1176340">
+                <cmd:ResourceType mimetype="text/html">LandingPage</cmd:ResourceType>
+                <cmd:ResourceRef>https://doi.org/10.25592/dgs.corpus-text-1176340</cmd:ResourceRef>
+            </cmd:ResourceProxy>
+            <cmd:ResourceProxy id="ref_1176340_1a1">
+                <cmd:ResourceType mimetype="video/mp4">Resource</cmd:ResourceType>
+                <cmd:ResourceRef>https://www.sign-lang.uni-hamburg.de/meinedgs/videos/1176340/1176340_1a1.mp4</cmd:ResourceRef>
+            </cmd:ResourceProxy>
+            <cmd:ResourceProxy id="ref_1176340_1b1">
+                <cmd:ResourceType mimetype="video/mp4">Resource</cmd:ResourceType>
+                <cmd:ResourceRef>https://www.sign-lang.uni-hamburg.de/meinedgs/videos/1176340/1176340_1b1.mp4</cmd:ResourceRef>
+            </cmd:ResourceProxy>
+            <cmd:ResourceProxy id="ref_1176340_1c">
+                <cmd:ResourceType mimetype="video/mp4">Resource</cmd:ResourceType>
+                <cmd:ResourceRef>https://www.sign-lang.uni-hamburg.de/meinedgs/videos/1176340/1176340_1c.mp4</cmd:ResourceRef>
+            </cmd:ResourceProxy>
+            <cmd:ResourceProxy id="ref_1176340_1ab">
+                <cmd:ResourceType mimetype="video/mp4">Resource</cmd:ResourceType>
+                <cmd:ResourceRef>https://www.sign-lang.uni-hamburg.de/meinedgs/videos/1176340/1176340.mp4</cmd:ResourceRef>
+            </cmd:ResourceProxy>
+            <cmd:ResourceProxy id="ref_1176340_html_de">
+                <cmd:ResourceType mimetype="text/html">Resource</cmd:ResourceType>
+                <cmd:ResourceRef>https://www.sign-lang.uni-hamburg.de/meinedgs/html/1176340_de.html</cmd:ResourceRef>
+            </cmd:ResourceProxy>
+            <cmd:ResourceProxy id="ref_1176340_html_en">
+                <cmd:ResourceType mimetype="text/html">Resource</cmd:ResourceType>
+                <cmd:ResourceRef>https://www.sign-lang.uni-hamburg.de/meinedgs/html/1176340_en.html</cmd:ResourceRef>
+            </cmd:ResourceProxy>
+            <cmd:ResourceProxy id="ref_1176340_eaf">
+                <cmd:ResourceType mimetype="text/x-eaf+xml">Resource</cmd:ResourceType>
+                <cmd:ResourceRef>https://www.sign-lang.uni-hamburg.de/meinedgs/eaf/1176340.eaf</cmd:ResourceRef>
+            </cmd:ResourceProxy>
+            <cmd:ResourceProxy id="ref_1176340_ilex">
+                <cmd:ResourceType mimetype="text/x-ilex+xml">Resource</cmd:ResourceType>
+                <cmd:ResourceRef>https://www.sign-lang.uni-hamburg.de/meinedgs/ilex/1176340.ilex</cmd:ResourceRef>
+            </cmd:ResourceProxy>
+            <cmd:ResourceProxy id="ref_1176340_srt_de">
+                <cmd:ResourceType mimetype="application/x-subrip">Resource</cmd:ResourceType>
+                <cmd:ResourceRef>https://www.sign-lang.uni-hamburg.de/meinedgs/srt/1176340_de.srt</cmd:ResourceRef>
+            </cmd:ResourceProxy>
+            <cmd:ResourceProxy id="ref_1176340_srt_en">
+                <cmd:ResourceType mimetype="application/x-subrip">Resource</cmd:ResourceType>
+                <cmd:ResourceRef>https://www.sign-lang.uni-hamburg.de/meinedgs/srt/1176340_en.srt</cmd:ResourceRef>
             </cmd:ResourceProxy>
         </cmd:ResourceProxyList>
         <cmd:JournalFileProxyList/>
         <cmd:ResourceRelationList/>
     </cmd:Resources>
-
     <cmd:Components>
-        <cmdp:lat-corpus CollectionLevel="Collection">
-            <cmdp:Name>Barbsch L1</cmdp:Name>
-            <cmdp:Title>Barbsch L1</cmdp:Title>
-            <cmdp:Catalogue>
-                <cmdp:descriptions>
-                    <cmdp:Description xml:lang="eng">Description of the "Lamp" experiment - Children were asked to carry out tasks involving lamps.</cmdp:Description>
-                </cmdp:descriptions>
-                <cmdp:Subject_Languages>
-                    <cmdp:Subject_Language>
-                        <cmdp:Id>ISO639-3:deu</cmdp:Id>
-                        <cmdp:Name>German</cmdp:Name>
-                    </cmdp:Subject_Language>
-                </cmdp:Subject_Languages>
-                <cmdp:Location>
-                    <cmdp:Continent>Europe</cmdp:Continent>
-                    <cmdp:Country>Germany</cmdp:Country>
-                </cmdp:Location>
-            </cmdp:Catalogue>
-        </cmdp:lat-corpus>
+        <cmdp:lat-session>
+            <cmdp:Name>1176340</cmdp:Name>
+            <cmdp:Title>dgskorpus_sh_02: Experience Of Deaf Individuals</cmdp:Title>
+            <cmdp:Date>2010-01-16</cmdp:Date>
+            <cmdp:Location>
+                <cmdp:Continent>Europe</cmdp:Continent>
+                <cmdp:Country>Germany</cmdp:Country>
+                <cmdp:Region>Schleswig-Holstein</cmdp:Region>
+            </cmdp:Location>
+            <cmdp:Project>
+                <cmdp:Name>DGS-Korpus</cmdp:Name>
+                <cmdp:Title>DGS-Korpus</cmdp:Title>
+                <cmdp:Id>dgs-korpus.de</cmdp:Id>
+                <cmdp:Contact>
+                    <cmdp:Name>Institut für Deutsche Gebärdensprache und Kommunikation Gehörloser/DGS-Korpus</cmdp:Name>
+                    <cmdp:Address>Gorch-Fock-Wall 7, 20354 Hamburg, Germany</cmdp:Address>
+                    <cmdp:Organisation>Universität Hamburg</cmdp:Organisation>
+                </cmdp:Contact>
+            </cmdp:Project>
+            <cmdp:Content>
+                <cmdp:Genre>Discourse</cmdp:Genre>
+                <cmdp:Task>Experience Of Deaf Individuals</cmdp:Task>
+                <cmdp:Modalities>gestures; pointing-gestures; signs; eye-gaze; facial-expressions</cmdp:Modalities>
+                <cmdp:CommunicationContext>
+                    <cmdp:Interactivity>interactive</cmdp:Interactivity>
+                    <cmdp:PlanningType>spontaneous</cmdp:PlanningType>
+                    <cmdp:Involvement>non-elicited</cmdp:Involvement>
+                    <cmdp:SocialContext>Controlled environment</cmdp:SocialContext>
+                    <cmdp:EventStructure>Dialogue</cmdp:EventStructure>
+                    <cmdp:Channel>Face to Face</cmdp:Channel>
+                </cmdp:CommunicationContext>
+                <cmdp:Content_Languages>
+                    <cmdp:Content_Language>
+                        <cmdp:Id>ISO639-3:gsg</cmdp:Id>
+                        <cmdp:Name>Deutsche Gebärdensprache</cmdp:Name>
+                        <cmdp:Dominant>true</cmdp:Dominant>
+                        <cmdp:SourceLanguage>Unspecified</cmdp:SourceLanguage>
+                        <cmdp:TargetLanguage>Unspecified</cmdp:TargetLanguage>
+                    </cmdp:Content_Language>
+                </cmdp:Content_Languages>
+            </cmdp:Content>
+            <cmdp:Actors>
+                <cmdp:Actor>
+                    <cmdp:Role>speaker/signer</cmdp:Role>
+                    <cmdp:Name>SH-03 (informant A)</cmdp:Name>
+                    <cmdp:Code>SH-03</cmdp:Code>
+                    <cmdp:FamilySocialRole>Unspecified</cmdp:FamilySocialRole>
+                    <cmdp:EthnicGroup>Unspecified</cmdp:EthnicGroup>
+                    <cmdp:BirthDate>Unspecified</cmdp:BirthDate>
+                    <cmdp:Sex>Female</cmdp:Sex>
+                    <cmdp:Education>Unspecified</cmdp:Education>
+                    <cmdp:Anonymized>true</cmdp:Anonymized>
+                    <cmdp:Age>
+                        <cmdp:AgeRange>
+                            <cmdp:MinimumAge>
+                                <cmdp:years>18</cmdp:years>
+                            </cmdp:MinimumAge>
+                            <cmdp:MaximumAge>
+                                <cmdp:years>30</cmdp:years>
+                            </cmdp:MaximumAge>
+                        </cmdp:AgeRange>
+                    </cmdp:Age>
+                    <cmdp:Actor_Languages>
+                        <cmdp:Actor_Language>
+                            <cmdp:Id>ISO639-3:gsg</cmdp:Id>
+                            <cmdp:Name>Deutsche Gebärdensprache</cmdp:Name>
+                            <cmdp:MotherTongue>Unspecified</cmdp:MotherTongue>
+                            <cmdp:PrimaryLanguage>Unspecified</cmdp:PrimaryLanguage>
+                        </cmdp:Actor_Language>
+                    </cmdp:Actor_Languages>
+                </cmdp:Actor>
+                <cmdp:Actor>
+                    <cmdp:Role>speaker/signer</cmdp:Role>
+                    <cmdp:Name>SH-21 (informant B)</cmdp:Name>
+                    <cmdp:Code>SH-21</cmdp:Code>
+                    <cmdp:FamilySocialRole>Unspecified</cmdp:FamilySocialRole>
+                    <cmdp:EthnicGroup>Unspecified</cmdp:EthnicGroup>
+                    <cmdp:BirthDate>Unspecified</cmdp:BirthDate>
+                    <cmdp:Sex>Female</cmdp:Sex>
+                    <cmdp:Education>Unspecified</cmdp:Education>
+                    <cmdp:Anonymized>true</cmdp:Anonymized>
+                    <cmdp:Age>
+                        <cmdp:AgeRange>
+                            <cmdp:MinimumAge>
+                                <cmdp:years>18</cmdp:years>
+                            </cmdp:MinimumAge>
+                            <cmdp:MaximumAge>
+                                <cmdp:years>30</cmdp:years>
+                            </cmdp:MaximumAge>
+                        </cmdp:AgeRange>
+                    </cmdp:Age>
+                    <cmdp:Actor_Languages>
+                        <cmdp:Actor_Language>
+                            <cmdp:Id>ISO639-3:gsg</cmdp:Id>
+                            <cmdp:Name>Deutsche Gebärdensprache</cmdp:Name>
+                            <cmdp:MotherTongue>Unspecified</cmdp:MotherTongue>
+                            <cmdp:PrimaryLanguage>Unspecified</cmdp:PrimaryLanguage>
+                        </cmdp:Actor_Language>
+                    </cmdp:Actor_Languages>
+                </cmdp:Actor>
+                <cmdp:Actor>
+                    <cmdp:Role>interviewer</cmdp:Role>
+                    <cmdp:Name>sh-mod-1 (moderator)</cmdp:Name>
+                    <cmdp:Code>sh-mod-1</cmdp:Code>
+                    <cmdp:FamilySocialRole>Unspecified</cmdp:FamilySocialRole>
+                    <cmdp:EthnicGroup>Unspecified</cmdp:EthnicGroup>
+                    <cmdp:BirthDate>Unspecified</cmdp:BirthDate>
+                    <cmdp:Sex>Female</cmdp:Sex>
+                    <cmdp:Education>Unspecified</cmdp:Education>
+                    <cmdp:Anonymized>true</cmdp:Anonymized>
+                    <cmdp:Age>
+                        <cmdp:AgeRange>
+                            <cmdp:MinimumAge>
+                                <cmdp:years>46</cmdp:years>
+                            </cmdp:MinimumAge>
+                            <cmdp:MaximumAge>
+                                <cmdp:years>60</cmdp:years>
+                            </cmdp:MaximumAge>
+                        </cmdp:AgeRange>
+                    </cmdp:Age>
+                    <cmdp:Actor_Languages>
+                        <cmdp:Actor_Language>
+                            <cmdp:Id>ISO639-3:gsg</cmdp:Id>
+                            <cmdp:Name>Deutsche Gebärdensprache</cmdp:Name>
+                            <cmdp:MotherTongue>Unspecified</cmdp:MotherTongue>
+                            <cmdp:PrimaryLanguage>Unspecified</cmdp:PrimaryLanguage>
+                        </cmdp:Actor_Language>
+                    </cmdp:Actor_Languages>
+                </cmdp:Actor>
+            </cmdp:Actors>
+            <cmdp:Resources>
+                <cmdp:MediaFile cmd:ref="ref_1176340_1a1">
+                    <cmdp:Type>video</cmdp:Type>
+                    <cmdp:Format>video/mp4</cmdp:Format>
+                    <cmdp:Size>19590630</cmdp:Size>
+                    <cmdp:RecordingConditions>***</cmdp:RecordingConditions>
+                </cmdp:MediaFile>
+                <cmdp:MediaFile cmd:ref="ref_1176340_1b1">
+                    <cmdp:Type>video</cmdp:Type>
+                    <cmdp:Format>video/mp4</cmdp:Format>
+                    <cmdp:Size>35161212</cmdp:Size>
+                    <cmdp:RecordingConditions>***</cmdp:RecordingConditions>
+                </cmdp:MediaFile>
+                <cmdp:MediaFile cmd:ref="ref_1176340_1c">
+                    <cmdp:Type>video</cmdp:Type>
+                    <cmdp:Format>video/mp4</cmdp:Format>
+                    <cmdp:Size>30312783</cmdp:Size>
+                    <cmdp:RecordingConditions>***</cmdp:RecordingConditions>
+                </cmdp:MediaFile>
+                <cmdp:MediaFile cmd:ref="ref_1176340_1ab">
+                    <cmdp:Type>video</cmdp:Type>
+                    <cmdp:Format>video/mp4</cmdp:Format>
+                    <cmdp:Size>51471004</cmdp:Size>
+                    <cmdp:RecordingConditions>***</cmdp:RecordingConditions>
+                </cmdp:MediaFile>
+                <cmdp:WrittenResource cmd:ref="ref_1176340_html_de">
+                    <cmdp:Type>Annotation</cmdp:Type>
+                    <cmdp:Format>text/html</cmdp:Format>
+                    <cmdp:Size>1147425</cmdp:Size>
+                    <cmdp:LanguageId>ISO639-3:deu</cmdp:LanguageId>
+                    <cmdp:Anonymized>true</cmdp:Anonymized>
+                </cmdp:WrittenResource>
+                <cmdp:WrittenResource cmd:ref="ref_1176340_html_en">
+                    <cmdp:Type>Annotation</cmdp:Type>
+                    <cmdp:Format>text/html</cmdp:Format>
+                    <cmdp:Size>1131647</cmdp:Size>
+                    <cmdp:LanguageId>ISO639-3:eng</cmdp:LanguageId>
+                    <cmdp:Anonymized>true</cmdp:Anonymized>
+                </cmdp:WrittenResource>
+                <cmdp:WrittenResource cmd:ref="ref_1176340_eaf">
+                    <cmdp:Type>Annotation</cmdp:Type>
+                    <cmdp:Format>text/x-eaf+xml</cmdp:Format>
+                    <cmdp:Size>1658484</cmdp:Size>
+                    <cmdp:LanguageId/>
+                    <cmdp:Anonymized>true</cmdp:Anonymized>
+                </cmdp:WrittenResource>
+                <cmdp:WrittenResource cmd:ref="ref_1176340_ilex">
+                    <cmdp:Type>Annotation</cmdp:Type>
+                    <cmdp:Format>text/x-ilex+xml</cmdp:Format>
+                    <cmdp:Size>610540</cmdp:Size>
+                    <cmdp:LanguageId/>
+                    <cmdp:Anonymized>true</cmdp:Anonymized>
+                </cmdp:WrittenResource>
+                <cmdp:WrittenResource cmd:ref="ref_1176340_srt_de">
+                    <cmdp:Type>Annotation</cmdp:Type>
+                    <cmdp:Format>application/x-subrip</cmdp:Format>
+                    <cmdp:Size>159370</cmdp:Size>
+                    <cmdp:LanguageId>ISO639-3:deu</cmdp:LanguageId>
+                    <cmdp:Anonymized>true</cmdp:Anonymized>
+                </cmdp:WrittenResource>
+                <cmdp:WrittenResource cmd:ref="ref_1176340_srt_en">
+                    <cmdp:Type>Annotation</cmdp:Type>
+                    <cmdp:Format>application/x-subrip</cmdp:Format>
+                    <cmdp:Size>157092</cmdp:Size>
+                    <cmdp:LanguageId>ISO639-3:eng</cmdp:LanguageId>
+                    <cmdp:Anonymized>true</cmdp:Anonymized>
+                </cmdp:WrittenResource>
+            </cmdp:Resources>
+        </cmdp:lat-session>
     </cmd:Components>
 </cmd:CMD>
