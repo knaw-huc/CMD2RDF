@@ -36,7 +36,7 @@
     <!-- Slugify function: convert name to lowercase identifier with underscores -->
     <xsl:function name="ost:slugify" as="xs:string">
         <xsl:param name="text" as="xs:string"/>
-        <xsl:sequence select="lower-case(replace(normalize-space($text), '\s+', '_'))"/>
+        <xsl:sequence select="encode-for-uri(lower-case(replace(normalize-space($text), '\s+', '_')))"/>
     </xsl:function>
 
     <xsl:template match="/cmd0:CMD|/cmd1:CMD">
