@@ -161,8 +161,8 @@
 			<xsl:apply-templates select="@*"/>
 			<xsl:variable name="facets-url" select="concat($beta-vlo-facets-url,js:encode-for-uri(vlo:encodeId(.//*:MdSelfLink)))"/>
 			<xsl:variable name="record-url" select="concat($beta-vlo-record-url,js:encode-for-uri(vlo:encodeId(.//*:MdSelfLink)))"/>
-			<xsl:message>DBG: beta-vlo-facets[<xsl:value-of select="$facets-url" />]</xsl:message>
-			<xsl:message>DBG: beta-vlo-record[<xsl:value-of select="$record-url" />]</xsl:message>
+			<!--<xsl:message>DBG: beta-vlo-facets[<xsl:value-of select="$facets-url" />]</xsl:message>-->
+			<!--<xsl:message>DBG: beta-vlo-record[<xsl:value-of select="$record-url" />]</xsl:message>-->
 			<xsl:variable name="beta-vlo-facets-json" select="if (unparsed-text-available($facets-url)) then json-to-xml(unparsed-text($facets-url)) else ()"/>
 			<xsl:variable name="facets-from-beta" as="xs:string*"
 						  select="$beta-vlo-facets-json//js:map[not(js:string[@key='name']=$skipVLOFacets)][js:array[@key='values']/js:map/js:string[@key='value'][normalize-space(.)!='']]/js:string[@key='name']/string(.)"/>

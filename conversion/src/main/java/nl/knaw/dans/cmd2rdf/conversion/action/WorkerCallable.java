@@ -17,15 +17,17 @@ import org.slf4j.LoggerFactory;
 public class WorkerCallable implements Callable<String> {
 
 	private static final Logger log = LoggerFactory.getLogger(WorkerCallable.class);
-    private String path;
-	private List<IAction> actions;
-	private int i;
+    private final String path;
+	private final List<IAction> actions;
+	private final int i;
+	private final Long throttleDuration;
 	
 
-    public WorkerCallable(String path, List<IAction> actions, int i){
+    public WorkerCallable(String path, List<IAction> actions, int i, String throttleDuration) {
         this.path = path;
         this.actions = actions;
         this.i = i;
+		this.throttleDuration = throttleDuration != null ? Long.parseLong(throttleDuration) : null;
     }
     
     private String executeActions(String path) throws ActionException {
@@ -48,6 +50,10 @@ public class WorkerCallable implements Callable<String> {
 
 	@Override
 	public String call() throws Exception {
+		if (throttleDuration != null) {
+			Thread.sleep(throttleDuration); // throttle calls
+		}
+
 		String msg = "";
 		log.debug("Run worker for '" + path + "'.");
         try {
