@@ -184,7 +184,7 @@ public class StoreClient implements IAction {
                 WebTarget target = client.target(uriBuilder.build());
 
                 // Do request
-                Response response = target.request().put(
+                Response response = target.request().post(
                         Entity.entity(bytes, StoreMediaTypes.APPLICATION_RDF_XML.getMediaType()));
 
                 int status = response.getStatus();
