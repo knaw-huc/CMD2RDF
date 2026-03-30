@@ -1,27 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-<<<<<<< Updated upstream
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
-                xmlns:math="http://www.w3.org/2005/xpath-functions/math"
-                xmlns:cmd0="http://www.clarin.eu/cmd/"
-                xmlns:cmd1="http://www.clarin.eu/cmd/1"
-                xmlns:vlo="http://www.clarin.eu/vlo/"
-                xmlns:dc="http://purl.org/dc/terms/"
-                xmlns:fabio="http://purl.org/spar/fabio/"
-                xmlns:datacite="http://purl.org/spar/datacite/"
-                xmlns:silvio="http://www.essepuntato.it/2010/06/literalreification/"
-                xmlns:literal="http://www.essepuntato.it/2010/06/literalreification/"
-                xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-                xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-                xmlns:foaf="http://xmlns.com/foaf/0.1/"
-                xmlns:frbr="http://purl.org/vocab/frbr/core#"
-                xmlns:prism="http://prismstandard.org/namespaces/basic/2.0/"
-                xmlns:pso="http://purl.org/spar/pso/"
-                xmlns:ost="https://ostrails.eu/"
-                exclude-result-prefixes="xs math ost"
-                version="3.0">
-=======
-    xmlns:xs="http://www.w3.org/2001/XMLSchema"
     xmlns:math="http://www.w3.org/2005/xpath-functions/math"
     xmlns:cmd0="http://www.clarin.eu/cmd/"
     xmlns:cmd1="http://www.clarin.eu/cmd/1"
@@ -39,7 +18,6 @@
     xmlns:ost="https://ostrails.eu/"
     exclude-result-prefixes="xs math ost"
     version="3.0">
->>>>>>> Stashed changes
 
     <xsl:output method="xml" indent="yes" />
 
@@ -52,7 +30,7 @@
     <!-- SKG-IF base URI for organisation entities -->
     <xsl:param name="skg-base" select="'https://w3id.org/skg-if/sandbox/my-skg-acronym/'"/>
 
-    <xsl:variable name="about" select="replace(if ($base_strip=$base) then $base else for $strip in tokquenize($base_strip,',') return if (starts-with($base,concat('file:',$strip))) then replace($base, concat('file:',$strip), $base_add) else (),'([./])(xml|cmdi)$','$1rdf')"/>
+    <xsl:variable name="about" select="replace(if ($base_strip=$base) then $base else for $strip in tokenize($base_strip,',') return if (starts-with($base,concat('file:',$strip))) then replace($base, concat('file:',$strip), $base_add) else (),'([./])(xml|cmdi)$','$1rdf')"/>
 
     <!-- Slugify function: convert name to lowercase identifier with underscores -->
     <xsl:function name="ost:slugify" as="xs:string">
