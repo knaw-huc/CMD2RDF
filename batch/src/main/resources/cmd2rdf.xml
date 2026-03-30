@@ -19,7 +19,6 @@
 			<property name="username">dba</property>
 			<property name="password">dba</property>
 			<property name="prefixBaseURI">http://localhost:8080/cmd2rdf/graph</property>
-			<property name="shScriptPath">{gitrepo}/batch/src/main/resources/virtuoso_bulk_import.sh</property>
 			<property name="tmpOutDir">{workspace}/rdf-output</property>
 			<property name="dirDownloadPwd">Put here a strong password!</property>
 		</properties>
@@ -323,20 +322,6 @@
 			</actions>
 			<cleanup>
 				<actions>
-					<!--
-					<action name="EXECUTE BULK IMPORT temp">
-						<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.VirtuosoBulkImporter">
-							<properties>
-								<property name="bulkImportShellPath">{shScriptPath}</property>
-								<property name="host">virtuoso</property>
-								<property name="port">1111</property>
-								<property name="username">{username}</property>
-								<property name="password">{password}</property>
-								<property name="rdfDir">{tmpOutDir}/temp</property>
-							</properties>
-						</class>
-					</action>
-					-->
 					<action name="Deleting rdf output file temp">
 						<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.CleanDirectory">
 							<properties>
