@@ -159,8 +159,8 @@
 		<xsl:copy>
 			<xsl:attribute name="xml:base" select="base-uri()"/>
 			<xsl:apply-templates select="@*"/>
-			<xsl:variable name="facets-url" select="concat($beta-vlo-facets-url,vlo:encodeId(.//*:MdSelfLink))"/>
-			<xsl:variable name="record-url" select="concat($beta-vlo-record-url,vlo:encodeId(.//*:MdSelfLink))"/>
+			<xsl:variable name="facets-url" select="concat($beta-vlo-facets-url,js:encode-for-uri(vlo:encodeId(.//*:MdSelfLink)))"/>
+			<xsl:variable name="record-url" select="concat($beta-vlo-record-url,js:encode-for-uri(vlo:encodeId(.//*:MdSelfLink)))"/>
 			<xsl:message>DBG: beta-vlo-facets[<xsl:value-of select="$facets-url" />]</xsl:message>
 			<xsl:message>DBG: beta-vlo-record[<xsl:value-of select="$record-url" />]</xsl:message>
 			<xsl:variable name="beta-vlo-facets-json" select="if (unparsed-text-available($facets-url)) then json-to-xml(unparsed-text($facets-url)) else ()"/>

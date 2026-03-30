@@ -7,7 +7,7 @@
         <!-- encoders are assigned the type
      ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -22,7 +22,7 @@
         </rollingPolicy>
 
         <encoder>
-            <pattern>%d{HH:mm:ss.SSS}  %-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-4relative [%thread] %-5level %logger{35} - %msg %n</pattern>
         </encoder>
     </appender>
     
@@ -30,12 +30,25 @@
         <file>/app/logs/cmd2rdf/errors.log</file>
         <append>true</append>
         <encoder>
-            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg %n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-4relative [%thread] %-5level %logger{35} - %msg %n</pattern>
         </encoder>
     </appender>
+
+    <appender name="ERRORFILESLOG-FILE" class="ch.qos.logback.core.FileAppender">
+        <file>/app/logs/cmd2rdf/errorfiles.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-4relative [%thread] %-5level %logger{35} - %msg %n</pattern>
+        </encoder>
+    </appender>
+
     <!-- additivity=false ensures analytics data only goes to the analytics log -->
     <logger name="errorlog" level="INFO" additivity="false">
         <appender-ref ref="ERRORLOG-FILE"/>
+    </logger>
+
+    <logger name="errorfileslog" level="INFO" additivity="false">
+        <appender-ref ref="ERRORFILESLOG-FILE" />
     </logger>
  
 	<logger name="javax.xml.bind" level="INFO"/>
