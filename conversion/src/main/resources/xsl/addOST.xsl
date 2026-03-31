@@ -48,7 +48,9 @@
         <xsl:variable name="licenseTypes" select="distinct-values(vlo:hasFacetLicenseType[normalize-space(.)!=''])"/>
         <xsl:variable name="availability" select="distinct-values(vlo:hasFacetAvailability[normalize-space(.)!=''])"/>
         <xsl:variable name="versions" select="distinct-values(vlo:hasFacetVersion[normalize-space(.)!=''])"/>
-
+        <xsl:variable name="descriptions" select="vlo:hasFacetDescription[normalize-space(.)!='']" />
+        <xsl:variable name="titles" select="vlo:hasFacetName[normalize-space(.)!='']" />
+        
         <!-- Extract provider : try MdCollectionDisplayName first, fall back to repository from path -->
         <xsl:variable name="provider">
             <xsl:choose>
@@ -89,21 +91,17 @@
                             </datacite:Identifier>
                         </datacite:hasIdentifier>
                     </xsl:if>
-
-                    <!-- Description from VLO facet -->
-                    <xsl:if test="normalize-space(vlo:hasFacetDescription)!=''">
-                        <dc:abstract>
-                            <xsl:value-of select="normalize-space(vlo:hasFacetDescription)"/>
-                        </dc:abstract>
-                    </xsl:if>
-
-                    <!-- Title from VLO facet -->
-                    <xsl:if test="normalize-space(vlo:hasFacetName)!=''">
-                        <dc:title>
-                            <xsl:value-of select="normalize-space(vlo:hasFacetName)"/>
-                        </dc:title>
-                    </xsl:if>
-
+                    
+                    <!-- Descriptions from VLO facets -->
+                    <xsl:for-each select="$descriptions">
+                        <dc:abstract><xsl:value-of select="." /></dc:abstract>
+                    </xsl:for-each>
+                    
+                    <!-- Titles from VLO facet -->
+                    <xsl:for-each select="$titles">
+                        <dc:title><xsl:value-of select="."/></dc:title>
+                    </xsl:for-each>
+                 
                     <!-- Link to single VLO-facet-based manifestation via FRBR chain -->
                     <frbr:realization>
                         <fabio:Expression rdf:about="{concat($about, '#expression')}">
