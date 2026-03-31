@@ -123,7 +123,7 @@
                 <!-- That's how "aca" buried inside a long concatenated string gets matched. -->
                 <xsl:variable name="accessTokens" select="
                     distinct-values((
-                        for $av in ($availability, $licenseTypes)
+                        for $av in ($availability, $licenses, $licenseTypes)
                             return tokenize(lower-case(normalize-space($av)), '\s+')
                     ))"/>
 
@@ -158,9 +158,9 @@
                         </xsl:choose>
                     </xsl:for-each>
 
-                    <!-- Access rights from VLO hasFacetAvailability / hasFacetLicenseType.
-                         VLO concatenates multiple Availability values into one element, so we
-                         tokenize and pick the most restrictive keyword (RES > ACA > PUB). -->
+                    <!-- Access rights from VLO availability, license and licenseType. VLO concatenates multiple -->
+                    <!-- availability values into one element, so we tokenize and pick the most -->
+                    <!-- restrictive keyword (RES > ACA > PUB). -->
                     <xsl:choose>
                         <xsl:when test="$accessTokens = ('res', 'closed')">
                             <pso:holdsStatusInTime>
