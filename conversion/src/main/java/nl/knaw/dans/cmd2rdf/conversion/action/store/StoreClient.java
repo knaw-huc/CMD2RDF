@@ -41,6 +41,8 @@ public class StoreClient implements IAction {
 
     private static final Logger ERROR_LOG = LoggerFactory.getLogger("errorlog");
     private static final Logger LOG = LoggerFactory.getLogger(StoreClient.class);
+    private static final Logger ERROR_FILES_LOG = LoggerFactory.getLogger("errorfiles");
+
     private static int n;
     private final List<String> replacedPrefixBaseURI = new ArrayList<String>();
     private String userName;
@@ -171,7 +173,7 @@ public class StoreClient implements IAction {
 
                 byte[] bytes = bos.toByteArray();
                 LOG.info("{} has BYTES SIZE : {}", fileName,
-                        FileUtils.byteCountToDisplaySize(BigInteger.valueOf(bytes.length)));
+                            FileUtils.byteCountToDisplaySize(BigInteger.valueOf(bytes.length)));
 
                 long startUpload = System.currentTimeMillis();
 
@@ -182,7 +184,7 @@ public class StoreClient implements IAction {
                 WebTarget target = client.target(uriBuilder.build());
 
                 // Do request
-                Response response = target.request().post(
+                Response response = target.request().put(
                         Entity.entity(bytes, StoreMediaTypes.APPLICATION_RDF_XML.getMediaType()));
 
                 int status = response.getStatus();
@@ -192,11 +194,11 @@ public class StoreClient implements IAction {
                         || (status == Response.Status.OK.getStatusCode())
                         || (status == Response.Status.NO_CONTENT.getStatusCode())) {
                     n++;
-                    LOG.info("[{}] is CREATED. Duration: {} milliseconds.", n,
-                            System.currentTimeMillis() - startUpload);
+                    LOG.info("[{}] is CREATED. Duration: {} milliseconds.", n, System.currentTimeMillis() - startUpload);
                     return true;
                 } else {
                     LOG.error(">>>>>>>>>> ERROR: {}", status);
+                    ERROR_FILES_LOG.info(path.replace(".rdf", ".xml"));
                 }
             } catch (TransformerConfigurationException e) {
                 ERROR_LOG.error("ERROR: TransformerConfigurationException, caused by {}", e.getMessage(), e);

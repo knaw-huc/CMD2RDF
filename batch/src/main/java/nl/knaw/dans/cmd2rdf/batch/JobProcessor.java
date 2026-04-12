@@ -185,7 +185,7 @@ public class JobProcessor  implements RecordProcessor<org.easybatch.core.record.
 					try {
 						Integer.parseInt(r.getXmlLimitSizeMin());
 					} catch (NumberFormatException e) {
-						throw new IllegalArgumentException("ERROR: xmlLimitSizeMin value is not integer. " + e.getMessage());
+						throw new IllegalArgumentException("ERROR: xmlLimitSizeMin value is not integer: " + e.getMessage());
 					}
 				}
 					
@@ -193,7 +193,15 @@ public class JobProcessor  implements RecordProcessor<org.easybatch.core.record.
 					try {
 						Integer.parseInt(r.getXmlLimitSizeMax());
 					} catch (NumberFormatException e) {
-						throw new IllegalArgumentException("ERROR: xmlLimitSizeMax value is not integer. " + e.getMessage());
+						throw new IllegalArgumentException("ERROR: xmlLimitSizeMax value is not integer: " + e.getMessage());
+					}
+				}
+
+				if (r.getThrottleDuration() != null) {
+					try {
+						Long.parseLong(r.getThrottleDuration());
+					} catch (NumberFormatException e) {
+						throw new IllegalArgumentException("ERROR: throttleDuration value is not long: " + e.getMessage());
 					}
 				}
 				
@@ -305,7 +313,7 @@ public class JobProcessor  implements RecordProcessor<org.easybatch.core.record.
 			//List<Future<String>> futures = new ArrayList<Future<String>>();
 			for (String p : pth) {
 				i++;
-				 Callable<String> worker = new WorkerCallable(p, actions, i);
+				 Callable<String> worker = new WorkerCallable(p, actions, i, r.getThrottleDuration());
 				 executor.submit(worker);
 //			     Future<String> future = executor.submit(worker);
 //			     futures.add(future);

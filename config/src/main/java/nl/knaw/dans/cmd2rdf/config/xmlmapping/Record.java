@@ -35,7 +35,11 @@ public class Record{
 	@XmlAttribute(required = false)
 	private
 	String xmlLimitSizeMax;
-	
+
+	@XmlAttribute(required = false)
+	private
+	String throttleDuration;
+
 	@XmlAttribute(required = true)
 	private
 	String xmlSource;
@@ -117,4 +121,5 @@ public class Record{
 		this.cleanup = cleanup;
 	}
 
+	public String getThrottleDuration() { return throttleDuration; }
 }
