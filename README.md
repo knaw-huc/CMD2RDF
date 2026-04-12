@@ -152,6 +152,5 @@ CMD2RDF/
 │   └── src/main/resources/xsl/   # All XSLT stylesheets
 └── batch/src/main/resources/
     ├── cmd2rdf.xml            # Production config
-    ├── cmd2rdf-local.xml      # Local development config
     └── logback.xml            # Logging configuration
 ```
