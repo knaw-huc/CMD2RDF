@@ -28,7 +28,7 @@
     <xsl:param name="base_add" select="''"/>
 
     <!-- SKG-IF base URI for organisation entities -->
-    <xsl:param name="skg-base" select="'https://w3id.org/skg-if/sandbox/my-skg-acronym/'"/>
+    <xsl:param name="skg-base" select="'otf:'"/>
 
     <xsl:variable name="about" select="replace(if ($base_strip=$base) then $base else for $strip in tokenize($base_strip,',') return if (starts-with($base,concat('file:',$strip))) then replace($base, concat('file:',$strip), $base_add) else (),'([./])(xml|cmdi)$','$1rdf')"/>
 
@@ -217,12 +217,6 @@
                 </xsl:if>
             </OST>
             <xsl:apply-templates select="node()"/>
-        </xsl:copy>
-    </xsl:template>
-
-    <xsl:template match="node() | @*">
-        <xsl:copy>
-            <xsl:apply-templates select="node() | @*"/>
         </xsl:copy>
     </xsl:template>
 

@@ -333,8 +333,7 @@
 			</cleanup>
 		</record>
 	</records>
-	<profiles>
-		<!-- convert all the profiles we encountered into RDF -->
+	<!-- <profiles>
 		<profile desc="Convert all the profiles we encountered into RDF" xmlSource="{profilesCacheDir}" filter="clarin.eu_cr1_p_*.xml">
 			<actions>
 				<action name="transform">
@@ -357,7 +356,6 @@
 		</profile>
 	</profiles>
 	<components>
-		<!-- convert all the components we encountered into RDF -->
 		<component desc="Convert all the components we encountered into RDF" xmlSource="{profilesCacheDir}" filter="clarin.eu_cr1_c_*.xml">
 			<actions>
 				<action name="transform">
@@ -380,6 +378,7 @@
 			</actions>
 		</component>
 	</components>
+	-->
 	<cleanup>
 		<actions>
 			<action>
