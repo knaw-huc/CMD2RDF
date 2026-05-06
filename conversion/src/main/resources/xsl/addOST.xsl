@@ -65,7 +65,7 @@
         </xsl:variable>
 
         <xsl:copy>
-            <xsl:apply-templates select="@*"/>
+            <xsl:copy-of select="@*"/>
             <OST>
                 <fabio:Dataset rdf:about="{$about}"/>
                 <fabio:Work rdf:about="{$about}">
@@ -216,7 +216,7 @@
                     </foaf:Organization>
                 </xsl:if>
             </OST>
-            <xsl:apply-templates select="node()"/>
+            <xsl:copy-of select="node() except (cmd0:Components|cmd1:Components)"/>
         </xsl:copy>
     </xsl:template>
 
