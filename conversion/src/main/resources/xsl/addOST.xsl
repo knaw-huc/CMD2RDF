@@ -65,6 +65,7 @@
         </xsl:variable>
 
         <xsl:copy>
+            <!-- This copy preserves the attributes on the root cmd0:CMD / cmd1:CMD element — most importantly @xml:base, also used further downstream to compute the about -->
             <xsl:copy-of select="@*"/>
             <OST>
                 <fabio:Dataset rdf:about="{$about}"/>
@@ -216,7 +217,6 @@
                     </foaf:Organization>
                 </xsl:if>
             </OST>
-            <xsl:copy-of select="node() except (cmd0:Components|cmd1:Components)"/>
         </xsl:copy>
     </xsl:template>
 
