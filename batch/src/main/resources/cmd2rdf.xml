@@ -46,7 +46,8 @@
 	</prepare>
 	<records>
 		<!-- xml size > 0 and <= 10K -->
-		<record desc="xml size greater than 0 and smaller or equals 10K" filter="NEW UPDATE" nThreads="32" xmlLimitSizeMax="10240" xmlSource="{urlDB}">
+		<record desc="xml size greater than 0 and smaller or equals 10K" filter="NEW UPDATE" throttleDuration="2000"
+										nThreads="32" xmlLimitSizeMax="10240" xmlSource="{urlDB}">
 			<actions>
 				<action name="transform">
 					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
@@ -137,7 +138,8 @@
 			</actions>
 		</record>
 		<!-- xml size > 10K and <= 100K -->
-		<record desc="xml size greater than 10 and smaller or equals 100K" filter="NEW UPDATE" nThreads="16" xmlLimitSizeMin="10241" xmlLimitSizeMax="102400" xmlSource="{urlDB}">
+		<record desc="xml size greater than 10 and smaller or equals 100K" filter="NEW UPDATE" nThreads="16" throttleDuration="2000"
+											xmlLimitSizeMin="10241" xmlLimitSizeMax="102400" xmlSource="{urlDB}">
 			<actions>
 				<action name="transform">
 					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
