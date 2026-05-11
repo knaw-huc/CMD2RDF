@@ -32,10 +32,10 @@
 
     <xsl:variable name="about" select="replace(if ($base_strip=$base) then $base else for $strip in tokenize($base_strip,',') return if (starts-with($base,concat('file:',$strip))) then replace($base, concat('file:',$strip), $base_add) else (),'([./])(xml|cmdi)$','$1rdf')"/>
 
-    <!-- Slugify function: convert name to lowercase identifier with underscores -->
+    <!-- Slugify function: replaces any run of non-letter/non-digit characters with _ and strips leading/trailing underscores -->
     <xsl:function name="ost:slugify" as="xs:string">
         <xsl:param name="text" as="xs:string"/>
-        <xsl:sequence select="encode-for-uri(lower-case(replace(normalize-space($text), '\s+', '_')))"/>
+        <xsl:sequence select="lower-case(replace(replace(normalize-space($text), '[^\p{L}\p{N}]+', '_'), '^_|_$', ''))"/>
     </xsl:function>
 
     <xsl:template match="/cmd0:CMD|/cmd1:CMD">
