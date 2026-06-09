@@ -43,6 +43,7 @@
 
         <!-- Extract VLO facet values -->
         <xsl:variable name="orgs" select="distinct-values(vlo:hasFacetOrganisation[normalize-space(.)!=''])"/>
+        <xsl:variable name="creators" select="distinct-values(vlo:hasFacetCreator[normalize-space(.)!=''])"/>
         <xsl:variable name="formats" select="distinct-values(vlo:hasFacetFormat[normalize-space(.)!=''])"/>
         <xsl:variable name="licenses" select="distinct-values(vlo:hasFacetLicense[normalize-space(.)!=''])"/>
         <xsl:variable name="licenseTypes" select="distinct-values(vlo:hasFacetLicenseType[normalize-space(.)!=''])"/>
@@ -113,6 +114,11 @@
                     <!-- Link to organisations (relevant_organisations in SKG-IF) -->
                     <xsl:for-each select="$orgs">
                         <dc:relation rdf:resource="{concat($skg-base, ost:slugify(.))}"/>
+                    </xsl:for-each>
+
+                    <!-- Link to creators (contributions / persons in SKG-IF) -->
+                    <xsl:for-each select="$creators">
+                        <dc:creator rdf:resource="{concat($skg-base, ost:slugify(.))}"/>
                     </xsl:for-each>
                 </fabio:Work>
 
@@ -207,6 +213,19 @@
                         <foaf:name><xsl:value-of select="."/></foaf:name>
                         <rdf:type rdf:resource="http://purl.org/cerif/frapo/ResearchInstitute"/>
                     </foaf:Organization>
+                </xsl:for-each>
+
+                <!-- Person entities from creator facet (type: person) -->
+                <!-- VLO supplies names as "Family, Given"; split on the first comma. -->
+                <!-- When no comma is present we cannot reliably split, so emit foaf:name only. -->
+                <xsl:for-each select="$creators">
+                    <foaf:Person rdf:about="{concat($skg-base, ost:slugify(.))}">
+                        <foaf:name><xsl:value-of select="."/></foaf:name>
+                        <xsl:if test="contains(., ',')">
+                            <foaf:familyName><xsl:value-of select="normalize-space(substring-before(., ','))"/></foaf:familyName>
+                            <foaf:givenName><xsl:value-of select="normalize-space(substring-after(., ','))"/></foaf:givenName>
+                        </xsl:if>
+                    </foaf:Person>
                 </xsl:for-each>
 
                 <!-- Provider organisation (type: archive) -->

@@ -8,7 +8,7 @@
     <p:option name="base_add"   select="''"/>
     
     <p:option name="skg-base"
-        select="'https://w3id.org/skg-if/sandbox/my-skg-acronym/'"/>
+        select="'otf:'"/>
     
     <p:option name="beta-vlo-facets-url"
         select="'https://beta-vlo.clarin.eu/api/facets?q=id:'"/>
