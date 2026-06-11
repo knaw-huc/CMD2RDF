@@ -69,9 +69,9 @@
             <xsl:apply-templates select="(cmd0:Header|cmd1:Header)"/>
         	<rdf:Description rdf:about="{$about}">
         		<xsl:apply-templates select="vlo:*"/>
-        	    <ost:hasSKG>
+        	    <!--<ost:hasSKG>-->
         	        <xsl:copy-of select="OST/*"/>
-        	    </ost:hasSKG>
+        	    <!--</ost:hasSKG>-->
         	</rdf:Description>
         </rdf:RDF>
     </xsl:template>
