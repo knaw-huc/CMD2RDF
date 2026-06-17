@@ -15,6 +15,7 @@
     xmlns:frbr="http://purl.org/vocab/frbr/core#"
     xmlns:prism="http://prismstandard.org/namespaces/basic/2.0/"
     xmlns:pso="http://purl.org/spar/pso/"
+    xmlns:dcat="http://www.w3.org/ns/dcat#"
     xmlns:ost="https://ostrails.eu/"
     exclude-result-prefixes="xs math ost"
     version="3.0">
@@ -43,6 +44,7 @@
 
         <!-- Extract VLO facet values -->
         <xsl:variable name="orgs" select="distinct-values(vlo:hasFacetOrganisation[normalize-space(.)!=''])"/>
+        <xsl:variable name="creators" select="distinct-values(vlo:hasFacetCreator[normalize-space(.)!=''])"/>
         <xsl:variable name="formats" select="distinct-values(vlo:hasFacetFormat[normalize-space(.)!=''])"/>
         <xsl:variable name="licenses" select="distinct-values(vlo:hasFacetLicense[normalize-space(.)!=''])"/>
         <xsl:variable name="licenseTypes" select="distinct-values(vlo:hasFacetLicenseType[normalize-space(.)!=''])"/>
@@ -51,11 +53,11 @@
         <xsl:variable name="descriptions" select="vlo:hasFacetDescription[normalize-space(.)!='']" />
         <xsl:variable name="titles" select="vlo:hasFacetName[normalize-space(.)!='']" />
         
-        <!-- Extract provider : try MdCollectionDisplayName first, fall back to repository from path -->
+        <!-- Extract provider : try the VLO 'collection' facet first, fall back to repository from path -->
         <xsl:variable name="provider">
             <xsl:choose>
-                <xsl:when test="normalize-space(/cmd0:CMD/cmd0:Header/cmd0:MdCollectionDisplayName | /cmd1:CMD/cmd1:Header/cmd1:MdCollectionDisplayName) != ''">
-                    <xsl:value-of select="normalize-space(/cmd0:CMD/cmd0:Header/cmd0:MdCollectionDisplayName | /cmd1:CMD/cmd1:Header/cmd1:MdCollectionDisplayName)"/>
+                <xsl:when test="vlo:hasFacetCollection[normalize-space(.)!='']">
+                    <xsl:value-of select="normalize-space((vlo:hasFacetCollection[normalize-space(.)!=''])[1])"/>
                 </xsl:when>
                 <xsl:otherwise>
                     <!-- Fall back to repository name from file path -->
@@ -114,6 +116,11 @@
                     <xsl:for-each select="$orgs">
                         <dc:relation rdf:resource="{concat($skg-base, ost:slugify(.))}"/>
                     </xsl:for-each>
+
+                    <!-- Link to creators (contributions / persons in SKG-IF) -->
+                    <xsl:for-each select="$creators">
+                        <dc:creator rdf:resource="{concat($skg-base, ost:slugify(.))}"/>
+                    </xsl:for-each>
                 </fabio:Work>
 
                 <!-- Single manifestation derived from VLO facets (availability, license, licenseType, format) -->
@@ -129,6 +136,11 @@
                     ))"/>
 
                 <fabio:Manifestation rdf:about="{concat($about, '#manifestation')}">
+
+                    <!-- Hosting data source (SKG-IF hosting_data_source) -->
+                    <xsl:if test="normalize-space($provider) != ''">
+                        <dcat:accessService rdf:resource="{concat($skg-base, ost:slugify($provider))}"/>
+                    </xsl:if>
 
                     <!-- Format(s) from VLO hasFacetFormat -->
                     <xsl:for-each select="$formats">
@@ -209,12 +221,25 @@
                     </foaf:Organization>
                 </xsl:for-each>
 
-                <!-- Provider organisation (type: archive) -->
+                <!-- Person entities from creator facet (type: person) -->
+                <!-- VLO supplies names as "Family, Given"; split on the first comma. -->
+                <!-- When no comma is present we cannot reliably split, so emit foaf:name only. -->
+                <xsl:for-each select="$creators">
+                    <foaf:Person rdf:about="{concat($skg-base, ost:slugify(.))}">
+                        <foaf:name><xsl:value-of select="."/></foaf:name>
+                        <xsl:if test="contains(., ',')">
+                            <foaf:familyName><xsl:value-of select="normalize-space(substring-before(., ','))"/></foaf:familyName>
+                            <foaf:givenName><xsl:value-of select="normalize-space(substring-after(., ','))"/></foaf:givenName>
+                        </xsl:if>
+                    </foaf:Person>
+                </xsl:for-each>
+
+                <!-- Provider as data source (SKG-IF data source = dcat:DataService), classified as a repository -->
                 <xsl:if test="normalize-space($provider) != ''">
-                    <foaf:Organization rdf:about="{concat($skg-base, ost:slugify($provider))}">
+                    <dcat:DataService rdf:about="{concat($skg-base, ost:slugify($provider))}">
                         <foaf:name><xsl:value-of select="$provider"/></foaf:name>
                         <rdf:type rdf:resource="http://purl.org/cerif/frapo/Repository"/>
-                    </foaf:Organization>
+                    </dcat:DataService>
                 </xsl:if>
             </OST>
         </xsl:copy>
