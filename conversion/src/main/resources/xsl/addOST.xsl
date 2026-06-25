@@ -16,6 +16,8 @@
     xmlns:prism="http://prismstandard.org/namespaces/basic/2.0/"
     xmlns:pso="http://purl.org/spar/pso/"
     xmlns:dcat="http://www.w3.org/ns/dcat#"
+    xmlns:schema="https://schema.org/"
+    xmlns:srv="https://w3id.org/skg-if/extension/srv/ontology/"
     xmlns:ost="https://ostrails.eu/"
     exclude-result-prefixes="xs math ost"
     version="3.0">
@@ -65,6 +67,9 @@
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
+
+        <!-- WebLicht profile records describe a tool/web service rather than a dataset -->
+        <xsl:variable name="isWebLicht" select="contains(normalize-space(string-join((/cmd0:CMD/cmd0:Header/cmd0:MdProfile,/cmd1:CMD/cmd1:Header/cmd1:MdProfile),' ')), 'clarin.eu:cr1:p_1320657629644')"/>
 
         <xsl:copy>
             <!-- This copy preserves the attributes on the root cmd0:CMD / cmd1:CMD element — most importantly @xml:base, also used further downstream to compute the about -->
@@ -240,6 +245,94 @@
                         <foaf:name><xsl:value-of select="$provider"/></foaf:name>
                         <rdf:type rdf:resource="http://purl.org/cerif/frapo/Repository"/>
                     </dcat:DataService>
+                </xsl:if>
+
+                <!-- SKG-IF Service entity: emitted in addition to the dataset Work/Manifestation for -->
+                <!-- records on the WebLicht profile (clarin.eu:cr1:p_1320657629644). Mapped onto the -->
+                <!-- SKG-IF service extension ontology (https://w3id.org/skg-if/extension/srv/ontology/). -->
+                <!-- srv:Service is a subclass of schema:SoftwareApplication. -->
+                <xsl:if test="$isWebLicht">
+                    <srv:Service rdf:about="{concat($about, '#service')}">
+
+                        <!-- name (foaf:name) -->
+                        <xsl:for-each select="$titles">
+                            <foaf:name><xsl:value-of select="."/></foaf:name>
+                        </xsl:for-each>
+
+                        <!-- description (dcterms:description) -->
+                        <xsl:for-each select="$descriptions">
+                            <dc:description><xsl:value-of select="."/></dc:description>
+                        </xsl:for-each>
+
+                        <!-- identifiers (datacite:hasIdentifier) -->
+                        <xsl:variable name="pid" select="normalize-space(/cmd0:CMD/cmd0:Header/cmd0:MdSelfLink|/cmd1:CMD/cmd1:Header/cmd1:MdSelfLink)"/>
+                        <xsl:if test="$pid!=''">
+                            <datacite:hasIdentifier>
+                                <datacite:Identifier>
+                                    <xsl:choose>
+                                        <xsl:when test="starts-with($pid,'https://hdl.handle.net/') or starts-with($pid,'http://hdl.handle.net/')">
+                                            <datacite:usesIdentifierScheme rdf:resource="http://purl.org/spar/datacite/handle"/>
+                                        </xsl:when>
+                                        <xsl:when test="starts-with($pid,'https://doi.org/') or starts-with($pid,'http://dx.doi.org/')">
+                                            <datacite:usesIdentifierScheme rdf:resource="http://purl.org/spar/datacite/doi"/>
+                                        </xsl:when>
+                                    </xsl:choose>
+                                    <silvio:hasLiteralValue><xsl:value-of select="$pid"/></silvio:hasLiteralValue>
+                                </datacite:Identifier>
+                            </datacite:hasIdentifier>
+                        </xsl:if>
+
+                        <!-- hosting organisation (srv:hasHostingOrganisation): the provider derived above -->
+                        <xsl:if test="normalize-space($provider) != ''">
+                            <srv:hasHostingOrganisation rdf:resource="{concat($skg-base, ost:slugify($provider))}"/>
+                        </xsl:if>
+
+                        <!-- relevant organisations (dcterms:relation) -->
+                        <xsl:for-each select="$orgs">
+                            <dc:relation rdf:resource="{concat($skg-base, ost:slugify(.))}"/>
+                        </xsl:for-each>
+
+                        <!-- API profile (dcterms:conformsTo): e.g. WADL media type. -->
+                        <!-- NB: the WADL endpoint URL lives in the VLO _resourceRef field, which addVLOFacets -->
+                        <!-- skips, so only the media type is available here. -->
+                        <xsl:for-each select="$formats">
+                            <dc:conformsTo><xsl:value-of select="."/></dc:conformsTo>
+                        </xsl:for-each>
+
+                        <!-- License: not part of the srv extension, retained as plain DCTerms. -->
+                        <xsl:for-each select="$licenses">
+                            <xsl:choose>
+                                <xsl:when test="starts-with(., 'http://') or starts-with(., 'https://')">
+                                    <dc:license rdf:resource="{.}"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <dc:license><xsl:value-of select="."/></dc:license>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:for-each>
+
+                        <xsl:for-each select="$licenseTypes">
+                            <xsl:choose>
+                                <xsl:when test="starts-with(., 'http://') or starts-with(., 'https://')">
+                                    <dc:license rdf:resource="{.}"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <dc:license><xsl:value-of select="."/></dc:license>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:for-each>
+
+                        <!-- Free access (schema:isAccessibleForFree): derived from the same access tokens -->
+                        <!-- used for the manifestation. Open/public => true, restricted/closed => false. -->
+                        <xsl:choose>
+                            <xsl:when test="$accessTokens = ('pub', 'open', 'public')">
+                                <schema:isAccessibleForFree rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">true</schema:isAccessibleForFree>
+                            </xsl:when>
+                            <xsl:when test="$accessTokens = ('res', 'closed', 'aca', 'academic', 'restricted')">
+                                <schema:isAccessibleForFree rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</schema:isAccessibleForFree>
+                            </xsl:when>
+                        </xsl:choose>
+                    </srv:Service>
                 </xsl:if>
             </OST>
         </xsl:copy>
