@@ -16,10 +16,8 @@ import nl.knaw.dans.cmd2rdf.config.exception.ConfigException;
 import nl.knaw.dans.cmd2rdf.config.xmlmapping.Jobs;
 import nl.knaw.dans.cmd2rdf.config.xmlmapping.Property;
 
-import org.easybatch.core.record.Record;
-import org.easybatch.xml.XmlRecord;
-import org.easybatch.xml.XmlRecordMapper;
-import org.easybatch.xml.XmlRecordReader;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Unmarshaller;
 
 /**
  * @author akmi
@@ -50,27 +48,16 @@ public class ConfigReader {
 	}
 
 	private void init() throws ConfigException{
-		// Build an easy batch job
 		try {
-			XmlRecordReader xrr = new XmlRecordReader("CMD2RDF", new FileInputStream(xmlFile));
-			xrr.open();
-			boolean b = xrr.hasNextRecord();
-			if (b) {
-				XmlRecord r = xrr.readNextRecord();
-				rawXmlContent = r.getPayload();
-				XmlRecordMapper<Jobs> xrm = new XmlRecordMapper<Jobs>(Jobs.class);
-				Record<Jobs> record = xrm.processRecord(r);
-				Jobs j = record.getPayload();
-				fetchConfigProperties(j.getConfig().getProperty());
-			} else
-				throw new ConfigException("The " + xmlFile.getAbsolutePath() + " isn't valid CMD2RDF config file.");
-			xrr.close();
+			rawXmlContent = new String(java.nio.file.Files.readAllBytes(xmlFile.toPath()), "UTF-8");
+			Unmarshaller unmarshaller = JAXBContext.newInstance(Jobs.class).createUnmarshaller();
+			Jobs j = (Jobs) unmarshaller.unmarshal(xmlFile);
+			fetchConfigProperties(j.getConfig().getProperty());
 		} catch (Exception e) {
 			throw new ConfigException("Cannot open CMD2RDF FIle. " + e.getMessage());
 		}
-
 	}
-	
+
 	private void fetchConfigProperties(List<Property> configPropertyList) {
 		for (Property p : configPropertyList) {
 			GLOBAL_VARS.put(p.name, p.value);

@@ -12,16 +12,11 @@ import java.nio.file.Files;
 
 import nl.knaw.dans.cmd2rdf.config.xmlmapping.Jobs;
 
-import org.easybatch.core.job.JobExecutor;
-import org.easybatch.core.job.JobReport;
-import org.easybatch.core.job.Job;
-import org.easybatch.core.job.JobBuilder;
-import org.easybatch.xml.XmlRecordMapper;
-import org.easybatch.xml.XmlRecordReader;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Unmarshaller;
 import org.javasimon.SimonManager;
 import org.javasimon.Split;
 import org.javasimon.Stopwatch;
-import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -58,34 +53,20 @@ public class Launcher {
     	SLF4JBridgeHandler.install();
     	
     	
-        // Build an easy batch job
-        Job job = new JobBuilder()
-                .reader(new XmlRecordReader("CMD2RDF",
-								Files.newInputStream(new File(args[0]).toPath())))
-                .mapper(new XmlRecordMapper<Jobs>(Jobs.class))
-                .processor(new JobProcessor())
-                .build();
-
-        
-        // Run easy batch job
-        JobReport jobReport = JobExecutor.execute(job);
+        Unmarshaller unmarshaller = JAXBContext.newInstance(Jobs.class).createUnmarshaller();
+        Jobs jobs = (Jobs) unmarshaller.unmarshal(new File(args[0]));
+        long startTime = System.currentTimeMillis();
+        new JobProcessor().processJobs(jobs);
+        long endTime = System.currentTimeMillis();
         split.stop();
-       
-        // Print the job execution report
-        log.info("Start time: {}", jobReport.getFormattedStartTime());
-        log.info("End time: {}", jobReport.getFormattedEndTime());
-		String duration = jobReport.getFormattedDuration();
-		try {
-			Period p = new Period(Long.parseLong(duration.replace("ms", "").trim()));
-			log.info("Duration: {} hours, {} minutes, {} seconds, {} ms.", p.getHours(), p.getMinutes(),
-							p.getSeconds(), p.getMillis());
-		} catch (NumberFormatException e) {
-			// We're going to log what we got back as duration, it's better than nothing
-			log.info("Duration: {}", duration);
-		}
-        Period p2 = new Period(stopwatchTotal.getLastUsage()-stopwatchTotal.getFirstUsage());
+
+        log.info("Start time: {}", new java.util.Date(startTime));
+        log.info("End time: {}", new java.util.Date(endTime));
+        java.time.Duration d = java.time.Duration.ofMillis(endTime - startTime);
+        log.info("Duration: {} hours, {} minutes, {} seconds, {} ms.", d.toHours(), d.toMinutesPart(), d.toSecondsPart(), d.toMillisPart());
+        java.time.Duration p2 = java.time.Duration.ofMillis(stopwatchTotal.getLastUsage()-stopwatchTotal.getFirstUsage());
         log.debug("Total: {} hours, {} minutes, {} seconds, {} ms.",
-						p2.getHours(), p2.getMinutes(), p2.getSeconds(), p2.getMillis());
+						p2.toHours(), p2.toMinutesPart(), p2.toSecondsPart(), p2.toMillisPart());
         log.debug("stopwatchTotal: {}", stopwatchTotal);
         log.debug("stopwatchDb: {}", stopwatchDb);
         log.debug("stopwatchOai: {}", stopwatchOai);

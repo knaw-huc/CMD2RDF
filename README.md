@@ -14,7 +14,7 @@ The application runs as a batch job that:
 
 ## Building
 
-Requires Java 1.8+ and Maven.
+Requires Java 25+ and Maven.
 
 ```bash
 mvn clean package

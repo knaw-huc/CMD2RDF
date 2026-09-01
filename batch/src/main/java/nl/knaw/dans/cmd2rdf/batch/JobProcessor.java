@@ -21,7 +21,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import nl.knaw.dans.cmd2rdf.config.xmlmapping.Action;
 import nl.knaw.dans.cmd2rdf.config.xmlmapping.Config;
 import nl.knaw.dans.cmd2rdf.config.xmlmapping.Jobs;
@@ -34,16 +33,14 @@ import nl.knaw.dans.cmd2rdf.conversion.action.IAction;
 import nl.knaw.dans.cmd2rdf.conversion.action.WorkerCallable;
 import nl.knaw.dans.cmd2rdf.conversion.db.ChecksumDb;
 import nl.knaw.dans.cmd2rdf.conversion.util.Misc;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 import org.apache.directmemory.DirectMemory;
 import org.apache.directmemory.cache.CacheService;
-import org.easybatch.core.processor.RecordProcessingException;
-import org.easybatch.core.processor.RecordProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-public class JobProcessor  implements RecordProcessor<org.easybatch.core.record.Record<Jobs>, org.easybatch.core.record.Record<Jobs>> {
+
+public class JobProcessor {
 	private static final Logger log = LoggerFactory.getLogger(JobProcessor.class);
 	private final Pattern pattern = Pattern.compile("\\{(.*?)\\}");
 	private static final String URL_DB = "urlDB";
@@ -52,10 +49,8 @@ public class JobProcessor  implements RecordProcessor<org.easybatch.core.record.
 	private static int TOTAL_NUM_PROCESSED_PATHS;
 	
 
-	public org.easybatch.core.record.Record<Jobs> processRecord(org.easybatch.core.record.Record<Jobs> record)
-			throws RecordProcessingException {
+	public void processJobs(Jobs job) {
 		try {
-			Jobs job = record.getPayload();
 			setupGlolbalConfiguration(job);
 			initiateCacheService();
 			doPrepare(job.getPrepare().getActions());
@@ -65,9 +60,8 @@ public class JobProcessor  implements RecordProcessor<org.easybatch.core.record.
 			doProcessComponent(job.components);
 			closeCacheService();
 			log.info("TOTAL NUMBER OF PROCESSED PATHS: " + TOTAL_NUM_PROCESSED_PATHS);
-			return record;
 		} catch (Exception e) {
-			throw new RecordProcessingException("Unable to process job " + record.getPayload(), e);
+			throw new RuntimeException("Unable to process job " + job, e);
 		}
 	}
 	private void doProcessComponent(List<Profile> components) throws ClassNotFoundException, InstantiationException,

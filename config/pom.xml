@@ -12,20 +12,17 @@
   <url>http://maven.apache.org</url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <easybatch.version>4.0.0</easybatch.version>
   </properties>
   <dependencies>
-  
-    <!-- EasyBatch -->
 	<dependency>
-    	<groupId>org.easybatch</groupId>
-    	<artifactId>easybatch-xml</artifactId>
-    	<version>${easybatch.version}</version>
-		</dependency>
+		<groupId>jakarta.xml.bind</groupId>
+		<artifactId>jakarta.xml.bind-api</artifactId>
+		<version>4.0.2</version>
+	</dependency>
 	<dependency>
-        <groupId>org.easybatch</groupId>
-        <artifactId>easybatch-core</artifactId>
-        <version>${easybatch.version}</version>
-    </dependency>
+		<groupId>org.glassfish.jaxb</groupId>
+		<artifactId>jaxb-runtime</artifactId>
+		<version>4.0.5</version>
+	</dependency>
   </dependencies>
 </project>
