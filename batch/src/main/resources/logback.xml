@@ -53,7 +53,7 @@
  
 	<logger name="javax.xml.bind" level="INFO"/>
 	<logger name="org.easybatch.core.impl" level="INFO"/>
-	<logger name="nl.knaw.dans.clarin" level="INFO"/>
+	<logger name="nl.knaw.dans.cmd2rdf" level="INFO"/>
 	<logger name="org.apache.directmemory" level="ERROR"/>
 	<logger name="org.apache.http" level="ERROR"/>
 	

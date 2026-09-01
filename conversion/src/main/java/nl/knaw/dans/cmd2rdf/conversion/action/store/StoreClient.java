@@ -5,7 +5,6 @@ import nl.knaw.dans.cmd2rdf.conversion.action.ActionStatus;
 import nl.knaw.dans.cmd2rdf.conversion.action.IAction;
 import nl.knaw.dans.cmd2rdf.conversion.util.Misc;
 import org.apache.commons.io.FileUtils;
-import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
 import org.javasimon.SimonManager;
 import org.javasimon.Split;
 import org.joda.time.Period;
@@ -13,12 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -26,10 +19,16 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 
@@ -41,13 +40,16 @@ public class StoreClient implements IAction {
 
     private static final Logger ERROR_LOG = LoggerFactory.getLogger("errorlog");
     private static final Logger LOG = LoggerFactory.getLogger(StoreClient.class);
-    private static final Logger ERROR_FILES_LOG = LoggerFactory.getLogger("errorfiles");
+    private static final Logger ERROR_FILES_LOG = LoggerFactory.getLogger("errorfileslog");
+
+    private static final String APPLICATION_RDF_XML = "application/rdf+xml";
 
     private static int n;
     private final List<String> replacedPrefixBaseURI = new ArrayList<String>();
     private String userName;
     private String password;
-    private Client client;
+    private HttpClient client;
+    private String authorization;
     private String serverURL;
     private ActionStatus actionStatus;
     private String namedGIRIQueryParam;
@@ -105,13 +107,12 @@ public class StoreClient implements IAction {
 
         actionStatus = Misc.convertToActionStatus(action);
 
-        client = ClientBuilder.newClient();
+        client = HttpClient.newHttpClient();
         if (credentialsProvided()) {
             LOG.info("Using provided credentials for user '{}' for HTTP Basic authentication", userName);
-            HttpAuthenticationFeature authFeature = HttpAuthenticationFeature.basic(userName, password);
-            client.register(authFeature);
+            authorization = "Basic " + Base64.getEncoder().encodeToString(
+                    (userName + ":" + password).getBytes(StandardCharsets.UTF_8));
         }
-        client.register(new BodyLoggingFilter());
 
         LOG.debug("StoreClient variables: ");
         LOG.debug("replacedPrefixBaseURI: {}", replacedPrefixBaseURI);
@@ -178,21 +179,20 @@ public class StoreClient implements IAction {
                 long startUpload = System.currentTimeMillis();
 
                 // Build named / context IRI
-                UriBuilder uriBuilder = UriBuilder.fromUri(new URI(serverURL));
                 String giri = getGIRI(path);
-                uriBuilder.queryParam(namedGIRIQueryParam, namedGIRIEncloseWithBrackets ? "<" + giri + ">" : giri);
-                WebTarget target = client.target(uriBuilder.build());
+                URI uri = buildStoreURI(namedGIRIEncloseWithBrackets ? "<" + giri + ">" : giri);
 
                 // Do request
-                Response response = target.request().put(
-                        Entity.entity(bytes, StoreMediaTypes.APPLICATION_RDF_XML.getMediaType()));
+                HttpRequest request = newRequestBuilder(uri)
+                        .header("Content-Type", APPLICATION_RDF_XML)
+                        .PUT(HttpRequest.BodyPublishers.ofByteArray(bytes))
+                        .build();
+                HttpResponse<String> response = send(request, bytes);
 
-                int status = response.getStatus();
+                int status = response.statusCode();
                 LOG.info("'{}' is uploaded to store.\nResponse status: {}",
                         path.replace(".xml", ".rdf"), status);
-                if ((status == Response.Status.CREATED.getStatusCode())
-                        || (status == Response.Status.OK.getStatusCode())
-                        || (status == Response.Status.NO_CONTENT.getStatusCode())) {
+                if (isSuccessful(status)) {
                     n++;
                     LOG.info("[{}] is CREATED. Duration: {} milliseconds.", n, System.currentTimeMillis() - startUpload);
                     return true;
@@ -208,6 +208,11 @@ public class StoreClient implements IAction {
                 ERROR_LOG.error("ERROR: TransformerFactoryConfigurationError, caused by {}", e.getMessage(), e);
             } catch (URISyntaxException e) {
                 ERROR_LOG.error("ERROR: URISyntaxException, caused by {}", e.getMessage(), e);
+            } catch (IOException e) {
+                ERROR_LOG.error("ERROR: IOException, caused by {}", e.getMessage(), e);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                ERROR_LOG.error("ERROR: InterruptedException, caused by {}", e.getMessage(), e);
             } catch (IllegalArgumentException e) {
                 ERROR_LOG.error("ERROR: IllegalArgumentException, caused by {}", e.getMessage(), e);
             }
@@ -218,18 +223,14 @@ public class StoreClient implements IAction {
     }
 
     private boolean deleteRdfFromStore(String path) {
-        UriBuilder uriBuilder;
         try {
-            uriBuilder = UriBuilder.fromUri(new URI(serverURL));
-            uriBuilder.queryParam(namedGIRIQueryParam, getGIRI(path));
-            WebTarget target = client.target(uriBuilder.build());
-            Response response = target.request().delete();
-            int status = response.getStatus();
+            URI uri = buildStoreURI(getGIRI(path));
+            HttpRequest request = newRequestBuilder(uri).DELETE().build();
+            HttpResponse<String> response = send(request, null);
+            int status = response.statusCode();
             LOG.info("Delete {} from store.\nResponse status: {}",
                     path.replace(".xml", ".rdf"), status);
-            if ((status == Response.Status.CREATED.getStatusCode())
-                    || (status == Response.Status.OK.getStatusCode())
-                    || (status == Response.Status.NO_CONTENT.getStatusCode())) {
+            if (isSuccessful(status)) {
                 n++;
                 LOG.info("[{}] is DELETED.", n);
                 return true;
@@ -238,11 +239,55 @@ public class StoreClient implements IAction {
             }
         } catch (URISyntaxException e) {
             ERROR_LOG.error("ERROR: URISyntaxException, caused by {}", e.getMessage(), e);
+        } catch (IOException e) {
+            ERROR_LOG.error("ERROR: IOException, caused by {}", e.getMessage(), e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            ERROR_LOG.error("ERROR: InterruptedException, caused by {}", e.getMessage(), e);
         } catch (ActionException e) {
             ERROR_LOG.error("ERROR: ActionException, caused by {}", e.getMessage(), e);
         }
 
         return false;
+    }
+
+    /**
+     * Appends the named / context IRI as query parameter to the configured server URL.
+     */
+    private URI buildStoreURI(String giri) throws URISyntaxException {
+        URI base = new URI(serverURL);
+        String query = namedGIRIQueryParam + "=" + giri;
+        if (base.getQuery() != null) {
+            query = base.getQuery() + "&" + query;
+        }
+        return new URI(base.getScheme(), base.getAuthority(), base.getPath(), query, base.getFragment());
+    }
+
+    private HttpRequest.Builder newRequestBuilder(URI uri) {
+        HttpRequest.Builder builder = HttpRequest.newBuilder(uri);
+        if (authorization != null) {
+            builder.header("Authorization", authorization);
+        }
+        return builder;
+    }
+
+    private HttpResponse<String> send(HttpRequest request, byte[] body) throws IOException, InterruptedException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug(">>> REQUEST >>> {} {}", request.method(), request.uri());
+            if (body != null) {
+                LOG.debug("Request Body: {}", new String(body, StandardCharsets.UTF_8));
+            }
+        }
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("<<< RESPONSE <<< Status: {}", response.statusCode());
+            LOG.debug("Response Body: {}", response.body());
+        }
+        return response;
+    }
+
+    private boolean isSuccessful(int status) {
+        return status == 200 || status == 201 || status == 204;
     }
 
     private String getGIRI(String path) throws ActionException {
