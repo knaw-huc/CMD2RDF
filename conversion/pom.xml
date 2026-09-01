@@ -58,6 +58,17 @@
     	<artifactId>jersey-client</artifactId>
     	<version>2.9</version>
 	</dependency>
+	<!-- Jersey 2.x expects javax.xml.bind from the JDK (removed since Java 11) -->
+	<dependency>
+		<groupId>javax.xml.bind</groupId>
+		<artifactId>jaxb-api</artifactId>
+		<version>2.3.1</version>
+		<scope>runtime</scope>
+		<exclusions>
+			<!-- javax.activation is already provided by the batch module -->
+			<exclusion><groupId>javax.activation</groupId><artifactId>javax.activation-api</artifactId></exclusion>
+		</exclusions>
+	</dependency>
 	<dependency>
 		<groupId>org.glassfish.jersey.connectors</groupId>
 		<artifactId>jersey-apache-connector</artifactId>
