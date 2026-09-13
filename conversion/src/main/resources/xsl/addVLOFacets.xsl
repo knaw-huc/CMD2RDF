@@ -10,6 +10,7 @@
 	<xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 
 	<xsl:include href="CMD2RDF.xsl"/>
+	<xsl:include href="vloIdentifier.xsl"/>
 
 	<!-- load the VLO facet mapping -->
 	<xsl:param name="beta-vlo-facets-url" select="'https://beta-vlo.clarin.eu/api/facets?q=id:'"/>
@@ -18,7 +19,8 @@
 	<xsl:variable name="fm" select="document($vloFacetMapping)"/>
 
 	<!-- skip some facets -->
-	<xsl:param name="skipVLOFacets" select="('id','_selfLink','text','_componentProfile')"/>
+	<!--<xsl:param name="skipVLOFacets" select="('id','_selfLink','text','_componentProfile')"/>-->
+	<xsl:param name="skipVLOFacets" select="('text','_componentProfile')"/>
 
 	<!-- SIL to ISO 639 -->
 	<xsl:variable name="lang-top" select="document('sil_to_iso6393.xml')/languages"/>
@@ -123,15 +125,6 @@
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:if>
-	</xsl:function>
-
-	<xsl:function name="vlo:encodeId" as="xs:string">
-		<xsl:param name="id" as="xs:string"/>
-		<!-- codepoints: : 58  / 47  ? 63  # 35  [ 91  ] 93  @ 64  ! 33  $ 36  & 38  ' 39  ( 40  ) 41  * 42  + 43  , 44  ; 59  = 61  % 37 -->
-		<xsl:variable name="url-codepoints" select="(58, 47, 63, 35, 91, 93, 64, 33, 36, 38, 39, 40, 41, 42, 43, 44, 59, 61, 37)"/>
-		<xsl:sequence select="
-			string-join((for $cp in string-to-codepoints($id) return
-							if ($cp = $url-codepoints) then concat('_', $cp, '_') else codepoints-to-string($cp)), '') "/>
 	</xsl:function>
 
 	<xsl:template match="text()" mode="beta-vlo"/>

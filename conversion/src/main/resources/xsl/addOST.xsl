@@ -22,6 +22,8 @@
     exclude-result-prefixes="xs math ost"
     version="3.0">
 
+    <xsl:include href="vloIdentifier.xsl"/>
+
     <xsl:output method="xml" indent="yes" />
 
     <xsl:param name="base" select="if (exists(/*/@xml:base)) then (/*/@xml:base) else (base-uri())"/>
@@ -54,6 +56,10 @@
         <xsl:variable name="versions" select="distinct-values(vlo:hasFacetVersion[normalize-space(.)!=''])"/>
         <xsl:variable name="descriptions" select="vlo:hasFacetDescription[normalize-space(.)!='']" />
         <xsl:variable name="titles" select="vlo:hasFacetName[normalize-space(.)!='']" />
+        <!-- Prefer the VLO ID; derive the same encoding from MdSelfLink when the facet is absent. -->
+        <xsl:variable name="selfLink" select="normalize-space(((cmd0:Header/cmd0:MdSelfLink | cmd1:Header/cmd1:MdSelfLink)[normalize-space(.)!=''])[1])"/>
+        <xsl:variable name="id" select="(vlo:hasFacetId[normalize-space(.)!=''][1],
+            if ($selfLink!='') then vlo:encodeId($selfLink) else ())[1]"/>
         
         <!-- Extract provider : try the VLO 'collection' facet first, fall back to repository from path -->
         <xsl:variable name="provider">
@@ -75,8 +81,8 @@
             <!-- This copy preserves the attributes on the root cmd0:CMD / cmd1:CMD element — most importantly @xml:base, also used further downstream to compute the about -->
             <xsl:copy-of select="@*"/>
             <OST>
-                <fabio:Dataset rdf:about="{$about}"/>
-                <fabio:Work rdf:about="{$about}">
+                <fabio:Dataset rdf:about="{$id}"/>
+                <fabio:Work rdf:about="{$id}">
                     <!-- PID (Handle, DOI, etc.) -->
                     <xsl:variable name="pid" select="normalize-space(/cmd0:CMD/cmd0:Header/cmd0:MdSelfLink|/cmd1:CMD/cmd1:Header/cmd1:MdSelfLink)"/>
                     <xsl:if test="$pid!=''">
