@@ -6,7 +6,7 @@
     <!ENTITY cmdm 'http://www.clarin.eu/cmd/general.rdf#'>
     <!ENTITY oa 'http://www.w3.org/ns/oa#'>
 ]>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0" xmlns:dcr="http://www.isocat.org/ns/dcr.rdf#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:cmd0="http://www.clarin.eu/cmd/" xmlns:cmd1="http://www.clarin.eu/cmd/1" xmlns:cmdm="http://www.clarin.eu/cmd/general.rdf#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:oa="http://www.w3.org/ns/oa#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:vlo="http://www.clarin.eu/vlo/"  xmlns:cmdi="http://www.clarin.eu/cmdi/" xmlns:ost="https://ostrails.eu/">
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="3.0" xmlns:dcr="http://www.isocat.org/ns/dcr.rdf#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:cmd0="http://www.clarin.eu/cmd/" xmlns:cmd1="http://www.clarin.eu/cmd/1" xmlns:cmdm="http://www.clarin.eu/cmd/general.rdf#" xmlns:ore="http://www.openarchives.org/ore/terms/" xmlns:oa="http://www.w3.org/ns/oa#" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:vlo="http://www.clarin.eu/vlo/"  xmlns:cmdi="http://www.clarin.eu/cmdi/">
 
     <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 
@@ -16,7 +16,8 @@
     <xsl:param name="base_strip" select="'/Users/menzowi/Documents/Projects/OSTrails/SKG/test/'"/>
     <xsl:param name="base_add" select="''"/>
 
-    <xsl:variable name="about" select="replace(if ($base_strip=$base) then $base else for $strip in tokenize($base_strip,',') return if (starts-with($base,concat('file:',$strip))) then replace($base, concat('file:',$strip), $base_add) else (),'([./])(xml|cmdi)$','$1rdf')"/>
+    <xsl:variable name="path-about" select="replace(if ($base_strip=$base) then $base else for $strip in tokenize($base_strip,',') return if (starts-with($base,concat('file:',$strip))) then replace($base, concat('file:',$strip), $base_add) else (),'([./])(xml|cmdi)$','$1rdf')"/>
+    <xsl:variable name="about" select="replace($path-about, '^(urn:)/+', '$1', 'i')"/>
 
     <xsl:include href="CMD2RDF.xsl"/>
 
@@ -69,10 +70,9 @@
             <xsl:apply-templates select="(cmd0:Header|cmd1:Header)"/>
         	<rdf:Description rdf:about="{$about}">
         		<xsl:apply-templates select="vlo:*"/>
-        	    <ost:hasSKG>
-        	        <xsl:copy-of select="OST/*"/>
-        	    </ost:hasSKG>
         	</rdf:Description>
+        	<!-- the SKG-IF entities carry their own identifiers, so they are top level resources -->
+        	<xsl:copy-of select="OST/*"/>
         </rdf:RDF>
     </xsl:template>
 

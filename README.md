@@ -79,8 +79,10 @@ PUT http://localhost:7200/repositories/ost-clarin-skg/statements
 Content-Type: application/rdf+xml
 ```
 
-Named graph IRIs are derived from each record's file path by stripping `xmlSourceDir` and
-prepending `prefixBaseURI`.
+Upload graph IRIs use the generated RDF root's `xml:base`, which must be an absolute URI.
+If `xml:base` is absent, the graph IRI is derived from the file path by stripping
+`xmlSourceDir` and prepending `prefixBaseURI`. Deletions still use this file-path mapping;
+changing graph names in XSLT therefore also requires aligning deletion handling.
 
 ## Running
 

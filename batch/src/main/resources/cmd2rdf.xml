@@ -18,7 +18,7 @@
 			<property name="serverURL">{serverHost}/repositories/ost-clarin-skg/statements</property>
 			<property name="username">dba</property>
 			<property name="password">dba</property>
-			<property name="prefixBaseURI">http://localhost:8080/cmd2rdf/graph</property>
+			<property name="prefixBaseURI">https://clarin-skg.dev.diginfra.org/api/v1</property>
 			<property name="tmpOutDir">{workspace}/rdf-output</property>
 			<property name="dirDownloadPwd">Put here a strong password!</property>
 		</properties>
@@ -60,6 +60,8 @@
 					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
 						<properties>
 							<property name="xsltSource">{xsltSourceDir}/addOST.xsl</property>
+							<property name="base_strip">{xmlSourceDir}</property>
+							<property name="base_add">{prefixBaseURI}</property>
 						</properties>
 					</class>
 				</action>
@@ -152,6 +154,8 @@
 					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
 						<properties>
 							<property name="xsltSource">{xsltSourceDir}/addOST.xsl</property>
+							<property name="base_strip">{xmlSourceDir}</property>
+							<property name="base_add">{prefixBaseURI}</property>
 						</properties>
 					</class>
 				</action>
@@ -243,6 +247,8 @@
 					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
 						<properties>
 							<property name="xsltSource">{xsltSourceDir}/addOST.xsl</property>
+							<property name="base_strip">{xmlSourceDir}</property>
+							<property name="base_add">{prefixBaseURI}</property>
 						</properties>
 					</class>
 				</action>
