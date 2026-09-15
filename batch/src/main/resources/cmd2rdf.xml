@@ -11,7 +11,6 @@
 			<property name="urlDB">{workspace}/db/DB_CMD_CHECKSUM</property>
 			<property name="profilesCacheDir">{workspace}/profiles-cache</property>
 			<property name="registry">http://catalog.clarin.eu/ds/ComponentRegistry</property>
-			<property name="virtuosoHome">/opt/virtuoso-opensource</property>
 			<property name="namedGraphIRIQueryParam">context</property>
 			<property name="namedGraphIRIEncloseWithBrackets">true</property>
 			<property name="serverHost">http://graphdb:7200</property>
