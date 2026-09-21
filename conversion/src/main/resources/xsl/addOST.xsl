@@ -82,7 +82,8 @@
         <xsl:variable name="versions" select="distinct-values(vlo:hasFacetVersion[normalize-space(.)!=''])"/>
         <xsl:variable name="descriptions" select="vlo:hasFacetDescription[normalize-space(.)!='']" />
         <xsl:variable name="titles" select="vlo:hasFacetName[normalize-space(.)!='']" />
-        
+        <xsl:variable name="collections" select="distinct-values(vlo:hasFacetCollection[normalize-space(.)!='']/normalize-space(.))"/>
+
         <!-- Extract provider : try the VLO 'collection' facet first, fall back to repository from path -->
         <xsl:variable name="provider">
             <xsl:choose>
@@ -98,6 +99,10 @@
 
         <!-- WebLicht profile records describe a tool/web service rather than a dataset -->
         <xsl:variable name="isWebLicht" select="contains(normalize-space(string-join((/cmd0:CMD/cmd0:Header/cmd0:MdProfile,/cmd1:CMD/cmd1:Header/cmd1:MdProfile),' ')), 'clarin.eu:cr1:p_1320657629644')"/>
+
+        <!-- Creator organisation(s) of a WebLicht service. The profile elements are in the cmd0 namespace -->
+        <!-- in CMDI 1.1 and in a profile-specific namespace in CMDI 1.2, hence the wildcards. -->
+        <xsl:variable name="hostingOrgs" select="distinct-values((/cmd0:CMD/cmd0:Components|/cmd1:CMD/cmd1:Components)/*:WebLichtWebService/*:Service/*:Creation/*:Creators/*:Creator/*:Contact/*:Organisation[normalize-space(.)!='']/normalize-space(.))"/>
 
         <xsl:copy>
             <!-- This copy preserves the attributes on the root cmd0:CMD / cmd1:CMD element — most importantly @xml:base, also used further downstream to compute the about -->
@@ -311,15 +316,30 @@
                             </datacite:hasIdentifier>
                         </xsl:if>
 
-                        <!-- hosting organisation (srv:hasHostingOrganisation): the provider derived above -->
-                        <xsl:if test="normalize-space($provider) != ''">
-                            <srv:hasHostingOrganisation rdf:resource="{ost:entity-id('ds', $provider)}"/>
-                        </xsl:if>
+                        <!-- hosting organisation (srv:hasHostingOrganisation): no VLO facet names it, so take the -->
+                        <!-- creator organisation from the record itself; for WebLicht services the creating centre -->
+                        <!-- also hosts the service -->
+                        <xsl:for-each select="$hostingOrgs">
+                            <srv:hasHostingOrganisation rdf:resource="{ost:entity-id('org', .)}"/>
+                        </xsl:for-each>
 
-                        <!-- relevant organisations (dcterms:relation) -->
-                        <xsl:for-each select="$orgs">
+                        <!-- research infrastructure (srv:isPartOfResearchInfrastructure): always CLARIN -->
+                        <srv:isPartOfResearchInfrastructure rdf:resource="{ost:entity-id('org', 'CLARIN ERIC')}"/>
+
+                        <!-- venues (srv:hasVenue): the VLO, which catalogues every record, and the portal(s) -->
+                        <!-- named by the collection facet, e.g. "WebLicht Webservice Orchestrator" -->
+                        <srv:hasVenue rdf:resource="{ost:entity-id('venue', 'Virtual Language Observatory')}"/>
+                        <xsl:for-each select="$collections">
+                            <srv:hasVenue rdf:resource="{ost:entity-id('venue', .)}"/>
+                        </xsl:for-each>
+
+                        <!-- relevant organisations (dcterms:relation). Until the srv ontology declares its -->
+                        <!-- organisation properties subproperties of dcterms:relation, it asks producers to -->
+                        <!-- repeat those organisations here, hence the hosting organisations and CLARIN. -->
+                        <xsl:for-each select="distinct-values(($orgs, $hostingOrgs))">
                             <dc:relation rdf:resource="{ost:entity-id('org', .)}"/>
                         </xsl:for-each>
+                        <dc:relation rdf:resource="{ost:entity-id('org', 'CLARIN ERIC')}"/>
 
                         <!-- API profile (dcterms:conformsTo): e.g. WADL media type. -->
                         <!-- NB: the WADL endpoint URL lives in the VLO _resourceRef field, which addVLOFacets -->
@@ -362,6 +382,34 @@
                             </xsl:when>
                         </xsl:choose>
                     </srv:Service>
+
+                    <!-- Hosting organisations (SKG-IF organization, type srv_hosting_organisation) -->
+                    <xsl:for-each select="$hostingOrgs">
+                        <foaf:Organization rdf:about="{ost:entity-id('org', .)}">
+                            <foaf:name><xsl:value-of select="."/></foaf:name>
+                            <rdf:type rdf:resource="https://w3id.org/skg-if/extension/srv/ontology/HostingOrganisation"/>
+                        </foaf:Organization>
+                    </xsl:for-each>
+
+                    <!-- CLARIN as research infrastructure (SKG-IF organisation, type srv_research_infrastructure) -->
+                    <foaf:Organization rdf:about="{ost:entity-id('org', 'CLARIN ERIC')}">
+                        <foaf:name>CLARIN ERIC</foaf:name>
+                        <rdf:type rdf:resource="https://w3id.org/skg-if/extension/srv/ontology/ResearchInfrastructure"/>
+                        <foaf:homepage rdf:resource="https://www.clarin.eu/"/>
+                    </foaf:Organization>
+
+                    <!-- Venues (skg:Venue = fabio:ExpressionCollection, type srv_portal) -->
+                    <fabio:ExpressionCollection rdf:about="{ost:entity-id('venue', 'Virtual Language Observatory')}">
+                        <foaf:name>Virtual Language Observatory</foaf:name>
+                        <rdf:type rdf:resource="https://w3id.org/skg-if/extension/srv/ontology/Portal"/>
+                        <foaf:homepage rdf:resource="https://vlo.clarin.eu/"/>
+                    </fabio:ExpressionCollection>
+                    <xsl:for-each select="$collections">
+                        <fabio:ExpressionCollection rdf:about="{ost:entity-id('venue', .)}">
+                            <foaf:name><xsl:value-of select="."/></foaf:name>
+                            <rdf:type rdf:resource="https://w3id.org/skg-if/extension/srv/ontology/Portal"/>
+                        </fabio:ExpressionCollection>
+                    </xsl:for-each>
                 </xsl:if>
             </OST>
         </xsl:copy>
