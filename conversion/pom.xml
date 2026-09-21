@@ -14,6 +14,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   <dependencies>
+    <!-- Fast MD5 -->
 	<dependency>
         <groupId>com.joyent.util</groupId>
         <artifactId>fast-md5</artifactId>
