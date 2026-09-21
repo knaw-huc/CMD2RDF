@@ -147,21 +147,7 @@ full CMDI → RDF conversion:
 
 For local `file:` records, `SKG2RDF.xsl` sets `xml:base` to the file name only.
 
-These stylesheets can be chained as separate `XsltTransformer` actions (as in `cmd2rdf-local.xml`),
-or run as a single XProc pipeline, `CMD2RDF-facet-only.xpl`, through the `XProcTransformer` action
-(using XML Calabash):
-
-```xml
-<action name="transform">
-    <class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XProcTransformer">
-        <properties>
-            <property name="xprocSource">{xsltSourceDir}/CMD2RDF-facet-only.xpl</property>
-            <property name="base_strip">{xmlSourceDir}</property>
-            <property name="base_add">{prefixBaseURI}</property>
-        </properties>
-    </class>
-</action>
-```
+These stylesheets can be run as a single XProc pipeline, `CMD2RDF-facet-only.xpl`, in something like Oxygen.
 
 The pipeline must have a `source` input port and a `result` output port. Configuration properties
 whose names match options declared by the pipeline are passed to it as option values. The
