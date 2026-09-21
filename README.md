@@ -30,6 +30,7 @@ included:
 | File | Purpose |
 |------|---------|
 | `batch/src/main/resources/cmd2rdf.xml` | Production (GraphDB in Docker at `graphdb:7200`) |
+| `batch/src/main/resources/cmd2rdf-local.xml` | Local development (GraphDB at `localhost:7200`, repository `test`, `prefixBaseURI` = `urn:`); small records use the [SKG-only pipeline](#skg-only-pipeline) |
 
 ### Key properties
 
@@ -84,6 +85,10 @@ If `xml:base` is absent, the graph IRI is derived from the file path by strippin
 `xmlSourceDir` and prepending `prefixBaseURI`. Deletions still use this file-path mapping;
 changing graph names in XSLT therefore also requires aligning deletion handling.
 
+When `prefixBaseURI` is `urn:`, slashes directly after the scheme are dropped, so
+`urn:/record.rdf` becomes `urn:record.rdf`. The stylesheets apply the same rule, so graph IRIs
+from `xml:base` and from the file-path mapping match.
+
 ## Running
 
 ```bash
@@ -125,6 +130,49 @@ Each record passes through these XSLT transforms in sequence:
 | `saveVLO.xsl` | Exports VLO facets to a separate file |
 
 After transformation, the RDF is uploaded to GraphDB and the checksum DB is marked `DONE`.
+
+`addVLOFacets.xsl` only queries the VLO API when the record has a non-empty `MdSelfLink`;
+records without one get their facets from the local VLO facet mapping only.
+
+#### SKG-only pipeline
+
+An alternative pipeline emits only the SKG-IF entities derived from the VLO facets, without the
+full CMDI → RDF conversion:
+
+| Stylesheet | Purpose |
+|-----------|---------|
+| `addVLOFacets.xsl` | Enriches with VLO facet metadata |
+| `VLOFacets2SKG.xsl` | Maps the facets to SKG-IF entities (reuses `addOST.xsl`) and wraps them in an `ost:SKG` intermediate document |
+| `SKG2RDF.xsl` | Serializes the `ost:SKG` document as RDF/XML, one top-level resource per entity |
+
+For local `file:` records, `SKG2RDF.xsl` sets `xml:base` to the file name only.
+
+These stylesheets can be chained as separate `XsltTransformer` actions (as in `cmd2rdf-local.xml`),
+or run as a single XProc pipeline, `CMD2RDF-facet-only.xpl`, through the `XProcTransformer` action
+(using XML Calabash):
+
+```xml
+<action name="transform">
+    <class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XProcTransformer">
+        <properties>
+            <property name="xprocSource">{xsltSourceDir}/CMD2RDF-facet-only.xpl</property>
+            <property name="base_strip">{xmlSourceDir}</property>
+            <property name="base_add">{prefixBaseURI}</property>
+        </properties>
+    </class>
+</action>
+```
+
+The pipeline must have a `source` input port and a `result` output port. Configuration properties
+whose names match options declared by the pipeline are passed to it as option values. The
+pipeline's options are:
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `beta-vlo-facets-url`, `beta-vlo-record-url`, `vloFacetMapping` | CLARIN VLO endpoints | Facet lookup (see `addVLOFacets.xsl`) |
+| `base_strip`, `base_add` | empty | Rewrites the source path into the record IRI |
+| `skgBaseURI` | `otf:` | Base URI for generated SKG-IF entity identifiers |
+| `debug`, `debugOutputDir` | `true`, `/Users/listj/debug` | Write the output of each stage to `debugOutputDir` |
 
 ### 3. Profiles & Components
 Cached CLARIN metadata profiles (eg., `clarin.eu_cr1_p_*.xml`) and components (eg., `clarin.eu_cr1_c_*.xml`)

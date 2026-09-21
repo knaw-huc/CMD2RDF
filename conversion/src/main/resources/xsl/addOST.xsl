@@ -32,7 +32,7 @@
     <xsl:param name="base_strip" select="'/Users/listj/Clarin.Data/TI_Total/'"/>
     <xsl:param name="base_add" select="''"/>
 
-    <!-- Entity identifiers must be absolute, including when the document base is a filename URN. -->
+    <!-- Entity identifiers must be absolute. -->
     <xsl:param name="skgBaseURI" select="'otf:'"/>
 
     <xsl:variable name="path-about" select="replace(if ($base_strip=$base) then $base else for $strip in tokenize($base_strip,',') return if (starts-with($base,concat('file:',$strip))) then replace($base, concat('file:',$strip), $base_add) else (),'([./])(xml|cmdi)$','$1rdf')"/>
@@ -103,8 +103,9 @@
             <!-- This copy preserves the attributes on the root cmd0:CMD / cmd1:CMD element — most importantly @xml:base, also used further downstream to compute the about -->
             <xsl:copy-of select="@*"/>
             <OST>
-                <fabio:Dataset rdf:about="{$skg-id}"/>
                 <fabio:Work rdf:about="{$skg-id}">
+                    <rdf:type rdf:resource="http://purl.org/spar/fabio/Dataset" />
+
                     <!-- PID (Handle, DOI, etc.) -->
                     <xsl:variable name="pid" select="$selfLink"/>
                     <xsl:if test="$pid!=''">
