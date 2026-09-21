@@ -10,6 +10,7 @@
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
     xmlns:cmd="http://www.clarin.eu/cmd/"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
 >
     <!-- location of the registry -->
     <xsl:param name="registry" select="'http://catalog.clarin.eu/ds/ComponentRegistry'"/>
@@ -75,6 +76,17 @@
         <xsl:sequence select="replace($id,'.*(clarin.eu:cr[0-9]+:p_[0-9]+).*','$1')"/>
     </xsl:function>
     
+    <!-- encode an identifier so it can be used as a URL path segment, the way the VLO does:
+         unsafe characters are replaced by their decimal codepoint surrounded by underscores -->
+    <xsl:function name="cmd:encodeId" as="xs:string">
+        <xsl:param name="id" as="xs:string"/>
+        <!-- codepoints: : 58  / 47  ? 63  # 35  [ 91  ] 93  @ 64  ! 33  $ 36  & 38  ' 39  ( 40  ) 41  * 42  + 43  , 44  ; 59  = 61  % 37 -->
+        <xsl:variable name="url-codepoints" select="(58, 47, 63, 35, 91, 93, 64, 33, 36, 38, 39, 40, 41, 42, 43, 44, 59, 61, 37)"/>
+        <xsl:sequence select="
+            string-join((for $cp in string-to-codepoints($id) return
+                            if ($cp = $url-codepoints) then concat('_', $cp, '_') else codepoints-to-string($cp)), '') "/>
+    </xsl:function>
+
     <!-- the registry URL for a profile -->
     <xsl:function name="cmd:ppath">
         <xsl:param name="id"/>

@@ -15,7 +15,9 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     exclude-result-prefixes="xs"
     version="2.0">
-    
+
+    <xsl:output method="xml" indent="yes" />
+
     <xsl:param name="vloOutputDir" select="'.'"/>
     
     <xsl:template match="/rdf:RDF">

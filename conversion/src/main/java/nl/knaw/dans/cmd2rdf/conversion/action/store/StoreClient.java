@@ -251,7 +251,9 @@ public class StoreClient implements IAction {
             if (path.startsWith(s)) {
                 gIRI = path.replace(s, this.prefixBaseURI)
                         .replace(".xml", ".rdf")
-                        .replaceAll(" ", "_");
+                        .replaceAll(" ", "_")
+                        // Same as the stylesheets: urn:/record.rdf -> urn:record.rdf
+                        .replaceFirst("(?i)^(urn:)/+", "$1");
                 break;
             }
         }

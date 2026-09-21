@@ -24,21 +24,49 @@
 
     <xsl:output method="xml" indent="yes" />
 
+    <xsl:include href="CMD2RDF.xsl"/>
+
     <xsl:param name="base" select="if (exists(/*/@xml:base)) then (/*/@xml:base) else (base-uri())"/>
 
     <!-- allow to rewrite the urls -->
     <xsl:param name="base_strip" select="'/Users/listj/Clarin.Data/TI_Total/'"/>
     <xsl:param name="base_add" select="''"/>
 
-    <!-- SKG-IF base URI for organisation entities -->
-    <xsl:param name="skg-base" select="'otf:'"/>
+    <!-- Entity identifiers must be absolute. -->
+    <xsl:param name="skgBaseURI" select="'otf:'"/>
 
-    <xsl:variable name="about" select="replace(if ($base_strip=$base) then $base else for $strip in tokenize($base_strip,',') return if (starts-with($base,concat('file:',$strip))) then replace($base, concat('file:',$strip), $base_add) else (),'([./])(xml|cmdi)$','$1rdf')"/>
+    <xsl:variable name="path-about" select="replace(if ($base_strip=$base) then $base else for $strip in tokenize($base_strip,',') return if (starts-with($base,concat('file:',$strip))) then replace($base, concat('file:',$strip), $base_add) else (),'([./])(xml|cmdi)$','$1rdf')"/>
+    <xsl:variable name="about" select="replace($path-about, '^(urn:)/+', '$1', 'i')"/>
 
-    <!-- Slugify function: replaces any run of non-letter/non-digit characters with _ and strips leading/trailing underscores -->
+    <!-- the identifier the record carries itself, which is also what the VLO keys its records on -->
+    <xsl:variable name="selfLink" select="normalize-space((/cmd0:CMD/cmd0:Header/cmd0:MdSelfLink|/cmd1:CMD/cmd1:Header/cmd1:MdSelfLink)[1])"/>
+
+    <!-- the record path relative to the harvest directory, unique within the corpus -->
+    <xsl:variable name="record-path" select="replace(if (starts-with($about,$base_add)) then substring-after($about,$base_add) else $about,'^/|\.rdf$','')"/>
+
+    <!-- SKG-IF local identifier of this record, encoded the way the VLO encodes record identifiers.
+         A record without an MdSelfLink has no identifier of its own, so mint one from its path and
+         mark it as created on-the-fly. -->
+    <xsl:variable name="skg-id" select="
+        if ($selfLink!='')
+        then concat($skgBaseURI, cmd0:encodeId($selfLink))
+        else concat($skgBaseURI, 'otf___', cmd0:encodeId($record-path))"/>
+
+    <!-- Slugify function: replaces any run of non-letter/non-digit characters with _ and strips leading/trailing underscores.
+         Normalizes to NFC first, so that a name spelled with a precomposed character and one spelled with a combining mark
+         do not end up as two different identifiers. -->
     <xsl:function name="ost:slugify" as="xs:string">
         <xsl:param name="text" as="xs:string"/>
-        <xsl:sequence select="lower-case(replace(replace(normalize-space($text), '[^\p{L}\p{N}]+', '_'), '^_|_$', ''))"/>
+        <xsl:sequence select="lower-case(replace(replace(normalize-unicode(normalize-space($text),'NFC'), '[^\p{L}\p{N}]+', '_'), '^_|_$', ''))"/>
+    </xsl:function>
+
+    <!-- SKG-IF local identifier for an entity derived from a facet value: the metadata holds no
+         identifier for it, so mint one from the name and mark it as created on-the-fly. The type is
+         part of the identifier so a person and an organisation of the same name stay distinct. -->
+    <xsl:function name="ost:entity-id" as="xs:string">
+        <xsl:param name="type" as="xs:string"/>
+        <xsl:param name="name" as="xs:string"/>
+        <xsl:sequence select="concat($skgBaseURI, 'otf___', $type, '___', ost:slugify($name))"/>
     </xsl:function>
 
     <xsl:template match="/cmd0:CMD|/cmd1:CMD">
@@ -75,10 +103,11 @@
             <!-- This copy preserves the attributes on the root cmd0:CMD / cmd1:CMD element — most importantly @xml:base, also used further downstream to compute the about -->
             <xsl:copy-of select="@*"/>
             <OST>
-                <fabio:Dataset rdf:about="{$about}"/>
-                <fabio:Work rdf:about="{$about}">
+                <fabio:Work rdf:about="{$skg-id}">
+                    <rdf:type rdf:resource="http://purl.org/spar/fabio/Dataset" />
+
                     <!-- PID (Handle, DOI, etc.) -->
-                    <xsl:variable name="pid" select="normalize-space(/cmd0:CMD/cmd0:Header/cmd0:MdSelfLink|/cmd1:CMD/cmd1:Header/cmd1:MdSelfLink)"/>
+                    <xsl:variable name="pid" select="$selfLink"/>
                     <xsl:if test="$pid!=''">
                         <datacite:hasIdentifier>
                             <datacite:Identifier>
@@ -112,19 +141,19 @@
                  
                     <!-- Link to single VLO-facet-based manifestation via FRBR chain -->
                     <frbr:realization>
-                        <fabio:Expression rdf:about="{concat($about, '#expression')}">
-                            <frbr:embodiment rdf:resource="{concat($about, '#manifestation')}"/>
+                        <fabio:Expression rdf:about="{concat($skg-id, '#expression')}">
+                            <frbr:embodiment rdf:resource="{concat($skg-id, '#manifestation')}"/>
                         </fabio:Expression>
                     </frbr:realization>
 
                     <!-- Link to organisations (relevant_organisations in SKG-IF) -->
                     <xsl:for-each select="$orgs">
-                        <dc:relation rdf:resource="{concat($skg-base, ost:slugify(.))}"/>
+                        <dc:relation rdf:resource="{ost:entity-id('org', .)}"/>
                     </xsl:for-each>
 
                     <!-- Link to creators (contributions / persons in SKG-IF) -->
                     <xsl:for-each select="$creators">
-                        <dc:creator rdf:resource="{concat($skg-base, ost:slugify(.))}"/>
+                        <dc:creator rdf:resource="{ost:entity-id('person', .)}"/>
                     </xsl:for-each>
                 </fabio:Work>
 
@@ -140,11 +169,11 @@
                             return tokenize(lower-case(normalize-space($av)), '\s+')
                     ))"/>
 
-                <fabio:Manifestation rdf:about="{concat($about, '#manifestation')}">
+                <fabio:Manifestation rdf:about="{concat($skg-id, '#manifestation')}">
 
                     <!-- Hosting data source (SKG-IF hosting_data_source) -->
                     <xsl:if test="normalize-space($provider) != ''">
-                        <dcat:accessService rdf:resource="{concat($skg-base, ost:slugify($provider))}"/>
+                        <dcat:accessService rdf:resource="{ost:entity-id('ds', $provider)}"/>
                     </xsl:if>
 
                     <!-- Format(s) from VLO hasFacetFormat -->
@@ -220,7 +249,7 @@
 
                 <!-- Organisation entities from facet (type: research) -->
                 <xsl:for-each select="$orgs">
-                    <foaf:Organization rdf:about="{concat($skg-base, ost:slugify(.))}">
+                    <foaf:Organization rdf:about="{ost:entity-id('org', .)}">
                         <foaf:name><xsl:value-of select="."/></foaf:name>
                         <rdf:type rdf:resource="http://purl.org/cerif/frapo/ResearchInstitute"/>
                     </foaf:Organization>
@@ -230,7 +259,7 @@
                 <!-- VLO supplies names as "Family, Given"; split on the first comma. -->
                 <!-- When no comma is present we cannot reliably split, so emit foaf:name only. -->
                 <xsl:for-each select="$creators">
-                    <foaf:Person rdf:about="{concat($skg-base, ost:slugify(.))}">
+                    <foaf:Person rdf:about="{ost:entity-id('person', .)}">
                         <foaf:name><xsl:value-of select="."/></foaf:name>
                         <xsl:if test="contains(., ',')">
                             <foaf:familyName><xsl:value-of select="normalize-space(substring-before(., ','))"/></foaf:familyName>
@@ -241,7 +270,7 @@
 
                 <!-- Provider as data source (SKG-IF data source = dcat:DataService), classified as a repository -->
                 <xsl:if test="normalize-space($provider) != ''">
-                    <dcat:DataService rdf:about="{concat($skg-base, ost:slugify($provider))}">
+                    <dcat:DataService rdf:about="{ost:entity-id('ds', $provider)}">
                         <foaf:name><xsl:value-of select="$provider"/></foaf:name>
                         <rdf:type rdf:resource="http://purl.org/cerif/frapo/Repository"/>
                     </dcat:DataService>
@@ -252,7 +281,7 @@
                 <!-- SKG-IF service extension ontology (https://w3id.org/skg-if/extension/srv/ontology/). -->
                 <!-- srv:Service is a subclass of schema:SoftwareApplication. -->
                 <xsl:if test="$isWebLicht">
-                    <srv:Service rdf:about="{concat($about, '#service')}">
+                    <srv:Service rdf:about="{concat($skg-id, '#service')}">
 
                         <!-- name (foaf:name) -->
                         <xsl:for-each select="$titles">
@@ -265,7 +294,7 @@
                         </xsl:for-each>
 
                         <!-- identifiers (datacite:hasIdentifier) -->
-                        <xsl:variable name="pid" select="normalize-space(/cmd0:CMD/cmd0:Header/cmd0:MdSelfLink|/cmd1:CMD/cmd1:Header/cmd1:MdSelfLink)"/>
+                        <xsl:variable name="pid" select="$selfLink"/>
                         <xsl:if test="$pid!=''">
                             <datacite:hasIdentifier>
                                 <datacite:Identifier>
@@ -284,12 +313,12 @@
 
                         <!-- hosting organisation (srv:hasHostingOrganisation): the provider derived above -->
                         <xsl:if test="normalize-space($provider) != ''">
-                            <srv:hasHostingOrganisation rdf:resource="{concat($skg-base, ost:slugify($provider))}"/>
+                            <srv:hasHostingOrganisation rdf:resource="{ost:entity-id('ds', $provider)}"/>
                         </xsl:if>
 
                         <!-- relevant organisations (dcterms:relation) -->
                         <xsl:for-each select="$orgs">
-                            <dc:relation rdf:resource="{concat($skg-base, ost:slugify(.))}"/>
+                            <dc:relation rdf:resource="{ost:entity-id('org', .)}"/>
                         </xsl:for-each>
 
                         <!-- API profile (dcterms:conformsTo): e.g. WADL media type. -->

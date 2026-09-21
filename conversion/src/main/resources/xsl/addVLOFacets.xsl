@@ -125,15 +125,6 @@
 		</xsl:if>
 	</xsl:function>
 
-	<xsl:function name="vlo:encodeId" as="xs:string">
-		<xsl:param name="id" as="xs:string"/>
-		<!-- codepoints: : 58  / 47  ? 63  # 35  [ 91  ] 93  @ 64  ! 33  $ 36  & 38  ' 39  ( 40  ) 41  * 42  + 43  , 44  ; 59  = 61  % 37 -->
-		<xsl:variable name="url-codepoints" select="(58, 47, 63, 35, 91, 93, 64, 33, 36, 38, 39, 40, 41, 42, 43, 44, 59, 61, 37)"/>
-		<xsl:sequence select="
-			string-join((for $cp in string-to-codepoints($id) return
-							if ($cp = $url-codepoints) then concat('_', $cp, '_') else codepoints-to-string($cp)), '') "/>
-	</xsl:function>
-
 	<xsl:template match="text()" mode="beta-vlo"/>
 
 	<xsl:template match="js:map" mode="beta-vlo-facets">
@@ -163,8 +154,15 @@
 		<xsl:copy>
 			<xsl:attribute name="xml:base" select="base-uri()"/>
 			<xsl:apply-templates select="@*"/>
-			<xsl:variable name="facets-url" select="concat($beta-vlo-facets-url,js:encode-for-uri(vlo:encodeId(.//*:MdSelfLink)))"/>
-			<xsl:variable name="record-url" select="concat($beta-vlo-record-url,js:encode-for-uri(vlo:encodeId(.//*:MdSelfLink)))"/>
+			<!-- A missing/blank self link cannot identify a VLO record. Use local mapping instead. -->
+			<xsl:variable name="self-link" as="xs:string"
+				select="normalize-space(string((.//*:MdSelfLink[normalize-space(.) ne ''])[1]))"/>
+			<xsl:variable name="vlo-id" as="xs:string?"
+				select="if ($self-link ne '') then js:encode-for-uri(cmd0:encodeId($self-link)) else ()"/>
+			<xsl:variable name="facets-url" as="xs:string?"
+				select="if (exists($vlo-id)) then concat($beta-vlo-facets-url, $vlo-id) else ()"/>
+			<xsl:variable name="record-url" as="xs:string?"
+				select="if (exists($vlo-id)) then concat($beta-vlo-record-url, $vlo-id) else ()"/>
 			<!--<xsl:message>DBG: beta-vlo-facets[<xsl:value-of select="$facets-url" />]</xsl:message>-->
 			<!--<xsl:message>DBG: beta-vlo-record[<xsl:value-of select="$record-url" />]</xsl:message>-->
 			<xsl:variable name="beta-vlo-facets-json" select="if (unparsed-text-available($facets-url)) then json-to-xml(unparsed-text($facets-url)) else ()"/>
