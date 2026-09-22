@@ -1,26 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xs="http://www.w3.org/2001/XMLSchema"
-    xmlns:math="http://www.w3.org/2005/xpath-functions/math"
-    xmlns:cmd0="http://www.clarin.eu/cmd/"
-    xmlns:cmd1="http://www.clarin.eu/cmd/1"
-    xmlns:vlo="http://www.clarin.eu/vlo/"
-    xmlns:dc="http://purl.org/dc/terms/"
-    xmlns:fabio="http://purl.org/spar/fabio/"
-    xmlns:datacite="http://purl.org/spar/datacite/"
-    xmlns:silvio="http://www.essepuntato.it/2010/06/literalreification/"
-    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-    xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-    xmlns:foaf="http://xmlns.com/foaf/0.1/"
-    xmlns:frbr="http://purl.org/vocab/frbr/core#"
-    xmlns:prism="http://prismstandard.org/namespaces/basic/2.0/"
-    xmlns:pso="http://purl.org/spar/pso/"
-    xmlns:dcat="http://www.w3.org/ns/dcat#"
-    xmlns:schema="https://schema.org/"
-    xmlns:srv="https://w3id.org/skg-if/extension/srv/ontology/"
-    xmlns:ost="https://ostrails.eu/"
-    exclude-result-prefixes="xs math ost"
-    version="3.0">
+                xmlns:math="http://www.w3.org/2005/xpath-functions/math"
+                xmlns:cmd0="http://www.clarin.eu/cmd/"
+                xmlns:cmd1="http://www.clarin.eu/cmd/1"
+                xmlns:vlo="http://www.clarin.eu/vlo/"
+                xmlns:dc="http://purl.org/dc/terms/"
+                xmlns:fabio="http://purl.org/spar/fabio/"
+                xmlns:datacite="http://purl.org/spar/datacite/"
+                xmlns:silvio="http://www.essepuntato.it/2010/06/literalreification/"
+                xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+                xmlns:foaf="http://xmlns.com/foaf/0.1/"
+                xmlns:frbr="http://purl.org/vocab/frbr/core#"
+                xmlns:prism="http://prismstandard.org/namespaces/basic/2.0/"
+                xmlns:pso="http://purl.org/spar/pso/"
+                xmlns:dcat="http://www.w3.org/ns/dcat#"
+                xmlns:schema="https://schema.org/"
+                xmlns:srv="https://w3id.org/skg-if/extension/srv/ontology/"
+                xmlns:ost="https://ostrails.eu/"
+                exclude-result-prefixes="xs math ost"
+                version="3.0">
 
     <xsl:output method="xml" indent="yes" />
 
@@ -84,6 +84,26 @@
         <xsl:variable name="titles" select="vlo:hasFacetName[normalize-space(.)!='']" />
         <xsl:variable name="collections" select="distinct-values(vlo:hasFacetCollection[normalize-space(.)!='']/normalize-space(.))"/>
 
+        <!-- A collection is not necessarily a service portal. Only values that explicitly look like
+             a portal/catalogue are promoted to an SKG-IF srv:Portal. -->
+        <xsl:variable name="portalCollections" select="$collections[
+            matches(lower-case(.), '(portal|catalog|catalogue|marketplace|orchestrator|registry|virtual language observatory|weblight)')
+        ]"/>
+
+        <!-- The Service shape requires exactly one foaf:name. Prefer the first VLO title and use a
+             deterministic identifier-derived fallback for malformed records without a title. -->
+        <xsl:variable name="serviceName" select="
+            if (exists($titles)) then normalize-space($titles[1])
+            else if ($selfLink != '') then $selfLink
+            else $record-path"/>
+
+        <!-- API endpoint/specification references are available in the original CMDI resource list,
+             even when addVLOFacets does not expose the VLO _resourceRef field. -->
+        <xsl:variable name="resourceRefs" select="distinct-values((
+            /cmd0:CMD/cmd0:Resources/cmd0:ResourceProxyList/cmd0:ResourceProxy/cmd0:ResourceRef,
+            /cmd1:CMD/cmd1:Resources/cmd1:ResourceProxyList/cmd1:ResourceProxy/cmd1:ResourceRef
+        )[normalize-space(.) != '']/normalize-space(.))"/>
+
         <!-- Extract provider : try the VLO 'collection' facet first, fall back to repository from path -->
         <xsl:variable name="provider">
             <xsl:choose>
@@ -108,59 +128,62 @@
             <!-- This copy preserves the attributes on the root cmd0:CMD / cmd1:CMD element — most importantly @xml:base, also used further downstream to compute the about -->
             <xsl:copy-of select="@*"/>
             <OST>
-                <fabio:Work rdf:about="{$skg-id}">
-                    <rdf:type rdf:resource="http://purl.org/spar/fabio/Dataset" />
+                <!-- A WebLicht profile describes a service, not a dataset. -->
+                <xsl:if test="not($isWebLicht)">
+                    <fabio:Work rdf:about="{$skg-id}">
+                        <rdf:type rdf:resource="http://purl.org/spar/fabio/Dataset" />
 
-                    <!-- PID (Handle, DOI, etc.) -->
-                    <xsl:variable name="pid" select="$selfLink"/>
-                    <xsl:if test="$pid!=''">
-                        <datacite:hasIdentifier>
-                            <datacite:Identifier>
-                                <xsl:choose>
-                                    <xsl:when test="starts-with($pid,'https://hdl.handle.net/')">
-                                        <datacite:usesIdentifierScheme rdf:resource="http://purl.org/spar/datacite/handle"/>
-                                    </xsl:when>
-                                    <xsl:when test="starts-with($pid,'http://hdl.handle.net/')">
-                                        <datacite:usesIdentifierScheme rdf:resource="http://purl.org/spar/datacite/handle"/>
-                                    </xsl:when>
-                                    <xsl:when test="starts-with($pid,'https://doi.org/') or starts-with($pid,'http://dx.doi.org/')">
-                                        <datacite:usesIdentifierScheme rdf:resource="http://purl.org/spar/datacite/doi"/>
-                                    </xsl:when>
-                                </xsl:choose>
-                                <silvio:hasLiteralValue>
-                                    <xsl:value-of select="$pid"/>
-                                </silvio:hasLiteralValue>
-                            </datacite:Identifier>
-                        </datacite:hasIdentifier>
-                    </xsl:if>
-                    
-                    <!-- Descriptions from VLO facets -->
-                    <xsl:for-each select="$descriptions">
-                        <dc:abstract><xsl:value-of select="." /></dc:abstract>
-                    </xsl:for-each>
-                    
-                    <!-- Titles from VLO facet -->
-                    <xsl:for-each select="$titles">
-                        <dc:title><xsl:value-of select="."/></dc:title>
-                    </xsl:for-each>
-                 
-                    <!-- Link to single VLO-facet-based manifestation via FRBR chain -->
-                    <frbr:realization>
-                        <fabio:Expression rdf:about="{concat($skg-id, '#expression')}">
-                            <frbr:embodiment rdf:resource="{concat($skg-id, '#manifestation')}"/>
-                        </fabio:Expression>
-                    </frbr:realization>
+                        <!-- PID (Handle, DOI, etc.) -->
+                        <xsl:variable name="pid" select="$selfLink"/>
+                        <xsl:if test="$pid!=''">
+                            <datacite:hasIdentifier>
+                                <datacite:Identifier>
+                                    <xsl:choose>
+                                        <xsl:when test="starts-with($pid,'https://hdl.handle.net/')">
+                                            <datacite:usesIdentifierScheme rdf:resource="http://purl.org/spar/datacite/handle"/>
+                                        </xsl:when>
+                                        <xsl:when test="starts-with($pid,'http://hdl.handle.net/')">
+                                            <datacite:usesIdentifierScheme rdf:resource="http://purl.org/spar/datacite/handle"/>
+                                        </xsl:when>
+                                        <xsl:when test="starts-with($pid,'https://doi.org/') or starts-with($pid,'http://dx.doi.org/')">
+                                            <datacite:usesIdentifierScheme rdf:resource="http://purl.org/spar/datacite/doi"/>
+                                        </xsl:when>
+                                    </xsl:choose>
+                                    <silvio:hasLiteralValue>
+                                        <xsl:value-of select="$pid"/>
+                                    </silvio:hasLiteralValue>
+                                </datacite:Identifier>
+                            </datacite:hasIdentifier>
+                        </xsl:if>
 
-                    <!-- Link to organisations (relevant_organisations in SKG-IF) -->
-                    <xsl:for-each select="$orgs">
-                        <dc:relation rdf:resource="{ost:entity-id('org', .)}"/>
-                    </xsl:for-each>
+                        <!-- Descriptions from VLO facets -->
+                        <xsl:for-each select="$descriptions">
+                            <dc:abstract><xsl:value-of select="." /></dc:abstract>
+                        </xsl:for-each>
 
-                    <!-- Link to creators (contributions / persons in SKG-IF) -->
-                    <xsl:for-each select="$creators">
-                        <dc:creator rdf:resource="{ost:entity-id('person', .)}"/>
-                    </xsl:for-each>
-                </fabio:Work>
+                        <!-- Titles from VLO facet -->
+                        <xsl:for-each select="$titles">
+                            <dc:title><xsl:value-of select="."/></dc:title>
+                        </xsl:for-each>
+
+                        <!-- Link to single VLO-facet-based manifestation via FRBR chain -->
+                        <frbr:realization>
+                            <fabio:Expression rdf:about="{concat($skg-id, '#expression')}">
+                                <frbr:embodiment rdf:resource="{concat($skg-id, '#manifestation')}"/>
+                            </fabio:Expression>
+                        </frbr:realization>
+
+                        <!-- Link to organisations (relevant_organisations in SKG-IF) -->
+                        <xsl:for-each select="$orgs">
+                            <dc:relation rdf:resource="{ost:entity-id('org', .)}"/>
+                        </xsl:for-each>
+
+                        <!-- Link to creators (contributions / persons in SKG-IF) -->
+                        <xsl:for-each select="$creators">
+                            <dc:creator rdf:resource="{ost:entity-id('person', .)}"/>
+                        </xsl:for-each>
+                    </fabio:Work>
+                </xsl:if>
 
                 <!-- Single manifestation derived from VLO facets (availability, license, licenseType, format) -->
                 <!-- The var accessTokens creates a flat deduplicated set of lowercase words from 2 VLO facets variables: availability/licenseTypes -->
@@ -174,83 +197,85 @@
                             return tokenize(lower-case(normalize-space($av)), '\s+')
                     ))"/>
 
-                <fabio:Manifestation rdf:about="{concat($skg-id, '#manifestation')}">
+                <xsl:if test="not($isWebLicht)">
+                    <fabio:Manifestation rdf:about="{concat($skg-id, '#manifestation')}">
 
-                    <!-- Hosting data source (SKG-IF hosting_data_source) -->
-                    <xsl:if test="normalize-space($provider) != ''">
-                        <dcat:accessService rdf:resource="{ost:entity-id('ds', $provider)}"/>
-                    </xsl:if>
+                        <!-- Hosting data source (SKG-IF hosting_data_source) -->
+                        <xsl:if test="normalize-space($provider) != ''">
+                            <dcat:accessService rdf:resource="{ost:entity-id('ds', $provider)}"/>
+                        </xsl:if>
 
-                    <!-- Format(s) from VLO hasFacetFormat -->
-                    <xsl:for-each select="$formats">
-                        <dc:format><xsl:value-of select="."/></dc:format>
-                    </xsl:for-each>
+                        <!-- Format(s) from VLO hasFacetFormat -->
+                        <xsl:for-each select="$formats">
+                            <dc:format><xsl:value-of select="."/></dc:format>
+                        </xsl:for-each>
 
-                    <!-- License from VLO hasFacetLicense -->
-                    <xsl:for-each select="$licenses">
+                        <!-- License from VLO hasFacetLicense -->
+                        <xsl:for-each select="$licenses">
+                            <xsl:choose>
+                                <xsl:when test="starts-with(., 'http://') or starts-with(., 'https://')">
+                                    <dc:license rdf:resource="{.}"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <dc:license><xsl:value-of select="."/></dc:license>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:for-each>
+
+                        <!-- License type from VLO hasFacetLicenseType -->
+                        <xsl:for-each select="$licenseTypes">
+                            <xsl:choose>
+                                <xsl:when test="starts-with(., 'http://') or starts-with(., 'https://')">
+                                    <dc:license rdf:resource="{.}"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <dc:license><xsl:value-of select="."/></dc:license>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:for-each>
+
+                        <!-- Access rights from VLO availability, license and licenseType. VLO concatenates multiple -->
+                        <!-- availability values into one element, so we tokenize and pick the most -->
+                        <!-- restrictive keyword (RES > ACA > PUB). -->
                         <xsl:choose>
-                            <xsl:when test="starts-with(., 'http://') or starts-with(., 'https://')">
-                                <dc:license rdf:resource="{.}"/>
+                            <xsl:when test="$accessTokens = ('res', 'closed')">
+                                <pso:holdsStatusInTime>
+                                    <pso:StatusInTime>
+                                        <pso:withStatus rdf:resource="http://purl.org/spar/pso/closed-access"/>
+                                    </pso:StatusInTime>
+                                </pso:holdsStatusInTime>
                             </xsl:when>
-                            <xsl:otherwise>
-                                <dc:license><xsl:value-of select="."/></dc:license>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </xsl:for-each>
-
-                    <!-- License type from VLO hasFacetLicenseType -->
-                    <xsl:for-each select="$licenseTypes">
-                        <xsl:choose>
-                            <xsl:when test="starts-with(., 'http://') or starts-with(., 'https://')">
-                                <dc:license rdf:resource="{.}"/>
+                            <xsl:when test="$accessTokens = ('aca', 'academic', 'restricted')">
+                                <pso:holdsStatusInTime>
+                                    <pso:StatusInTime>
+                                        <pso:withStatus rdf:resource="http://purl.org/spar/pso/restricted-access"/>
+                                        <rdfs:comment>Academic/Restricted access</rdfs:comment>
+                                    </pso:StatusInTime>
+                                </pso:holdsStatusInTime>
                             </xsl:when>
-                            <xsl:otherwise>
-                                <dc:license><xsl:value-of select="."/></dc:license>
-                            </xsl:otherwise>
+                            <xsl:when test="$accessTokens = ('pub', 'open', 'public')">
+                                <pso:holdsStatusInTime>
+                                    <pso:StatusInTime>
+                                        <pso:withStatus rdf:resource="http://purl.org/spar/pso/open-access"/>
+                                    </pso:StatusInTime>
+                                </pso:holdsStatusInTime>
+                            </xsl:when>
+                            <xsl:when test="exists($availability)">
+                                <!-- Fallback: raw availability text as comment -->
+                                <pso:holdsStatusInTime>
+                                    <pso:StatusInTime>
+                                        <rdfs:comment><xsl:value-of select="string-join($availability, '; ')"/></rdfs:comment>
+                                    </pso:StatusInTime>
+                                </pso:holdsStatusInTime>
+                            </xsl:when>
                         </xsl:choose>
-                    </xsl:for-each>
 
-                    <!-- Access rights from VLO availability, license and licenseType. VLO concatenates multiple -->
-                    <!-- availability values into one element, so we tokenize and pick the most -->
-                    <!-- restrictive keyword (RES > ACA > PUB). -->
-                    <xsl:choose>
-                        <xsl:when test="$accessTokens = ('res', 'closed')">
-                            <pso:holdsStatusInTime>
-                                <pso:StatusInTime>
-                                    <pso:withStatus rdf:resource="http://purl.org/spar/pso/closed-access"/>
-                                </pso:StatusInTime>
-                            </pso:holdsStatusInTime>
-                        </xsl:when>
-                        <xsl:when test="$accessTokens = ('aca', 'academic', 'restricted')">
-                            <pso:holdsStatusInTime>
-                                <pso:StatusInTime>
-                                    <pso:withStatus rdf:resource="http://purl.org/spar/pso/restricted-access"/>
-                                    <rdfs:comment>Academic/Restricted access</rdfs:comment>
-                                </pso:StatusInTime>
-                            </pso:holdsStatusInTime>
-                        </xsl:when>
-                        <xsl:when test="$accessTokens = ('pub', 'open', 'public')">
-                            <pso:holdsStatusInTime>
-                                <pso:StatusInTime>
-                                    <pso:withStatus rdf:resource="http://purl.org/spar/pso/open-access"/>
-                                </pso:StatusInTime>
-                            </pso:holdsStatusInTime>
-                        </xsl:when>
-                        <xsl:when test="exists($availability)">
-                            <!-- Fallback: raw availability text as comment -->
-                            <pso:holdsStatusInTime>
-                                <pso:StatusInTime>
-                                    <rdfs:comment><xsl:value-of select="string-join($availability, '; ')"/></rdfs:comment>
-                                </pso:StatusInTime>
-                            </pso:holdsStatusInTime>
-                        </xsl:when>
-                    </xsl:choose>
-
-                    <!-- Version from VLO hasFacetVersion -->
-                    <xsl:for-each select="$versions">
-                        <prism:versionIdentifier><xsl:value-of select="."/></prism:versionIdentifier>
-                    </xsl:for-each>
-                </fabio:Manifestation>
+                        <!-- Version from VLO hasFacetVersion -->
+                        <xsl:for-each select="$versions">
+                            <prism:versionIdentifier><xsl:value-of select="."/></prism:versionIdentifier>
+                        </xsl:for-each>
+                    </fabio:Manifestation>
+                </xsl:if>
 
                 <!-- Organisation entities from facet (type: research) -->
                 <xsl:for-each select="$orgs">
@@ -288,14 +313,16 @@
                 <xsl:if test="$isWebLicht">
                     <srv:Service rdf:about="{concat($skg-id, '#service')}">
 
-                        <!-- name (foaf:name) -->
-                        <xsl:for-each select="$titles">
-                            <foaf:name><xsl:value-of select="."/></foaf:name>
-                        </xsl:for-each>
+                        <!-- name (foaf:name): exactly one value is required by the Service shape -->
+                        <foaf:name><xsl:value-of select="$serviceName"/></foaf:name>
 
-                        <!-- description (dcterms:description) -->
+                        <!-- description (dcterms:description): SRV-O expects rdfs:langString.
+                             Preserve a source language tag and use BCP 47 'und' when it is unknown. -->
                         <xsl:for-each select="$descriptions">
-                            <dc:description><xsl:value-of select="."/></dc:description>
+                            <dc:description>
+                                <xsl:attribute name="xml:lang" select="if (@xml:lang) then string(@xml:lang) else 'und'"/>
+                                <xsl:value-of select="."/>
+                            </dc:description>
                         </xsl:for-each>
 
                         <!-- identifiers (datacite:hasIdentifier) -->
@@ -326,10 +353,10 @@
                         <!-- research infrastructure (srv:isPartOfResearchInfrastructure): always CLARIN -->
                         <srv:isPartOfResearchInfrastructure rdf:resource="{ost:entity-id('org', 'CLARIN ERIC')}"/>
 
-                        <!-- venues (srv:hasVenue): the VLO, which catalogues every record, and the portal(s) -->
-                        <!-- named by the collection facet, e.g. "WebLicht Webservice Orchestrator" -->
+                        <!-- venues (srv:hasVenue): the VLO and collection values explicitly recognisable
+                             as portals/catalogues, e.g. "WebLicht Webservice Orchestrator" -->
                         <srv:hasVenue rdf:resource="{ost:entity-id('venue', 'Virtual Language Observatory')}"/>
-                        <xsl:for-each select="$collections">
+                        <xsl:for-each select="$portalCollections">
                             <srv:hasVenue rdf:resource="{ost:entity-id('venue', .)}"/>
                         </xsl:for-each>
 
@@ -341,12 +368,18 @@
                         </xsl:for-each>
                         <dc:relation rdf:resource="{ost:entity-id('org', 'CLARIN ERIC')}"/>
 
-                        <!-- API profile (dcterms:conformsTo): e.g. WADL media type. -->
-                        <!-- NB: the WADL endpoint URL lives in the VLO _resourceRef field, which addVLOFacets -->
-                        <!-- skips, so only the media type is available here. -->
-                        <xsl:for-each select="$formats">
-                            <dc:conformsTo><xsl:value-of select="."/></dc:conformsTo>
-                        </xsl:for-each>
+                        <!-- API profile: dcterms:conformsTo must point to at most one srv:APIProfile,
+                             rather than containing a media-type literal. ResourceRef values are retained
+                             as endpoint URLs; no API profile is fabricated when no URL is available. -->
+                          <xsl:if test="exists($resourceRefs)">
+                            <dc:conformsTo>
+                                <srv:APIProfile rdf:about="{concat($skg-id, '#api-profile')}">
+                                    <xsl:for-each select="$resourceRefs">
+                                        <dcat:endpointURL rdf:resource="{.}"/>
+                                    </xsl:for-each>
+                                </srv:APIProfile>
+                            </dc:conformsTo>
+                        </xsl:if>
 
                         <!-- License: not part of the srv extension, retained as plain DCTerms. -->
                         <xsl:for-each select="$licenses">
@@ -404,7 +437,7 @@
                         <rdf:type rdf:resource="https://w3id.org/skg-if/extension/srv/ontology/Portal"/>
                         <foaf:homepage rdf:resource="https://vlo.clarin.eu/"/>
                     </fabio:ExpressionCollection>
-                    <xsl:for-each select="$collections">
+                    <xsl:for-each select="$portalCollections">
                         <fabio:ExpressionCollection rdf:about="{ost:entity-id('venue', .)}">
                             <foaf:name><xsl:value-of select="."/></foaf:name>
                             <rdf:type rdf:resource="https://w3id.org/skg-if/extension/srv/ontology/Portal"/>
