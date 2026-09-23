@@ -88,6 +88,35 @@
         <xsl:sequence select="concat($skgBaseURI, 'otf___', $type, '___', ost:slugify($name))"/>
     </xsl:function>
 
+    <!-- Determine a product identifier scheme only from an unambiguous value pattern. More
+         specific resolver namespaces must be tested before the generic W3ID and URL fallbacks. -->
+    <xsl:function name="ost:identifier-scheme" as="xs:string?">
+        <xsl:param name="value" as="xs:string"/>
+        <xsl:variable name="v" as="xs:string" select="lower-case(normalize-space($value))"/>
+        <xsl:sequence select="
+            if (matches($v, '^(https?://hdl\.handle\.net/|hdl:)')) then 'handle'
+            else if (matches($v, '^(https?://(dx\.)?doi\.org/|doi:\s*|10\.[0-9]{4,9}/)')) then 'doi'
+            else if (matches($v, '^(https?://(www\.)?arxiv\.org/(abs|pdf)/|arxiv:)')) then 'arxiv'
+            else if (starts-with($v, 'ivo://')) then 'ivoid'
+            else if (matches($v, '^https?://openalex\.org/w[0-9]+/?$')) then 'openalex'
+            else if (matches($v, '^(pmc[0-9]+|https?://(www\.)?ncbi\.nlm\.nih\.gov/pmc/articles/pmc[0-9]+/?)$')) then 'pmcid'
+            else if (matches($v, '^https?://w3id\.org/oc/meta/br/')) then 'omid'
+            else if (starts-with($v, 'spase://')) then 'spase'
+            else if (starts-with($v, 'urn:')) then 'urn'
+            else if (matches($v, '^https?://w3id\.org/')) then 'w3id'
+            else if (matches($v, '^https?://')) then 'url'
+            else ()"/>
+    </xsl:function>
+
+    <!-- Only a subset of the globally recognised schemes is meaningful for a service.
+         Product-specific identifiers such as arXiv, OpenAlex Work, PMCID and OMID must
+         not be attached to srv:Service entities. Such a filter might also be done for eg., persons at some point. -->
+    <xsl:function name="ost:service-identifier-scheme" as="xs:string?">
+        <xsl:param name="value" as="xs:string"/>
+        <xsl:variable name="scheme" as="xs:string?" select="ost:identifier-scheme($value)"/>
+        <xsl:sequence select="if ($scheme = ('doi', 'handle', 'ivoid', 'url', 'urn', 'w3id')) then $scheme else ()"/>
+    </xsl:function>
+
     <xsl:template match="/cmd0:CMD|/cmd1:CMD">
         <!--<xsl:message expand-text="yes">DBG: base[{$base}]</xsl:message>-->
 
@@ -124,18 +153,23 @@
             '(^|[^a-z])(research literature|literature|journal article|article|book|book chapter|chapter|thesis|dissertation|report|conference paper|conference proceedings|proceedings|working paper|preprint|publication)([^a-z]|$)'
         )"/>
 
-        <!-- Explicit product URLs from profile metadata. Unlike MdSelfLink, these identifier fields
-             describe the resource/product. Do not infer a product identifier from arbitrary links. -->
-        <xsl:variable name="productIdentifierUrls" as="xs:string*"
+        <!-- Explicit product identifiers from profile metadata. Unlike MdSelfLink, these fields
+             describe the resource/product. Unknown literals and arbitrary links are ignored. -->
+        <xsl:variable name="productIdentifiers" as="xs:string*"
                       select="distinct-values((/cmd0:CMD/cmd0:Components | /cmd1:CMD/cmd1:Components)
-                                //*[matches(lower-case(local-name()), '(identifier|pid)$')]
+                                //*[
+                                    matches(lower-case(local-name()), '(identifier|pid)$')
+                                    or lower-case(local-name()) =
+                                       ('doi','handle','arxiv','pmcid','ivoid','urn','spase')
+                                ]
                                     [not(ancestor::*[
                                         matches(
                                             lower-case(local-name()),
                                             '^(service|person|creator|author|contact|organisation|organization)$'
                                         )
                                     ])]
-                                [matches(normalize-space(.), '^https?://')]
+                                [exists(ost:identifier-scheme(normalize-space(.)))]
+                                ! normalize-space(.)
         )"/>
 
         <!-- A collection is not necessarily a service portal. Only values that explicitly look like
@@ -242,12 +276,16 @@
                         </xsl:choose>
 
                         <!-- MdSelfLink identifies the CMDI metadata record and is deliberately not
-                             emitted here. Only explicit URI-typed product identifiers are mapped. -->
-                        <xsl:for-each select="$productIdentifierUrls">
+                             emitted here. Only identifiers with a reliably recognised scheme are mapped. -->
+                        <xsl:for-each select="$productIdentifiers">
+                            <xsl:variable name="identifier" select="."/>
+                            <xsl:variable name="identifierScheme"
+                                          select="ost:identifier-scheme($identifier)"/>
                             <datacite:hasIdentifier>
                                 <datacite:Identifier>
-                                    <datacite:usesIdentifierScheme rdf:resource="http://purl.org/spar/datacite/url"/>
-                                    <silvio:hasLiteralValue><xsl:value-of select="."/></silvio:hasLiteralValue>
+                                    <datacite:usesIdentifierScheme
+                                            rdf:resource="{concat('http://purl.org/spar/datacite/', $identifierScheme)}"/>
+                                    <silvio:hasLiteralValue><xsl:value-of select="$identifier"/></silvio:hasLiteralValue>
                                 </datacite:Identifier>
                             </datacite:hasIdentifier>
                         </xsl:for-each>
@@ -386,10 +424,16 @@
                 <!-- When no comma is present we cannot reliably split, so emit foaf:name only. -->
                 <xsl:for-each select="$creators">
                     <foaf:Person rdf:about="{ost:entity-id('person', .)}">
-                        <foaf:name><xsl:value-of select="."/></foaf:name>
+                        <foaf:name>
+                            <xsl:value-of select="."/>
+                        </foaf:name>
                         <xsl:if test="contains(., ',')">
-                            <foaf:familyName><xsl:value-of select="normalize-space(substring-before(., ','))"/></foaf:familyName>
-                            <foaf:givenName><xsl:value-of select="normalize-space(substring-after(., ','))"/></foaf:givenName>
+                            <foaf:familyName>
+                                <xsl:value-of select="normalize-space(substring-before(., ','))"/>
+                            </foaf:familyName>
+                            <foaf:givenName>
+                                <xsl:value-of select="normalize-space(substring-after(., ','))"/>
+                            </foaf:givenName>
                         </xsl:if>
                     </foaf:Person>
                 </xsl:for-each>
@@ -397,7 +441,9 @@
                 <!-- Provider as data source (SKG-IF data source = dcat:DataService), classified as a repository -->
                 <xsl:if test="normalize-space($provider) != ''">
                     <dcat:DataService rdf:about="{ost:entity-id('ds', $provider)}">
-                        <foaf:name><xsl:value-of select="$provider"/></foaf:name>
+                        <foaf:name>
+                            <xsl:value-of select="$provider"/>
+                        </foaf:name>
                         <rdf:type rdf:resource="http://purl.org/cerif/frapo/Repository"/>
                     </dcat:DataService>
                 </xsl:if>
@@ -410,7 +456,9 @@
                     <srv:Service rdf:about="{$service-id}">
 
                         <!-- name (foaf:name): exactly one value is required by the Service shape -->
-                        <foaf:name><xsl:value-of select="$serviceName"/></foaf:name>
+                        <foaf:name>
+                            <xsl:value-of select="$serviceName"/>
+                        </foaf:name>
 
                         <!-- description (dcterms:description): SRV-O expects rdfs:langString.
                              Preserve a source language tag and use BCP 47 'und' when it is unknown. -->
@@ -425,22 +473,17 @@
                              is intentionally not emitted here because it identifies the CMDI record. -->
                         <xsl:for-each select="$servicePids">
                             <xsl:variable name="pid" select="."/>
-                            <datacite:hasIdentifier>
-                                <datacite:Identifier>
-                                    <xsl:choose>
-                                        <xsl:when test="matches(lower-case($pid), '^(https?://hdl\.handle\.net/|hdl:)')">
-                                            <datacite:usesIdentifierScheme rdf:resource="http://purl.org/spar/datacite/handle"/>
-                                        </xsl:when>
-                                        <xsl:when test="matches(lower-case($pid), '^(https?://(dx\.)?doi\.org/|doi:|10\.[0-9]{4,9}/)')">
-                                            <datacite:usesIdentifierScheme rdf:resource="http://purl.org/spar/datacite/doi"/>
-                                        </xsl:when>
-                                        <xsl:otherwise>
-                                            <datacite:usesIdentifierScheme rdf:resource="http://purl.org/spar/datacite/local-resource-identifier-scheme"/>
-                                        </xsl:otherwise>
-                                    </xsl:choose>
-                                    <silvio:hasLiteralValue><xsl:value-of select="$pid"/></silvio:hasLiteralValue>
-                                </datacite:Identifier>
-                            </datacite:hasIdentifier>
+                            <xsl:variable name="identifierScheme"
+                                          select="ost:service-identifier-scheme($pid)"/>
+                            <xsl:if test="exists($identifierScheme)">
+                                <datacite:hasIdentifier>
+                                    <datacite:Identifier>
+                                        <datacite:usesIdentifierScheme
+                                                rdf:resource="{concat('http://purl.org/spar/datacite/', $identifierScheme)}"/>
+                                        <silvio:hasLiteralValue><xsl:value-of select="$pid"/></silvio:hasLiteralValue>
+                                    </datacite:Identifier>
+                                </datacite:hasIdentifier>
+                            </xsl:if>
                         </xsl:for-each>
 
                         <!-- hosting organisation (srv:hasHostingOrganisation): no VLO facet names it, so take the -->
