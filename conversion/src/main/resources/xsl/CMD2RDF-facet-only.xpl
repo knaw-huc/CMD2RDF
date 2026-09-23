@@ -49,7 +49,7 @@
     <!-- Stage 2: consume the facets and create the explicit SKG intermediate. -->
     <p:xslt name="createSKG">
         <p:input port="source">
-            <p:pipe step="addVLOFacets" port="result"/>
+            <p:pipe step="vloFacetsToSKGIntermediate" port="result"/>
         </p:input>
         <p:input port="stylesheet">
             <p:document href="VLOFacets2SKG.xsl"/>
