@@ -32,8 +32,9 @@
     <xsl:param name="base_strip" select="'/Users/listj/Clarin.Data/TI_Total/'"/>
     <xsl:param name="base_add" select="''"/>
 
-    <!-- Entity identifiers must be absolute. -->
-    <xsl:param name="skgBaseURI" select="'otf:'"/>
+    <!-- Absolute base for local SKG-IF entity identifiers. Override this parameter when the
+         deployment has its own persistent URI space. -->
+    <xsl:param name="skgBaseURI" select="'https://w3id.org/skg-if/sandbox/clarin/'"/>
 
     <xsl:variable name="path-about" select="replace(if ($base_strip=$base) then $base else for $strip in tokenize($base_strip,',') return if (starts-with($base,concat('file:',$strip))) then replace($base, concat('file:',$strip), $base_add) else (),'([./])(xml|cmdi)$','$1rdf')"/>
     <xsl:variable name="about" select="replace($path-about, '^(urn:)/+', '$1', 'i')"/>
@@ -44,13 +45,32 @@
     <!-- the record path relative to the harvest directory, unique within the corpus -->
     <xsl:variable name="record-path" select="replace(if (starts-with($about,$base_add)) then substring-after($about,$base_add) else $about,'^/|\.rdf$','')"/>
 
-    <!-- SKG-IF local identifier of this record, encoded the way the VLO encodes record identifiers.
-         A record without an MdSelfLink has no identifier of its own, so mint one from its path and
-         mark it as created on-the-fly. -->
-    <xsl:variable name="skg-id" select="
-        if ($selfLink!='')
-        then concat($skgBaseURI, cmd0:encodeId($selfLink))
-        else concat($skgBaseURI, 'otf___', cmd0:encodeId($record-path))"/>
+    <!-- Short fallback key: use only the final filename, without a CMDI/RDF extension. The normal
+         pipeline obtains a VLO id from addVLOFacets.xsl; this value is only used when addOST.xsl is
+         run directly on a record that has neither hasFacetId nor MdSelfLink. -->
+    <xsl:variable name="record-name" as="xs:string" select="
+        replace(
+            tokenize(replace($record-path, '\\', '/'), '/')[last()],
+            '\.(xml|cmdi|rdf)$',
+            '',
+            'i'
+        )"/>
+
+    <!-- addVLOFacets.xsl writes the VLO record key explicitly. The fallback keeps this stylesheet
+         usable on its own, but the normal pipeline should always take the first branch. -->
+    <xsl:variable name="vlo-id" as="xs:string" select="
+        if (normalize-space(string((/*/vlo:hasFacetId)[1])) != '')
+        then normalize-space(string((/*/vlo:hasFacetId)[1]))
+        else if ($selfLink != '')
+        then encode-for-uri(cmd0:encodeId($selfLink))
+        else encode-for-uri(cmd0:encodeId($record-name))"/>
+
+    <!-- The VLO id identifies the source record. Prefix it with the SKG entity kind so the
+         generated product and service IRIs do not conflate those entities with the record. -->
+    <xsl:variable name="product-id" as="xs:string"
+                  select="concat($skgBaseURI, 'product___', $vlo-id)"/>
+    <xsl:variable name="service-id" as="xs:string"
+                  select="concat($skgBaseURI, 'service___', $vlo-id)"/>
 
     <!-- Slugify function: replaces any run of non-letter/non-digit characters with _ and strips leading/trailing underscores.
          Normalizes to NFC first, so that a name spelled with a precomposed character and one spelled with a combining mark
@@ -83,6 +103,41 @@
         <xsl:variable name="descriptions" select="vlo:hasFacetDescription[normalize-space(.)!='']" />
         <xsl:variable name="titles" select="vlo:hasFacetName[normalize-space(.)!='']" />
         <xsl:variable name="collections" select="distinct-values(vlo:hasFacetCollection[normalize-space(.)!='']/normalize-space(.))"/>
+        <xsl:variable name="resourceClasses" as="xs:string*"
+                      select="distinct-values(vlo:hasFacetResourceClass[normalize-space(.)!='']/normalize-space(.))"/>
+        <xsl:variable name="resourceClassText" as="xs:string"
+                      select="lower-case(string-join($resourceClasses, ' '))"/>
+
+        <!-- Classify only on explicit resource-class signals. The order is intentional: records can
+             contain several broad CMDI/DCMI classes, so specific software and dataset signals take
+             precedence over publication signals. A generic value such as Text is not enough to call
+             a product literature. No reliable match means plain fabio:Work (SKG-IF 'other'). -->
+        <xsl:variable name="isSoftware" as="xs:boolean" select="matches(
+            $resourceClassText,
+            '(^|[^a-z])(research software|software|source code|computer program|executable|script|workflow|tool)([^a-z]|$)'
+        )"/>
+        <xsl:variable name="isDataset" as="xs:boolean" select="matches(
+            $resourceClassText,
+            '(^|[^a-z])(dataset|data set|corpus|lexical resource|lexicon|database|data collection)([^a-z]|$)'
+        )"/>
+        <xsl:variable name="isLiterature" as="xs:boolean" select="matches(
+            $resourceClassText,
+            '(^|[^a-z])(research literature|literature|journal article|article|book|book chapter|chapter|thesis|dissertation|report|conference paper|conference proceedings|proceedings|working paper|preprint|publication)([^a-z]|$)'
+        )"/>
+
+        <!-- Explicit product URLs from profile metadata. Unlike MdSelfLink, these identifier fields
+             describe the resource/product. Do not infer a product identifier from arbitrary links. -->
+        <xsl:variable name="productIdentifierUrls" as="xs:string*"
+                      select="distinct-values((/cmd0:CMD/cmd0:Components | /cmd1:CMD/cmd1:Components)
+                                //*[matches(lower-case(local-name()), '(identifier|pid)$')]
+                                    [not(ancestor::*[
+                                        matches(
+                                            lower-case(local-name()),
+                                            '^(service|person|creator|author|contact|organisation|organization)$'
+                                        )
+                                    ])]
+                                [matches(normalize-space(.), '^https?://')]
+        )"/>
 
         <!-- A collection is not necessarily a service portal. Only values that explicitly look like
              a portal/catalogue are promoted to an SKG-IF srv:Portal. -->
@@ -95,14 +150,32 @@
         <xsl:variable name="serviceName" select="
             if (exists($titles)) then normalize-space($titles[1])
             else if ($selfLink != '') then $selfLink
-            else $record-path"/>
+            else $vlo-id"/>
 
-        <!-- API endpoint/specification references are available in the original CMDI resource list,
-             even when addVLOFacets does not expose the VLO _resourceRef field. -->
-        <xsl:variable name="resourceRefs" select="distinct-values((
-            /cmd0:CMD/cmd0:Resources/cmd0:ResourceProxyList/cmd0:ResourceProxy/cmd0:ResourceRef,
-            /cmd1:CMD/cmd1:Resources/cmd1:ResourceProxyList/cmd1:ResourceProxy/cmd1:ResourceRef
-        )[normalize-space(.) != '']/normalize-space(.))"/>
+        <!-- Keep each CMDI ResourceRef together with its ResourceType. Treating every ResourceRef as
+             a service endpoint loses the distinction between resources, landing pages and services. -->
+        <xsl:variable name="resourceProxies" select="(
+            /cmd0:CMD/cmd0:Resources/cmd0:ResourceProxyList/cmd0:ResourceProxy,
+            /cmd1:CMD/cmd1:Resources/cmd1:ResourceProxyList/cmd1:ResourceProxy
+        )"/>
+
+        <!-- Standard SearchService proxies and historical/custom service-like proxy types used by
+             WebLicht. A proxy typed merely as Resource or LandingPage is deliberately excluded. -->
+        <xsl:variable name="serviceProxyRefs" as="xs:string*" select="distinct-values(
+            $resourceProxies[
+                *:ResourceRef[normalize-space(.) != '']
+                and matches(
+                    lower-case(normalize-space(string(*:ResourceType))),
+                    '^(search\s*service|web[ -]?service|wsdl\s*service|api\s*service|service)$'
+                )
+            ]/*:ResourceRef[normalize-space(.) != '']/normalize-space(.)
+        )"/>
+
+        <xsl:variable name="landingPageUrls" as="xs:string*" select="distinct-values(
+            $resourceProxies[
+                lower-case(normalize-space(string(*:ResourceType))) = 'landingpage'
+            ]/*:ResourceRef[normalize-space(.) != '']/normalize-space(.)
+        )"/>
 
         <!-- Extract provider : try the VLO 'collection' facet first, fall back to repository from path -->
         <xsl:variable name="provider">
@@ -124,37 +197,61 @@
         <!-- in CMDI 1.1 and in a profile-specific namespace in CMDI 1.2, hence the wildcards. -->
         <xsl:variable name="hostingOrgs" select="distinct-values((/cmd0:CMD/cmd0:Components|/cmd1:CMD/cmd1:Components)/*:WebLichtWebService/*:Service/*:Creation/*:Creators/*:Creator/*:Contact/*:Organisation[normalize-space(.)!='']/normalize-space(.))"/>
 
+        <!-- A WebLicht Service/PID identifies the service itself. Unlike MdSelfLink, it is therefore
+             suitable for datacite:hasIdentifier. Profiles may use different namespaces, so match by
+             local name while still requiring PID and URL to be direct children of Service. -->
+        <xsl:variable name="serviceElements" select="
+            (/cmd0:CMD/cmd0:Components|/cmd1:CMD/cmd1:Components)//*[local-name() = 'Service']
+        "/>
+        <xsl:variable name="servicePids" as="xs:string*" select="distinct-values(
+            $serviceElements/*[local-name() = 'PID'][normalize-space(.) != '']/normalize-space(.)
+        )"/>
+        <xsl:variable name="serviceComponentUrls" as="xs:string*" select="distinct-values(
+            $serviceElements/*[local-name() = 'URL'][normalize-space(.) != '']/normalize-space(.)
+        )"/>
+
+        <!-- Service/URL can denote either an executable endpoint or an API description such as WSDL,
+             OpenAPI or Swagger. Preserve that distinction in DCAT. -->
+        <xsl:variable name="endpointDescriptionUrls" as="xs:string*" select="$serviceComponentUrls[
+            matches(lower-case(.), '(\?wsdl($|[&amp;#])|\.wsdl($|[?#])|(^|[/_.-])(openapi|swagger)([/_.?#-]|$))')
+        ]"/>
+        <xsl:variable name="endpointUrls" as="xs:string*" select="distinct-values((
+            $serviceProxyRefs,
+            $serviceComponentUrls[not(. = $endpointDescriptionUrls)]
+        ))"/>
+
         <xsl:copy>
             <!-- This copy preserves the attributes on the root cmd0:CMD / cmd1:CMD element — most importantly @xml:base, also used further downstream to compute the about -->
             <xsl:copy-of select="@*"/>
             <OST>
                 <!-- A WebLicht profile describes a service, not a dataset. -->
                 <xsl:if test="not($isWebLicht)">
-                    <fabio:Work rdf:about="{$skg-id}">
-                        <rdf:type rdf:resource="http://purl.org/spar/fabio/Dataset" />
+                    <fabio:Work rdf:about="{$product-id}">
+                        <xsl:choose>
+                            <xsl:when test="$isSoftware">
+                                <rdf:type rdf:resource="http://purl.org/spar/fabio/Software"/>
+                            </xsl:when>
+                            <xsl:when test="$isDataset">
+                                <rdf:type rdf:resource="http://purl.org/spar/fabio/Dataset"/>
+                            </xsl:when>
+                            <xsl:when test="$isLiterature">
+                                <rdf:type rdf:resource="http://purl.org/spar/fabio/ScholarlyWork"/>
+                            </xsl:when>
+                            <!-- Otherwise the element itself types the entity only as fabio:Work,
+                                 which maps to the SKG-IF product type 'other'. -->
+                            <xsl:otherwise/>
+                        </xsl:choose>
 
-                        <!-- PID (Handle, DOI, etc.) -->
-                        <xsl:variable name="pid" select="$selfLink"/>
-                        <xsl:if test="$pid!=''">
+                        <!-- MdSelfLink identifies the CMDI metadata record and is deliberately not
+                             emitted here. Only explicit URI-typed product identifiers are mapped. -->
+                        <xsl:for-each select="$productIdentifierUrls">
                             <datacite:hasIdentifier>
                                 <datacite:Identifier>
-                                    <xsl:choose>
-                                        <xsl:when test="starts-with($pid,'https://hdl.handle.net/')">
-                                            <datacite:usesIdentifierScheme rdf:resource="http://purl.org/spar/datacite/handle"/>
-                                        </xsl:when>
-                                        <xsl:when test="starts-with($pid,'http://hdl.handle.net/')">
-                                            <datacite:usesIdentifierScheme rdf:resource="http://purl.org/spar/datacite/handle"/>
-                                        </xsl:when>
-                                        <xsl:when test="starts-with($pid,'https://doi.org/') or starts-with($pid,'http://dx.doi.org/')">
-                                            <datacite:usesIdentifierScheme rdf:resource="http://purl.org/spar/datacite/doi"/>
-                                        </xsl:when>
-                                    </xsl:choose>
-                                    <silvio:hasLiteralValue>
-                                        <xsl:value-of select="$pid"/>
-                                    </silvio:hasLiteralValue>
+                                    <datacite:usesIdentifierScheme rdf:resource="http://purl.org/spar/datacite/url"/>
+                                    <silvio:hasLiteralValue><xsl:value-of select="."/></silvio:hasLiteralValue>
                                 </datacite:Identifier>
                             </datacite:hasIdentifier>
-                        </xsl:if>
+                        </xsl:for-each>
 
                         <!-- Descriptions from VLO facets -->
                         <xsl:for-each select="$descriptions">
@@ -168,8 +265,8 @@
 
                         <!-- Link to single VLO-facet-based manifestation via FRBR chain -->
                         <frbr:realization>
-                            <fabio:Expression rdf:about="{concat($skg-id, '#expression')}">
-                                <frbr:embodiment rdf:resource="{concat($skg-id, '#manifestation')}"/>
+                            <fabio:Expression rdf:about="{concat($product-id, '#expression')}">
+                                <frbr:embodiment rdf:resource="{concat($product-id, '#manifestation')}"/>
                             </fabio:Expression>
                         </frbr:realization>
 
@@ -198,7 +295,7 @@
                     ))"/>
 
                 <xsl:if test="not($isWebLicht)">
-                    <fabio:Manifestation rdf:about="{concat($skg-id, '#manifestation')}">
+                    <fabio:Manifestation rdf:about="{concat($product-id, '#manifestation')}">
 
                         <!-- Hosting data source (SKG-IF hosting_data_source) -->
                         <xsl:if test="normalize-space($provider) != ''">
@@ -311,7 +408,7 @@
                 <!-- SKG-IF service extension ontology (https://w3id.org/skg-if/extension/srv/ontology/). -->
                 <!-- srv:Service is a subclass of schema:SoftwareApplication. -->
                 <xsl:if test="$isWebLicht">
-                    <srv:Service rdf:about="{concat($skg-id, '#service')}">
+                    <srv:Service rdf:about="{$service-id}">
 
                         <!-- name (foaf:name): exactly one value is required by the Service shape -->
                         <foaf:name><xsl:value-of select="$serviceName"/></foaf:name>
@@ -325,23 +422,27 @@
                             </dc:description>
                         </xsl:for-each>
 
-                        <!-- identifiers (datacite:hasIdentifier) -->
-                        <xsl:variable name="pid" select="$selfLink"/>
-                        <xsl:if test="$pid!=''">
+                        <!-- Service identifiers come from the profile's Service/PID element. MdSelfLink
+                             is intentionally not emitted here because it identifies the CMDI record. -->
+                        <xsl:for-each select="$servicePids">
+                            <xsl:variable name="pid" select="."/>
                             <datacite:hasIdentifier>
                                 <datacite:Identifier>
                                     <xsl:choose>
-                                        <xsl:when test="starts-with($pid,'https://hdl.handle.net/') or starts-with($pid,'http://hdl.handle.net/')">
+                                        <xsl:when test="matches(lower-case($pid), '^(https?://hdl\.handle\.net/|hdl:)')">
                                             <datacite:usesIdentifierScheme rdf:resource="http://purl.org/spar/datacite/handle"/>
                                         </xsl:when>
-                                        <xsl:when test="starts-with($pid,'https://doi.org/') or starts-with($pid,'http://dx.doi.org/')">
+                                        <xsl:when test="matches(lower-case($pid), '^(https?://(dx\.)?doi\.org/|doi:|10\.[0-9]{4,9}/)')">
                                             <datacite:usesIdentifierScheme rdf:resource="http://purl.org/spar/datacite/doi"/>
                                         </xsl:when>
+                                        <xsl:otherwise>
+                                            <datacite:usesIdentifierScheme rdf:resource="http://purl.org/spar/datacite/local-resource-identifier-scheme"/>
+                                        </xsl:otherwise>
                                     </xsl:choose>
                                     <silvio:hasLiteralValue><xsl:value-of select="$pid"/></silvio:hasLiteralValue>
                                 </datacite:Identifier>
                             </datacite:hasIdentifier>
-                        </xsl:if>
+                        </xsl:for-each>
 
                         <!-- hosting organisation (srv:hasHostingOrganisation): no VLO facet names it, so take the -->
                         <!-- creator organisation from the record itself; for WebLicht services the creating centre -->
@@ -368,14 +469,22 @@
                         </xsl:for-each>
                         <dc:relation rdf:resource="{ost:entity-id('org', 'CLARIN ERIC')}"/>
 
+                        <!-- Landing pages are user-facing pages about the service, not API endpoints. -->
+                        <xsl:for-each select="$landingPageUrls">
+                            <foaf:page rdf:resource="{.}"/>
+                        </xsl:for-each>
+
                         <!-- API profile: dcterms:conformsTo must point to at most one srv:APIProfile,
-                             rather than containing a media-type literal. ResourceRef values are retained
-                             as endpoint URLs; no API profile is fabricated when no URL is available. -->
-                          <xsl:if test="exists($resourceRefs)">
+                             rather than containing a media-type literal. Executable endpoints and API
+                             descriptions are mapped separately; unrelated ResourceRefs are ignored. -->
+                        <xsl:if test="exists($endpointUrls) or exists($endpointDescriptionUrls)">
                             <dc:conformsTo>
-                                <srv:APIProfile rdf:about="{concat($skg-id, '#api-profile')}">
-                                    <xsl:for-each select="$resourceRefs">
+                                <srv:APIProfile rdf:about="{concat($service-id, '#api-profile')}">
+                                    <xsl:for-each select="$endpointUrls">
                                         <dcat:endpointURL rdf:resource="{.}"/>
+                                    </xsl:for-each>
+                                    <xsl:for-each select="$endpointDescriptionUrls">
+                                        <dcat:endpointDescription rdf:resource="{.}"/>
                                     </xsl:for-each>
                                 </srv:APIProfile>
                             </dc:conformsTo>
