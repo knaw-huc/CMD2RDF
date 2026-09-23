@@ -32,9 +32,8 @@
     <xsl:param name="base_strip" select="'/Users/listj/Clarin.Data/TI_Total/'"/>
     <xsl:param name="base_add" select="''"/>
 
-    <!-- Absolute base for local SKG-IF entity identifiers. Override this parameter when the
-         deployment has its own persistent URI space. -->
-    <xsl:param name="skgBaseURI" select="'https://w3id.org/skg-if/sandbox/clarin/'"/>
+    <!-- Absolute base for local SKG-IF entity identifiers. -->
+    <xsl:param name="skgBaseURI" select="'otf:'"/>
 
     <xsl:variable name="path-about" select="replace(if ($base_strip=$base) then $base else for $strip in tokenize($base_strip,',') return if (starts-with($base,concat('file:',$strip))) then replace($base, concat('file:',$strip), $base_add) else (),'([./])(xml|cmdi)$','$1rdf')"/>
     <xsl:variable name="about" select="replace($path-about, '^(urn:)/+', '$1', 'i')"/>
