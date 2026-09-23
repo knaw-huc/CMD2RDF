@@ -246,10 +246,14 @@ public class StoreClient implements IAction {
     }
 
     private String getGIRI(String path) throws ActionException {
+        return getGIRI(path, replacedPrefixBaseURI, prefixBaseURI);
+    }
+
+    static String getGIRI(String path, List<String> replacedPrefixBaseURI, String prefixBaseURI) throws ActionException {
         String gIRI = null;
         for (String s:replacedPrefixBaseURI) {
             if (path.startsWith(s)) {
-                gIRI = path.replace(s, this.prefixBaseURI)
+                gIRI = path.replace(s, prefixBaseURI)
                         .replace(".xml", ".rdf")
                         .replaceAll(" ", "_")
                         // Same as the stylesheets: urn:/record.rdf -> urn:record.rdf

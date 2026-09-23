@@ -14,12 +14,12 @@
 			<property name="namedGraphIRIQueryParam">context</property>
 			<property name="namedGraphIRIEncloseWithBrackets">true</property>
 			<property name="serverHost">http://graphdb:7200</property>
-			<property name="serverURL">{serverHost}/repositories/ost-clarin-skg/statements</property>
+			<property name="repositoryURL">{serverHost}/repositories/ost-clarin-skg</property>
+			<property name="serverURL">{repositoryURL}/statements</property>
 			<property name="username">dba</property>
 			<property name="password">dba</property>
 			<property name="prefixBaseURI">urn:</property>
 			<property name="tmpOutDir">{workspace}/rdf-output</property>
-			<property name="dirDownloadPwd">Put here a strong password!</property>
 		</properties>
 	</config>
 	<prepare>
@@ -44,9 +44,12 @@
 		</actions>
 	</prepare>
 	<records>
-		<!-- xml size > 0 and <= 10K -->
-		<record desc="xml size greater than 0 and smaller or equals 10K" filter="NEW UPDATE" throttleDuration="2000"
-										nThreads="32" xmlLimitSizeMax="10240" xmlSource="{urlDB}">
+		<record desc="SKGIF from VLO facets"
+				filter="NEW UPDATE"
+				throttleDuration="2000"
+				nThreads="32"
+				xmlLimitSizeMax="2147483647"
+				xmlSource="{urlDB}">
 			<actions>
 				<action name="transform">
 					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
@@ -92,114 +95,6 @@
 					</class>
 				</action>
 			</actions>
-		</record>
-		<!-- xml size > 10K and <= 100K -->
-		<record desc="xml size greater than 10 and smaller or equals 100K" filter="NEW UPDATE" nThreads="16" throttleDuration="2000"
-											xmlLimitSizeMin="10241" xmlLimitSizeMax="102400" xmlSource="{urlDB}">
-			<actions>
-				<action name="transform">
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
-						<properties>
-							<property name="xsltSource">{xsltSourceDir}/addVLOFacets.xsl</property>
-						</properties>
-					</class>
-				</action>
-				<action name="transform">
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
-						<properties>
-							<property name="xsltSource">{xsltSourceDir}/VLOFacets2SKG.xsl</property>
-							<property name="base_strip">{xmlSourceDir}</property>
-							<property name="base_add">{prefixBaseURI}</property>
-						</properties>
-					</class>
-				</action>
-				<action name="transform">
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
-						<properties>
-							<property name="xsltSource">{xsltSourceDir}/SKG2RDF.xsl</property>
-							<property name="base_strip">{xmlSourceDir}</property>
-							<property name="base_add">{prefixBaseURI}</property>
-						</properties>
-					</class>
-				</action>
-				<action>
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.StoreClient">
-						<properties>
-							<property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
-							<property name="prefixBaseURI">{prefixBaseURI}</property>
-							<property name="action">POST</property>
-						</properties>
-					</class>
-				</action>
-				<action>
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.db.MD5ChecksumDBAction">
-						<properties>
-							<property name="urlDB">{urlDB}</property>
-							<property name="action">UPDATE</property>
-							<property name="status">DONE</property>
-						</properties>
-					</class>
-				</action>
-			</actions>
-		</record>
-		<!-- xml size > 100K -->
-		<record desc="xml size greater than 100K" filter="NEW UPDATE" nThreads="1" xmlLimitSizeMin="102401" xmlSource="{urlDB}">
-			<actions>
-				<action name="transform">
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
-						<properties>
-							<property name="xsltSource">{xsltSourceDir}/addVLOFacets.xsl</property>
-						</properties>
-					</class>
-				</action>
-				<action name="transform">
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
-						<properties>
-							<property name="xsltSource">{xsltSourceDir}/VLOFacets2SKG.xsl</property>
-							<property name="base_strip">{xmlSourceDir}</property>
-							<property name="base_add">{prefixBaseURI}</property>
-						</properties>
-					</class>
-				</action>
-				<action name="transform">
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.transform.XsltTransformer">
-						<properties>
-							<property name="xsltSource">{xsltSourceDir}/SKG2RDF.xsl</property>
-							<property name="base_strip">{xmlSourceDir}</property>
-							<property name="base_add">{prefixBaseURI}</property>
-						</properties>
-					</class>
-				</action>
-				<action>
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.StoreClient">
-						<properties>
-							<property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
-							<property name="prefixBaseURI">{prefixBaseURI}</property>
-							<property name="action">POST</property>
-						</properties>
-					</class>
-				</action>
-				<action>
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.db.MD5ChecksumDBAction">
-						<properties>
-							<property name="urlDB">{urlDB}</property>
-							<property name="action">UPDATE</property>
-							<property name="status">DONE</property>
-						</properties>
-					</class>
-				</action>
-			</actions>
-			<cleanup>
-				<actions>
-					<action name="Deleting rdf output file temp">
-						<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.CleanDirectory">
-							<properties>
-								<property name="directory">{tmpOutDir}/temp</property>
-							</properties>
-						</class>
-					</action>
-				</actions>
-			</cleanup>
 		</record>
 	</records>
 	<cleanup>
