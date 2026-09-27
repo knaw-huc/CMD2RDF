@@ -14,10 +14,12 @@
 	<!-- load the VLO facet mapping -->
 	<xsl:param name="beta-vlo-facets-url" select="'https://beta-vlo.clarin.eu/api/facets?q=id:'"/>
 	<xsl:param name="beta-vlo-record-url" select="'https://beta-vlo.clarin.eu/api/records/'" />
+	<!-- name of the VLO data root; the VLO identifies a record without a self link as '{data root}/{file name}' -->
+	<xsl:param name="beta-vlo-data-root" select="'CLARIN Centres'"/>
 	<xsl:param name="vloFacetMapping" select="'https://raw.githubusercontent.com/clarin-eric/VLO-mapping/master/mapping/facetConcepts.xml'"/>
 	<xsl:variable name="fm" select="document($vloFacetMapping)"/>
 
-	<!-- skip some facets -->
+	<!-- Skip the VLO API's id field: below we add exactly one deterministic hasFacetId ourselves. -->
 	<xsl:param name="skipVLOFacets" select="('id','_selfLink','text','_componentProfile')"/>
 
 	<!-- SIL to ISO 639 -->
@@ -29,9 +31,9 @@
 		<xsl:param name="arg" as="xs:string?"/>
 
 		<xsl:sequence select="
-			concat(upper-case(substring($arg,1,1)),
-			substring($arg,2))
-			"/>
+          concat(upper-case(substring($arg,1,1)),
+          substring($arg,2))
+          "/>
 
 	</xsl:function>
 
@@ -40,7 +42,7 @@
 		<xsl:choose>
 			<xsl:when test="exists((/cmd0:CMD/cmd0:Header/cmd0:MdProfile,/cmd1:CMD/cmd1:Header/cmd1:MdProfile))">
 				<!-- and ignore if there are multiple MdProfile and just take the first!!
-                         although probably this more a case for the schema validation!  -->
+                            although probably this more a case for the schema validation!  -->
 				<xsl:sequence select="cmd0:id((/cmd0:CMD/cmd0:Header/cmd0:MdProfile,/cmd1:CMD/cmd1:Header/cmd1:MdProfile)[1])"/>
 			</xsl:when>
 			<xsl:when test="exists(/(cmd0:CMD|cmd1:CMD)/@xsi:schemaLocation)">
@@ -63,15 +65,15 @@
 	<!-- namespaces -->
 	<xsl:variable name="cmdi_version" select="$rec/*:CMD/@CMDVersion"/>
 	<xsl:variable name="cmd-ns" select="
-		if ($cmdi_version = '1.2')  then
-		'http://www.clarin.eu/cmd/1'
-		else
-		'http://www.clarin.eu/cmd/'"/>
+       if ($cmdi_version = '1.2')  then
+       'http://www.clarin.eu/cmd/1'
+       else
+       'http://www.clarin.eu/cmd/'"/>
 	<xsl:variable name="cmdp-ns" select="
-		if ($cmdi_version = '1.2')  then
-		concat('http://www.clarin.eu/cmd/1/profiles/',$profileId)
-		else
-		'http://www.clarin.eu/cmd/'"/>
+       if ($cmdi_version = '1.2')  then
+       concat('http://www.clarin.eu/cmd/1/profiles/',$profileId)
+       else
+       'http://www.clarin.eu/cmd/'"/>
 
 	<xsl:variable name="NS" as="element()">
 		<xsl:element namespace="{$cmd-ns}" name="cmd:ns">
@@ -152,17 +154,21 @@
 
 	<xsl:template match="/cmd0:CMD|/cmd1:CMD">
 		<xsl:copy>
+			<xsl:apply-templates select="@* except @xml:base"/>
 			<xsl:attribute name="xml:base" select="base-uri()"/>
-			<xsl:apply-templates select="@*"/>
-			<!-- A missing/blank self link cannot identify a VLO record. Use local mapping instead. -->
+			<!-- A missing/blank self link: the VLO identifies the record by its data root and file name instead. -->
 			<xsl:variable name="self-link" as="xs:string"
-				select="normalize-space(string((.//*:MdSelfLink[normalize-space(.) ne ''])[1]))"/>
-			<xsl:variable name="vlo-id" as="xs:string?"
-				select="if ($self-link ne '') then js:encode-for-uri(cmd0:encodeId($self-link)) else ()"/>
+						  select="normalize-space(string((.//*:MdSelfLink[normalize-space(.) ne ''])[1]))"/>
+			<xsl:variable name="vlo-id" as="xs:string"
+						  select="if ($self-link ne '')
+                   then js:encode-for-uri(cmd0:encodeId($self-link))
+                   else replace(cmd0:encodeId(concat($beta-vlo-data-root, '/', tokenize(base-uri(), '/')[last()])), ' ', '_32_')"/>
 			<xsl:variable name="facets-url" as="xs:string?"
-				select="if (exists($vlo-id)) then concat($beta-vlo-facets-url, $vlo-id) else ()"/>
+						  select="if (exists($vlo-id)) then concat($beta-vlo-facets-url, $vlo-id) else ()"/>
 			<xsl:variable name="record-url" as="xs:string?"
-				select="if (exists($vlo-id)) then concat($beta-vlo-record-url, $vlo-id) else ()"/>
+						  select="if (exists($vlo-id)) then concat($beta-vlo-record-url, $vlo-id) else ()"/>
+			<!--<xsl:message>DBG: self-link[<xsl:value-of select="$self-link" />]</xsl:message>-->
+			<!--<xsl:message>DBG: vlo-id[<xsl:value-of select="$vlo-id" />]</xsl:message>-->
 			<!--<xsl:message>DBG: beta-vlo-facets[<xsl:value-of select="$facets-url" />]</xsl:message>-->
 			<!--<xsl:message>DBG: beta-vlo-record[<xsl:value-of select="$record-url" />]</xsl:message>-->
 			<xsl:variable name="beta-vlo-facets-json" select="if (unparsed-text-available($facets-url)) then json-to-xml(unparsed-text($facets-url)) else ()"/>
@@ -199,9 +205,9 @@
 							</xsl:for-each>
 						</xsl:variable>
 						<!--<xsl:message>DBG: facet values[<xsl:value-of select="count($facetValues/*)"/>]</xsl:message>
-                        <xsl:for-each select="$facetValues/*">
-                            <xsl:message>[<xsl:value-of select="position()"/>] <xsl:value-of select="."/></xsl:message>
-                        </xsl:for-each>-->
+                             <xsl:for-each select="$facetValues/*">
+                                 <xsl:message>[<xsl:value-of select="position()"/>] <xsl:value-of select="."/></xsl:message>
+                             </xsl:for-each>-->
 						<xsl:choose>
 							<xsl:when test="exists($facetValues/*)">
 								<xsl:for-each-group select="$facetValues/*" group-by="@pos">
@@ -232,8 +238,8 @@
 								</xsl:variable>
 								<!--<xsl:message>DBG: facet values[<xsl:value-of select="count($facetValues/*)"/>]</xsl:message>-->
 								<!--<xsl:for-each select="$facetValues/*">
-                            <xsl:message>[<xsl:value-of select="position()"/>] <xsl:value-of select="."/></xsl:message>
-                        </xsl:for-each>-->
+                                   <xsl:message>[<xsl:value-of select="position()"/>] <xsl:value-of select="."/></xsl:message>
+                               </xsl:for-each>-->
 								<xsl:for-each-group select="$facetValues/*" group-by="@pos">
 									<xsl:choose>
 										<xsl:when test="position()=1 or empty($facet/@allowMultipleValues) or ($facet/@allowMultipleValues='true')">
@@ -253,6 +259,12 @@
 					</xsl:for-each>
 				</xsl:if>
 			</xsl:variable>
+			<!-- Stable VLO record key used by addOST.xsl as the source for deterministic
+                 product___... and service___... local identifiers. This remains a record key;
+                 it must not be emitted as datacite:hasIdentifier. -->
+			<vlo:hasFacetId>
+				<xsl:value-of select="$vlo-id"/>
+			</vlo:hasFacetId>
 			<xsl:apply-templates select="$vlo"/>
 			<xsl:apply-templates select="node()"/>
 		</xsl:copy>
