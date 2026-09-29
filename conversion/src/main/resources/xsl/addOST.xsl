@@ -18,6 +18,8 @@
                 xmlns:dcat="http://www.w3.org/ns/dcat#"
                 xmlns:schema="https://schema.org/"
                 xmlns:srv="https://w3id.org/skg-if/extension/srv/ontology/"
+                xmlns:bido="http://purl.org/spar/bido/"
+                xmlns:skos="http://www.w3.org/2004/02/skos/core#"
                 xmlns:ost="https://ostrails.eu/"
                 exclude-result-prefixes="xs math ost"
                 version="3.0">
@@ -130,6 +132,12 @@
         <xsl:variable name="versions" select="distinct-values(vlo:hasFacetVersion[normalize-space(.)!=''])"/>
         <xsl:variable name="descriptions" select="vlo:hasFacetDescription[normalize-space(.)!='']" />
         <xsl:variable name="titles" select="vlo:hasFacetName[normalize-space(.)!='']" />
+        <!-- Subjects become SKG-IF topics. Placeholder values such as "Unknown" carry no topic.
+             Keep the facet elements (not just their strings) so a source language tag survives. -->
+        <xsl:variable name="subjects" select="vlo:hasFacetSubject[normalize-space(.)!='']
+            [not(matches(lower-case(normalize-space(.)), '^(unknown|unspecified|undefined|n/?a)([^\p{L}\p{N}]|$)'))]"/>
+        <xsl:variable name="topicIds" as="xs:string*"
+                      select="distinct-values($subjects ! ost:entity-id('topic', .))"/>
         <xsl:variable name="collections" select="distinct-values(vlo:hasFacetCollection[normalize-space(.)!='']/normalize-space(.))"/>
         <xsl:variable name="resourceClasses" as="xs:string*"
                       select="distinct-values(vlo:hasFacetResourceClass[normalize-space(.)!='']/normalize-space(.))"/>
@@ -316,6 +324,11 @@
                         <xsl:for-each select="$creators">
                             <dc:creator rdf:resource="{ost:entity-id('person', .)}"/>
                         </xsl:for-each>
+
+                        <!-- Topics from the VLO subject facet -->
+                        <xsl:call-template name="ost:topics">
+                            <xsl:with-param name="topicIds" select="$topicIds"/>
+                        </xsl:call-template>
                     </fabio:Work>
                 </xsl:if>
 
@@ -437,6 +450,18 @@
                         </xsl:if>
                     </foaf:Person>
                 </xsl:for-each>
+
+                <!-- Topic entities from subject facet (SKG-IF topic = fabio:SubjectTerm). Labels keep
+                     the source language tag, or BCP 47 'und' when it is unknown. -->
+                <xsl:for-each-group select="$subjects" group-by="ost:entity-id('topic', .)">
+                    <fabio:SubjectTerm rdf:about="{current-grouping-key()}">
+                        <xsl:for-each-group select="current-group()" group-by="string((@xml:lang, 'und')[1])">
+                            <skos:prefLabel xml:lang="{current-grouping-key()}">
+                                <xsl:value-of select="normalize-space(current-group()[1])"/>
+                            </skos:prefLabel>
+                        </xsl:for-each-group>
+                    </fabio:SubjectTerm>
+                </xsl:for-each-group>
 
                 <!-- Provider as data source (SKG-IF data source = dcat:DataService), classified as a repository -->
                 <xsl:if test="normalize-space($provider) != ''">
@@ -565,6 +590,12 @@
                                 <schema:isAccessibleForFree rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">false</schema:isAccessibleForFree>
                             </xsl:when>
                         </xsl:choose>
+
+                        <!-- Topics (bido:holdsBibliometricDataInTime): SRV-O extends the core
+                             topics relation to srv:Service with the same BIDO structure. -->
+                        <xsl:call-template name="ost:topics">
+                            <xsl:with-param name="topicIds" select="$topicIds"/>
+                        </xsl:call-template>
                     </srv:Service>
 
                     <!-- Hosting organisations (SKG-IF organization, type srv_hosting_organisation) -->
@@ -597,6 +628,19 @@
                 </xsl:if>
             </OST>
         </xsl:copy>
+    </xsl:template>
+
+    <!-- SKG-IF topics: each term is wrapped in a bido:BibliometricDataInTime node, which is where
+         provenance would go; the VLO facet gives none, so only the term is emitted. -->
+    <xsl:template name="ost:topics">
+        <xsl:param name="topicIds" as="xs:string*"/>
+        <xsl:for-each select="$topicIds">
+            <bido:holdsBibliometricDataInTime>
+                <bido:BibliometricDataInTime>
+                    <bido:withBibliometricData rdf:resource="{.}"/>
+                </bido:BibliometricDataInTime>
+            </bido:holdsBibliometricDataInTime>
+        </xsl:for-each>
     </xsl:template>
 
 </xsl:stylesheet>
