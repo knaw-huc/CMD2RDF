@@ -43,6 +43,7 @@ public class ClarinProfileResolver implements URIResolver {
 	private static final String REPLACED_REGISTRY_PROFILES = "/rest/registry/1.x/profiles/";
 	private static final String REPLACED_REGISTRY_COMPONENTS = "/rest/registry/1.x/components/";
 	private String registry;
+
 	public ClarinProfileResolver(String basePath, String registry, CacheService<Object, Object> cacheService) throws ActionException {
 		createCacheTempIfAbsent(basePath);
 		this.registry = registry;
@@ -114,6 +115,11 @@ public class ClarinProfileResolver implements URIResolver {
                     log.debug(filename + " is not in the cache service.");
                     if (file.exists()) {
                             return loadFromFile(filename, file);
+                        } else if (oHref instanceof File) {
+                            // The ref is a relative href, for example, a document loaded by the XSLT, such as
+							// document('sil_to_iso6393.xml'): let Saxon resolve it against the stylesheet base and
+							// leave it alone for now.
+                            return null;
                         } else {
                             return fetchAndWriteToCache(href, filename);
                         }
@@ -129,6 +135,7 @@ public class ClarinProfileResolver implements URIResolver {
 	private StreamSource fetchAndWriteToCache(String href, String filename) {
 		log.debug("Download profile '" + filename + "' from registry. HREF: " + href);
 		final ReadWriteLock rwl = new ReentrantReadWriteLock();
+		rwl.writeLock().lock();
 		try {
 			if (href.contains("p_1360230992133")) {
 				log.debug(">>>>>>>>>> THIS PART is BAD!!!");;
@@ -144,7 +151,6 @@ public class ClarinProfileResolver implements URIResolver {
 				cacheService.putByteArray(filename, b);
 				log.debug(cacheService.entries()
 						+ " put to cache service and save it as file: " + filename);
-				rwl.writeLock().lock();
 				FileUtils.writeByteArrayToFile(new File(basePath + "/" + filename),
 						b);
 			

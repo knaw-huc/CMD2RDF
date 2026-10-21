@@ -9,7 +9,6 @@
     <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 
     <xsl:template match="/ost:SKG">
-        <!-- Serialize local source records using only their filename. -->
         <xsl:variable name="source-record" as="xs:string"
             select="if (starts-with(lower-case(string(@source-record)), 'file:'))
                     then replace(string(@source-record), '^.*/', '')
@@ -19,7 +18,6 @@
                 <xsl:attribute name="xml:base" select="$source-record"/>
             </xsl:if>
 
-            <!-- Each generated entity is a top-level RDF node. -->
             <xsl:copy-of select="*" copy-namespaces="no"/>
         </rdf:RDF>
     </xsl:template>

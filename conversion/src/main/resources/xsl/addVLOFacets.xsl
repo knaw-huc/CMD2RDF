@@ -11,33 +11,52 @@
 
 	<xsl:include href="CMD2RDF.xsl"/>
 
-	<!-- load the VLO facet mapping -->
+	<!-- VLO facet API Urls - we have 2 and we try to merge properties from both later on -->
 	<xsl:param name="beta-vlo-facets-url" select="'https://beta-vlo.clarin.eu/api/facets?q=id:'"/>
 	<xsl:param name="beta-vlo-record-url" select="'https://beta-vlo.clarin.eu/api/records/'" />
-	<!-- name of the VLO data root; the VLO identifies a record without a self link as '{data root}/{file name}' -->
+	<!-- Name of the VLO data root -->
 	<xsl:param name="beta-vlo-data-root" select="'CLARIN Centres'"/>
 	<xsl:param name="vloFacetMapping" select="'https://raw.githubusercontent.com/clarin-eric/VLO-mapping/master/mapping/facetConcepts.xml'"/>
 	<xsl:variable name="fm" select="document($vloFacetMapping)"/>
-
-	<!-- Skip the VLO API's id field: below we add exactly one deterministic hasFacetId ourselves. -->
 	<xsl:param name="skipVLOFacets" select="('id','_selfLink','text','_componentProfile')"/>
 
 	<!-- SIL to ISO 639 -->
 	<xsl:variable name="lang-top" select="document('sil_to_iso6393.xml')/languages"/>
 	<xsl:key name="iso-lookup" match="lang" use="sil"/>
+	<!-- the two-letter sil entries are the ISO 639-1 codes -->
+	<xsl:key name="iso1-by-iso3" match="lang[matches(sil,'^[a-z]{2}$')]" use="iso"/>
 
-	<!-- helper -->
+	<!-- BCP 47 language tag: the ISO 639-1 code when one exists, else the ISO 639-3 code, else 'und'; subtags are kept -->
+	<xsl:function name="vlo:lang-tag" as="xs:string">
+		<xsl:param name="code" as="xs:string?"/>
+		<xsl:variable name="c" select="normalize-space($code)"/>
+		<xsl:variable name="primary" select="lower-case(substring-before(concat($c,'-'),'-'))"/>
+		<xsl:variable name="rest" select="substring($c, string-length($primary) + 1)"/>
+		<xsl:sequence select="
+			if (matches($primary,'^[a-z]{2}$')) then concat($primary,$rest)
+			else if (matches($primary,'^[a-z]{3}$') and not($primary=('xxx','und')))
+			then concat((key('iso1-by-iso3', $primary, $lang-top)/sil, $primary)[1], $rest)
+			else 'und'"/>
+	</xsl:function>
+
+	<!-- the VLO API drops xml:lang, so recover it from the nearest xml:lang of a record leaf with the same value -->
+	<xsl:function name="vlo:source-lang" as="attribute()?">
+		<xsl:param name="value" as="xs:string"/>
+		<xsl:variable name="v" select="normalize-space($value)"/>
+		<xsl:variable name="lang" select="($rec//*[not(*)][normalize-space(.)=$v]/ancestor-or-self::*[@xml:lang][1]/@xml:lang)[1]"/>
+		<xsl:if test="exists($lang)">
+			<xsl:attribute name="xml:lang" select="vlo:lang-tag($lang)"/>
+		</xsl:if>
+	</xsl:function>
+
 	<xsl:function name="functx:capitalize-first" as="xs:string?">
 		<xsl:param name="arg" as="xs:string?"/>
-
 		<xsl:sequence select="
           concat(upper-case(substring($arg,1,1)),
           substring($arg,2))
           "/>
-
 	</xsl:function>
 
-	<!-- get the profile id -->
 	<xsl:variable name="profileId">
 		<xsl:choose>
 			<xsl:when test="exists((/cmd0:CMD/cmd0:Header/cmd0:MdProfile,/cmd1:CMD/cmd1:Header/cmd1:MdProfile))">
@@ -56,13 +75,10 @@
 		</xsl:choose>
 	</xsl:variable>
 
-	<!-- load the profile -->
 	<xsl:variable name="profile" select="cmd0:profile($profileId)"/>
 
-	<!-- the CMD record -->
 	<xsl:variable name="rec" select="/"/>
 
-	<!-- namespaces -->
 	<xsl:variable name="cmdi_version" select="$rec/*:CMD/@CMDVersion"/>
 	<xsl:variable name="cmd-ns" select="
        if ($cmdi_version = '1.2')  then
@@ -134,6 +150,7 @@
 		<xsl:if test="not($f/js:string[@key='name']=$skipVLOFacets)">
 			<xsl:for-each select="$f/js:array[@key='values']/js:map/js:string[@key='value'][normalize-space(.)!='']">
 				<xsl:element name="vlo:hasFacet{functx:capitalize-first($f/js:string[@key='name'])}">
+					<xsl:sequence select="vlo:source-lang(.)"/>
 					<xsl:value-of select="."/>
 				</xsl:element>
 			</xsl:for-each>
@@ -146,6 +163,7 @@
 			<xsl:variable name="facetName" select="@key"/>
 			<xsl:for-each select="js:string[normalize-space(.)!='']">
 				<xsl:element name="vlo:hasFacet{functx:capitalize-first($facetName)}">
+					<xsl:sequence select="vlo:source-lang(.)"/>
 					<xsl:value-of select="."/>
 				</xsl:element>
 			</xsl:for-each>
@@ -214,6 +232,7 @@
 									<xsl:if test="position()=1">
 										<xsl:for-each select="current-group()[normalize-space(.)!='']">
 											<xsl:element name="vlo:hasFacet{functx:capitalize-first($facet/@name)}">
+												<xsl:sequence select="vlo:source-lang(.)"/>
 												<xsl:value-of select="."/>
 											</xsl:element>
 										</xsl:for-each>
@@ -245,6 +264,7 @@
 										<xsl:when test="position()=1 or empty($facet/@allowMultipleValues) or ($facet/@allowMultipleValues='true')">
 											<xsl:for-each select="current-group()[normalize-space(.)!='']">
 												<xsl:element name="vlo:hasFacet{functx:capitalize-first($facet/@name)}">
+													<xsl:sequence select="vlo:source-lang(.)"/>
 													<xsl:value-of select="."/>
 												</xsl:element>
 											</xsl:for-each>
@@ -270,6 +290,14 @@
 		</xsl:copy>
 	</xsl:template>
 
+	<!-- the VLO prefixes some values with their language, e.g. '{code:eng}...'; turn that into xml:lang -->
+	<xsl:template match="vlo:*[matches(., '^\{code:[a-z]{3}\}')]">
+		<xsl:copy>
+			<xsl:attribute name="xml:lang" select="vlo:lang-tag(substring(., 7, 3))"/>
+			<xsl:value-of select="replace(., '^\{code:[a-z]{3}\}', '')"/>
+		</xsl:copy>
+	</xsl:template>
+
 	<xsl:template match="vlo:hasFacetLanguageCode">
 		<xsl:copy>
 			<xsl:apply-templates select="@*|node()"/>
@@ -279,7 +307,7 @@
 		<xsl:variable name="codestr" select="substring-after($language,':')"/>
 		<xsl:variable name="code">
 			<xsl:choose>
-				<xsl:when test="$codeset='ISO639-3'">
+				<xsl:when test="$codeset=('ISO639-3','code')">
 					<xsl:choose>
 						<xsl:when test="$codestr='xxx'">
 							<xsl:message>WRN: language code[<xsl:value-of select="base-uri()"/>]: 'xxx' is a potential valid ISO 639-3 code, but for now mapped to 'und'!</xsl:message>
@@ -296,7 +324,7 @@
 				<xsl:when test="$codeset='RFC1766'">
 					<xsl:choose>
 						<xsl:when test="starts-with($codestr,'x-sil-')">
-							<xsl:variable name="iso" select="key('iso-lookup', lower-case(replace($codestr, 'x-sil-', '')))/iso"/>
+							<xsl:variable name="iso" select="key('iso-lookup', lower-case(replace($codestr, 'x-sil-', '')), $lang-top)/iso"/>
 							<xsl:choose>
 								<xsl:when test="$iso!='xxx'">
 									<xsl:value-of select="$iso"/>
@@ -320,6 +348,13 @@
 		<vlo:hasFacetISO6393>
 			<xsl:value-of select="$code"/>
 		</vlo:hasFacetISO6393>
+		<!-- only when the language has an ISO 639-1 code -->
+		<xsl:variable name="iso1" select="vlo:lang-tag($code)"/>
+		<xsl:if test="string-length($iso1)=2">
+			<vlo:hasFacetISO6391>
+				<xsl:value-of select="$iso1"/>
+			</vlo:hasFacetISO6391>
+		</xsl:if>
 	</xsl:template>
 
 </xsl:stylesheet>
