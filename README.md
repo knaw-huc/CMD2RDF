@@ -7,10 +7,11 @@ harvested from the CLARIN infrastructure into RDF and uploads them to a graph da
 ## Overview
 
 The application runs as a batch job that:
+
 1. Scans a directory of CMDI XML files and computes MD5 checksums to detect new/updated/deleted records
 2. Transforms each record through an XSLT pipeline (VLO facets, OST metadata, RDF conversion)
 3. Uploads the resulting RDF to a graph store (currently GraphDB) via HTTP PUT into named graphs
-4. Converts CLARIN metadata profiles and components to RDF classes
+4. Converts CLARIN metadata profiles and components to RDF classes. This is not used in the SKG-IF facet only pipeline.
 
 ## Building
 
