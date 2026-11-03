@@ -10,20 +10,10 @@
                 xmlns:ost="https://ostrails.eu/"
                 exclude-result-prefixes="#all">
 
-    <!--
-        Reuse the facet-to-entity mapping while giving this pipeline stage an
-        explicit output contract. The imported stylesheet creates a temporary
-        CMD wrapper containing OST; this stylesheet exposes only the generated
-        SKG resources to the next stage.
-    -->
     <xsl:import href="addOST.xsl"/>
 
     <xsl:output method="xml" encoding="UTF-8" indent="yes"/>
 
-    <!--
-        Override the legacy rewrite variables with a safe fallback. With no
-        configured strip prefix, retain the source base URI unchanged.
-    -->
     <xsl:variable name="path-about" as="xs:string"
                   select="
             let $rewritten := (
@@ -45,10 +35,6 @@
                 <xsl:next-match/>
             </xsl:document>
         </xsl:variable>
-
-        <!-- addOST.xsl now gives products and services separate identifiers. Read the
-             primary resource from the generated RDF instead of referring to the removed
-             legacy $skg-id variable. A CMDI record produces either a Work or a Service. -->
         <xsl:variable name="primary-resource" as="xs:string?"
                       select="string((
                 $generated/*/OST/fabio:Work/@rdf:about,

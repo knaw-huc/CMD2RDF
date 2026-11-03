@@ -108,7 +108,7 @@ public class XsltTransformer implements IAction {
 				split = SimonManager.getStopwatch("stopwatch.trans2").start();
 			}
 
-			URIResolver resolver = (URIResolver) new ClarinProfileResolver(profilesCacheDir, registry, cacheService);
+			URIResolver resolver = new ClarinProfileResolver(profilesCacheDir, registry, cacheService);
 			Transformer transformer = cachedXSLT.newTransformer();	
 			transformer.setURIResolver(resolver);
 

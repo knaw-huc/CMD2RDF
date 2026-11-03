@@ -12,6 +12,7 @@
                 xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
                 xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
                 xmlns:foaf="http://xmlns.com/foaf/0.1/"
+                xmlns:frapo="http://purl.org/cerif/frapo/"
                 xmlns:frbr="http://purl.org/vocab/frbr/core#"
                 xmlns:prism="http://prismstandard.org/namespaces/basic/2.0/"
                 xmlns:pso="http://purl.org/spar/pso/"
@@ -73,9 +74,10 @@
     <xsl:variable name="service-id" as="xs:string"
                   select="concat($skgBaseURI, 'service___', $vlo-id)"/>
 
-    <!-- Slugify function: replaces any run of non-letter/non-digit characters with _ and strips leading/trailing underscores.
-         Normalizes to NFC first, so that a name spelled with a precomposed character and one spelled with a combining mark
-         do not end up as two different identifiers. -->
+    <!-- Slugify function, that operates as follows:
+          - non-alphanumeric characters are replaced with _
+          - loading / trailing underscores are stripped
+          - normalizes to NFC first to avoid precomposed chars and chars with combining marks to end as 2 different identifiers  -->
     <xsl:function name="ost:slugify" as="xs:string">
         <xsl:param name="text" as="xs:string"/>
         <xsl:sequence select="lower-case(replace(replace(normalize-unicode(normalize-space($text),'NFC'), '[^\p{L}\p{N}]+', '_'), '^_|_$', ''))"/>
@@ -88,6 +90,20 @@
         <xsl:param name="type" as="xs:string"/>
         <xsl:param name="name" as="xs:string"/>
         <xsl:sequence select="concat($skgBaseURI, 'otf___', $type, '___', ost:slugify($name))"/>
+    </xsl:function>
+
+    <!-- Escape a case-sensitive value for use in a minted identifier, in the same _codepoint_ style
+         as VLO record ids: the URL delimiters of cmd0:encodeId, plus whitespace and other characters
+         not allowed in an IRI. '_' (95) is escaped too, so distinct values never yield the same
+         identifier and an escaped value never contains the '___' separator. Non-ASCII characters
+         are kept, as IRIs allow them. -->
+    <xsl:function name="ost:id-part" as="xs:string">
+        <xsl:param name="value" as="xs:string"/>
+        <xsl:sequence select="string-join(
+            for $cp in string-to-codepoints(normalize-space($value))
+            return if ($cp le 32 or $cp = (58, 47, 63, 35, 91, 93, 64, 33, 36, 38, 39, 40, 41, 42, 43, 44, 59, 61, 37,
+                                           34, 60, 62, 92, 94, 96, 123, 124, 125, 95))
+                   then concat('_', $cp, '_') else codepoints-to-string($cp), '')"/>
     </xsl:function>
 
     <!-- Determine a product identifier scheme only from an unambiguous value pattern. More
@@ -119,9 +135,16 @@
         <xsl:sequence select="if ($scheme = ('doi', 'handle', 'ivoid', 'url', 'urn', 'w3id')) then $scheme else ()"/>
     </xsl:function>
 
+    <!-- Ignore empty and conventional placeholder funding values. -->
+    <xsl:function name="ost:funding-value" as="xs:boolean">
+        <xsl:param name="value" as="xs:string"/>
+        <xsl:sequence select="normalize-space($value) != '' and
+            not(matches(lower-case(normalize-space($value)),
+                '^(unknown|unspecified|undefined|n/?a|none|not applicable|[-?]+)$'))"/>
+    </xsl:function>
+
     <xsl:template match="/cmd0:CMD|/cmd1:CMD">
         <!--<xsl:message expand-text="yes">DBG: base[{$base}]</xsl:message>-->
-
         <!-- Extract VLO facet values -->
         <xsl:variable name="orgs" select="distinct-values(vlo:hasFacetOrganisation[normalize-space(.)!=''])"/>
         <xsl:variable name="creators" select="distinct-values(vlo:hasFacetCreator[normalize-space(.)!=''])"/>
@@ -132,8 +155,7 @@
         <xsl:variable name="versions" select="distinct-values(vlo:hasFacetVersion[normalize-space(.)!=''])"/>
         <xsl:variable name="descriptions" select="vlo:hasFacetDescription[normalize-space(.)!='']" />
         <xsl:variable name="titles" select="vlo:hasFacetName[normalize-space(.)!='']" />
-        <!-- Subjects become SKG-IF topics. Placeholder values such as "Unknown" carry no topic.
-             Keep the facet elements (not just their strings) so a source language tag survives. -->
+        <!-- Subjects become SKG-IF topics. Keep the facet elements (not just their strings) so a source language tag survives. -->
         <xsl:variable name="subjects" select="vlo:hasFacetSubject[normalize-space(.)!='']
             [not(matches(lower-case(normalize-space(.)), '^(unknown|unspecified|undefined|n/?a)([^\p{L}\p{N}]|$)'))]"/>
         <xsl:variable name="topicIds" as="xs:string*"
@@ -173,12 +195,127 @@
                                     [not(ancestor::*[
                                         matches(
                                             lower-case(local-name()),
-                                            '^(service|person|creator|author|contact|organisation|organization)$'
+                                            '^(service|person|creator|author|contact|organisation|organization|grant|funding|fundingreference|project|journal|proceedings|datasetcatalog|datasetcatalogue)$'
                                         )
                                     ])]
+                                [not(lower-case(local-name()) = ('grantidentifier', 'awardidentifier'))]
                                 [exists(ost:identifier-scheme(normalize-space(.)))]
                                 ! normalize-space(.)
         )"/>
+
+        <xsl:variable name="fundingBlocks" select="
+            (/cmd0:CMD/cmd0:Components | /cmd1:CMD/cmd1:Components)
+            //*[
+                lower-case(local-name()) = ('grant', 'funding', 'fundingreference')
+                or *[lower-case(local-name()) = ('grantnumber', 'awardnumber')]
+            ]
+            [not(ancestor::*[lower-case(local-name()) =
+                ('references', 'reference', 'bibliography', 'citation', 'citations',
+                 'relatedresource', 'relatedresources')])]
+            [not(*[lower-case(local-name()) = ('grant', 'funding', 'fundingreference')])]
+        "/>
+        <xsl:variable name="grantCandidates" as="element(ost:grant)*">
+            <xsl:for-each select="$fundingBlocks">
+                <xsl:variable name="explicitBlock" select="lower-case(local-name()) =
+                    ('grant', 'funding', 'fundingreference', 'project')"/>
+                <xsl:variable name="numbers" select="*[not(*)]
+                    [lower-case(local-name()) = ('grantnumber', 'awardnumber')
+                     or ($explicitBlock and lower-case(local-name()) = 'number')]
+                    [ost:funding-value(string(.))]"/>
+                <!-- Ambiguous blocks with several award numbers need a profile-specific
+                     mapping; do not attach one block's details to several inferred awards. -->
+                <xsl:variable name="number" select="normalize-space($numbers[1])"/>
+                <xsl:variable name="titles" select="*[not(*)]
+                    [lower-case(local-name()) = ('granttitle', 'awardtitle')
+                     or ($explicitBlock and lower-case(local-name()) = ('title', 'name'))]
+                    [ost:funding-value(string(.))]"/>
+                <xsl:variable name="funders" select="(
+                    *[not(*)][lower-case(local-name()) =
+                        ('fundername', 'fundingagency', 'funder', 'fundingorganisation', 'fundingorganization')],
+                    *[lower-case(local-name()) = ('funder', 'fundingagency',
+                        'fundingorganisation', 'fundingorganization')]
+                        /*[not(*)][lower-case(local-name()) = 'name']
+                    )[ost:funding-value(string(.))]"/>
+                <xsl:variable name="identifiers" select="*[not(*)]
+                    [lower-case(local-name()) = ('grantidentifier', 'awardidentifier')
+                     or ($explicitBlock and lower-case(local-name()) = ('identifier', 'doi', 'pid'))]
+                    [ost:identifier-scheme(normalize-space(.)) =
+                        ('doi', 'handle', 'url', 'urn', 'w3id')]"/>
+                <xsl:if test="count(distinct-values($funders ! normalize-space(.))) le 1
+                    and count(distinct-values($numbers ! normalize-space(.))) le 1
+                    and ($number != '' or exists($identifiers)
+                         or (lower-case(local-name()) = 'grant' and exists($titles)))">
+                    <xsl:variable name="key" select="
+                        if (exists($identifiers)) then concat('identifier_', ost:id-part($identifiers[1]))
+                        else string-join((
+                            if (exists($funders))
+                            then concat('funder_', ost:id-part(string-join(sort(distinct-values($funders ! normalize-space(.))), '|')))
+                            else concat('record_', $vlo-id),
+                            if ($number != '') then concat('number_', ost:id-part($number))
+                            else concat('title_', ost:id-part($titles[1]))
+                        ), '___')"/>
+                    <ost:grant id="{concat($skgBaseURI, 'otf___grant___', $key)}">
+                        <xsl:if test="$number != ''"><ost:number><xsl:value-of select="$number"/></ost:number></xsl:if>
+                        <xsl:for-each select="$titles">
+                            <ost:title><xsl:copy-of select="@xml:lang"/><xsl:value-of select="normalize-space(.)"/></ost:title>
+                        </xsl:for-each>
+                        <xsl:for-each select="$funders">
+                            <ost:funder id="{ost:entity-id('org', normalize-space(.))}"><xsl:value-of select="normalize-space(.)"/></ost:funder>
+                        </xsl:for-each>
+                        <xsl:for-each select="$identifiers">
+                            <ost:identifier scheme="{ost:identifier-scheme(normalize-space(.))}"><xsl:value-of select="normalize-space(.)"/></ost:identifier>
+                        </xsl:for-each>
+                    </ost:grant>
+                </xsl:if>
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="productGrants" as="element(ost:grant)*">
+            <xsl:for-each-group select="$grantCandidates" group-by="@id">
+                <ost:grant id="{current-grouping-key()}">
+                    <xsl:for-each-group select="current-group()/*"
+                        group-by="string-join((local-name(), string(@xml:lang), string(@scheme), string(.)), '|')">
+                        <xsl:sequence select="current-group()[1]"/>
+                    </xsl:for-each-group>
+                </ost:grant>
+            </xsl:for-each-group>
+        </xsl:variable>
+
+        <xsl:variable name="venueFields" select="
+            (/cmd0:CMD/cmd0:Components | /cmd1:CMD/cmd1:Components)
+            //*[not(*)][normalize-space(.) != '']
+            [not(ancestor::*[lower-case(local-name()) =
+                ('references', 'reference', 'bibliography', 'citation', 'citations',
+                 'relatedresource', 'relatedresources')])]
+            [lower-case(local-name()) =
+                ('journaltitle', 'journalname', 'proceedingstitle',
+                 'datasetcatalogname', 'datasetcataloguename')
+             or (lower-case(local-name()) = ('name', 'title')
+                 and lower-case(local-name(..)) =
+                     ('journal', 'proceedings', 'datasetcatalog', 'datasetcatalogue'))
+             or lower-case(local-name()) = 'journal']
+        "/>
+        <xsl:variable name="venueCandidates" as="element(ost:venue)*">
+            <xsl:for-each select="$venueFields">
+                <xsl:variable name="kind" select="
+                    if (starts-with(lower-case(local-name()), 'journal')
+                        or lower-case(local-name(..)) = 'journal') then 'journal'
+                    else if (starts-with(lower-case(local-name()), 'proceedings')
+                        or lower-case(local-name(..)) = 'proceedings') then 'conference'
+                    else 'repository'"/>
+                <xsl:variable name="name" select="normalize-space(.)"/>
+                <xsl:if test="not(matches(lower-case($name),
+                    '^(unknown|unspecified|undefined|n/?a|none|unspecified journal)$'))
+                    and ost:slugify($name) != ''">
+                    <ost:venue id="{ost:entity-id(concat('venue_', $kind), $name)}"
+                               name="{$name}" kind="{$kind}"/>
+                </xsl:if>
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="productVenues" as="element(ost:venue)*">
+            <xsl:for-each-group select="$venueCandidates" group-by="@id">
+                <xsl:sequence select="current-group()[1]"/>
+            </xsl:for-each-group>
+        </xsl:variable>
 
         <!-- A collection is not necessarily a service portal. Only values that explicitly look like
              a portal/catalogue are promoted to an SKG-IF srv:Portal. -->
@@ -300,20 +437,32 @@
 
                         <!-- Descriptions from VLO facets -->
                         <xsl:for-each select="$descriptions">
-                            <dc:abstract><xsl:value-of select="." /></dc:abstract>
+                            <dc:abstract><xsl:copy-of select="@xml:lang"/><xsl:value-of select="." /></dc:abstract>
                         </xsl:for-each>
 
                         <!-- Titles from VLO facet -->
                         <xsl:for-each select="$titles">
-                            <dc:title><xsl:value-of select="."/></dc:title>
+                            <dc:title><xsl:copy-of select="@xml:lang"/><xsl:value-of select="."/></dc:title>
                         </xsl:for-each>
 
-                        <!-- Link to single VLO-facet-based manifestation via FRBR chain -->
-                        <frbr:realization>
-                            <fabio:Expression rdf:about="{concat($product-id, '#expression')}">
-                                <frbr:embodiment rdf:resource="{concat($product-id, '#manifestation')}"/>
-                            </fabio:Expression>
-                        </frbr:realization>
+                        <!-- SKG-IF biblio.in is frbr:partOf on the Expression, with at
+                             most one venue per expression. Preserve the original expression
+                             identifier for records without explicit publishing metadata. -->
+                        <xsl:for-each select="if (exists($productVenues)) then $productVenues else .">
+                            <frbr:realization>
+                                <fabio:Expression rdf:about="{concat($product-id, '#expression',
+                                    if (self::ost:venue) then concat('-', encode-for-uri(string(@id))) else '')}">
+                                    <xsl:if test="self::ost:venue">
+                                        <frbr:partOf rdf:resource="{@id}"/>
+                                    </xsl:if>
+                                    <frbr:embodiment rdf:resource="{concat($product-id, '#manifestation')}"/>
+                                </fabio:Expression>
+                            </frbr:realization>
+                        </xsl:for-each>
+
+                        <xsl:for-each select="$productGrants">
+                            <frapo:isFundedBy rdf:resource="{@id}"/>
+                        </xsl:for-each>
 
                         <!-- Link to organisations (relevant_organisations in SKG-IF) -->
                         <xsl:for-each select="$orgs">
@@ -422,6 +571,51 @@
                             <prism:versionIdentifier><xsl:value-of select="."/></prism:versionIdentifier>
                         </xsl:for-each>
                     </fabio:Manifestation>
+                </xsl:if>
+
+                <xsl:if test="not($isWebLicht)">
+                    <xsl:for-each select="$productVenues">
+                        <fabio:ExpressionCollection rdf:about="{@id}">
+                            <foaf:name><xsl:value-of select="@name"/></foaf:name>
+                            <rdf:type rdf:resource="{if (@kind = 'journal')
+                                then 'http://purl.org/spar/fabio/Journal'
+                                else if (@kind = 'conference')
+                                then 'http://purl.org/spar/fabio/ConferenceProceedings'
+                                else 'http://purl.org/spar/fabio/Repository'}"/>
+                        </fabio:ExpressionCollection>
+                    </xsl:for-each>
+                </xsl:if>
+
+                <!-- Core SKG-IF funding applies to research products. Do not invent a
+                     service funding relation for WebLicht records. -->
+                <xsl:if test="not($isWebLicht)">
+                    <xsl:for-each select="$productGrants">
+                        <frapo:Grant rdf:about="{@id}">
+                            <xsl:for-each select="ost:number">
+                                <frapo:hasGrantNumber><xsl:value-of select="."/></frapo:hasGrantNumber>
+                            </xsl:for-each>
+                            <xsl:for-each select="ost:title">
+                                <dc:title><xsl:copy-of select="@xml:lang"/><xsl:value-of select="."/></dc:title>
+                            </xsl:for-each>
+                            <xsl:for-each-group select="ost:funder" group-by="@id">
+                                <frapo:hasFundingAgency rdf:resource="{current-grouping-key()}"/>
+                            </xsl:for-each-group>
+                            <xsl:for-each select="ost:identifier">
+                                <datacite:hasIdentifier>
+                                    <datacite:Identifier>
+                                        <datacite:usesIdentifierScheme rdf:resource="{concat('http://purl.org/spar/datacite/', @scheme)}"/>
+                                        <silvio:hasLiteralValue><xsl:value-of select="."/></silvio:hasLiteralValue>
+                                    </datacite:Identifier>
+                                </datacite:hasIdentifier>
+                            </xsl:for-each>
+                        </frapo:Grant>
+                    </xsl:for-each>
+                    <xsl:for-each-group select="$productGrants/ost:funder" group-by="@id">
+                        <foaf:Organization rdf:about="{current-grouping-key()}">
+                            <rdf:type rdf:resource="http://purl.org/cerif/frapo/FundingAgency"/>
+                            <foaf:name><xsl:value-of select="current-group()[1]"/></foaf:name>
+                        </foaf:Organization>
+                    </xsl:for-each-group>
                 </xsl:if>
 
                 <!-- Organisation entities from facet (type: research) -->

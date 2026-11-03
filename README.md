@@ -7,10 +7,11 @@ harvested from the CLARIN infrastructure into RDF and uploads them to a graph da
 ## Overview
 
 The application runs as a batch job that:
+
 1. Scans a directory of CMDI XML files and computes MD5 checksums to detect new/updated/deleted records
 2. Transforms each record through an XSLT pipeline (VLO facets, OST metadata, RDF conversion)
 3. Uploads the resulting RDF to a graph store (currently GraphDB) via HTTP PUT into named graphs
-4. Converts CLARIN metadata profiles and components to RDF classes
+4. Converts CLARIN metadata profiles and components to RDF classes. This is not used in the SKG-IF facet only pipeline.
 
 ## Building
 
@@ -145,8 +146,6 @@ full CMDI → RDF conversion:
 | `VLOFacets2SKG.xsl` | Maps the facets to SKG-IF entities (reuses `addOST.xsl`) and wraps them in an `ost:SKG` intermediate document |
 | `SKG2RDF.xsl` | Serializes the `ost:SKG` document as RDF/XML, one top-level resource per entity |
 
-For local `file:` records, `SKG2RDF.xsl` sets `xml:base` to the file name only.
-
 These stylesheets can be run as a single XProc pipeline, `CMD2RDF-facet-only.xpl`, in something like Oxygen.
 
 The pipeline must have a `source` input port and a `result` output port. Configuration properties
@@ -191,3 +190,61 @@ CMD2RDF/
     ├── cmd2rdf-skgif.xml      # Production SKGIF only config
     └── logback.xml            # Logging configuration
 ```
+
+## Specifics related to entity generation
+
+### SKGIF Grants and Venues
+Publishing venues are generated as `fabio:ExpressionCollection` entities, linked from each `fabio:Expression` using `frbr:partOf` (SKG-IF `biblio.in`).
+The mapping accepts these explicit CMDI fields, independent of profile namespace:
+
+| Source fields | Venue type |
+|---------------|------------|
+| `JournalTitle`, `JournalName`, text-only `Journal`, `Journal/Name`, `Journal/Title` | Journal |
+| `ProceedingsTitle`, `Proceedings/Name`, `Proceedings/Title` | Conference proceedings |
+| `DatasetCatalogName`, `DatasetCatalogueName`, `DatasetCatalog/Name` or `Title`, `DatasetCatalogue/Name` or `Title` | Repository |
+
+The above are heuristics, based on the CMDI data, not necessarily facets; sadly the facets do not provide enough information.
+
+More heuristics surrounding venues:
+
+- Field matching ignores case.
+- Blank and placeholder values and fields inside references, citations, bibliographies or related resources are excluded.
+- Generic collection/provider names and conference events do not establish publishing venues.
+- Venue identifiers are minted from the venue type and normalized name. Repeated names of the same type are
+  deduplicated within a record.
+- Multiple venues produce separate expressions sharing the existing manifestation. These mappings produce names and types only; they do not infer
+  venue identifiers such as ISSNs or venue access rights from product metadata.
+
+WebLicht services retain their existing VLO and explicitly recognised portal collection venues.
+
+Grants are emitted as `frapo:Grant` entities, linked from the product using `frapo:isFundedBy` (SKG-IF `funding`). Supported funding metadata is:
+
+| Source fields within a funding block | Output |
+|-------------------------------------|--------|
+| `GrantNumber`, `AwardNumber`; `Number` in an explicit block | `frapo:hasGrantNumber` |
+| `GrantTitle`, `AwardTitle`; `Title` or `Name` in an explicit block | `dcterms:title`, retaining explicit language tags |
+| `FunderName`, text-only `Funder` or `FundingAgency`, `FundingOrganisation` / `FundingOrganization`, or their `Name` child | `frapo:hasFundingAgency` plus a funder organisation |
+| `GrantIdentifier`, `AwardIdentifier`; `Identifier`, `DOI` or `PID` in an explicit block | `datacite:hasIdentifier` for recognised DOI, Handle, URL, URN or W3ID values |
+
+Explicit blocks are `Grant`, `Funding` and `FundingReference`. A `Project` or
+other component with a direct `GrantNumber` or `AwardNumber` is also supported;
+`Project` permits the generic field names above. Matching ignores case and profile
+namespaces. Each block must supply an award number or recognised award identifier;
+a `Grant` block may instead supply a title. A project name, generic project ID,
+funder name alone, or free-text funding acknowledgement does not create a grant.
+References, related resources, blank values and placeholders are excluded. Blocks
+with multiple distinct award numbers or funder names are skipped because they need
+a profile-specific mapping to establish which award belongs to which funder.
+
+Identifiers are deterministic:
+
+- Explicit award identifiers take precedence
+- Otherwise the exact award number is scoped by funder name, or by source record when no funder
+  is known. T
+- Title-only grants use the source record and title.
+- Repeated grants are merged within a record.
+- Grant identifiers are excluded from product identifiers. This first
+  mapping emits numbers, titles, identifiers and funders; it does not infer amounts,
+  dates, beneficiaries or funding for WebLicht services.
+
+For local `file:` records, `SKG2RDF.xsl` sets `xml:base` to the file name only.
