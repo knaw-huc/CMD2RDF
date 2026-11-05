@@ -1,9 +1,6 @@
 package nl.knaw.dans.cmd2rdf.conversion.action.store;
 
 import nl.knaw.dans.cmd2rdf.conversion.action.ActionException;
-import nl.knaw.dans.cmd2rdf.conversion.action.ActionStatus;
-import nl.knaw.dans.cmd2rdf.conversion.action.IAction;
-import nl.knaw.dans.cmd2rdf.conversion.util.Misc;
 import org.apache.http.HttpStatus;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFParser;
@@ -15,8 +12,7 @@ import org.javasimon.Split;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
+
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.HttpHeaders;
@@ -28,8 +24,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -39,62 +33,28 @@ import java.util.Map;
  * Action POST replaces the record's named graph (HTTP PUT), action DELETE drops it (HTTP DELETE).
  * Updates require the QLever access token, which is sent as a Bearer token.
  */
-public class QLeverStoreClient implements IAction {
+public class QLeverStoreClient extends StoreClient {
 
     private static final Logger ERROR_LOG = LoggerFactory.getLogger("errorlog");
     private static final Logger LOG = LoggerFactory.getLogger(QLeverStoreClient.class);
     private static final Logger ERROR_FILES_LOG = LoggerFactory.getLogger("errorfiles");
 
-    private final List<String> replacedPrefixBaseURI = new ArrayList<String>();
-    private String prefixBaseURI;
-    private String serverURL;
-    private String accessToken;
-    private ActionStatus actionStatus;
-    private Client client;
-
     @Override
     public void startUp(Map<String, String> vars) throws ActionException {
-        String replacedPrefixBaseURIVar = vars.get("replacedPrefixBaseURI");
-        String action = vars.get("action");
-        prefixBaseURI = vars.get("prefixBaseURI");
-        serverURL = vars.get("serverURL");
-        accessToken = vars.get("accessToken");
-
-        if (replacedPrefixBaseURIVar == null || replacedPrefixBaseURIVar.isEmpty()) {
-            throw new ActionException("replacedPrefixBaseURI is null or empty");
-        }
-        if (prefixBaseURI == null || prefixBaseURI.isEmpty()) {
-            throw new ActionException("prefixBaseURI is null or empty");
-        }
-        if (serverURL == null || serverURL.isEmpty()) {
-            throw new ActionException("serverURL is null or empty");
-        }
-        if (accessToken == null || accessToken.isEmpty()) {
+        super.startUp(vars);
+        if (getAccessToken() == null) {
             throw new ActionException("accessToken is null or empty");
         }
-        if (action == null || action.isEmpty()) {
-            throw new ActionException("action is null or empty");
-        }
-
-        for (String s : replacedPrefixBaseURIVar.split(",")) {
-            if (!s.trim().isEmpty())
-                replacedPrefixBaseURI.add(s);
-        }
-
-        actionStatus = Misc.convertToActionStatus(action);
-
-        client = ClientBuilder.newClient();
-        client.register(new BodyLoggingFilter());
 
         LOG.debug("QLeverStoreClient variables: replacedPrefixBaseURI: {}, prefixBaseURI: {}, qleverURL: {}, action: {}",
-                replacedPrefixBaseURI, prefixBaseURI, serverURL, action);
+                getReplacedPrefixBaseURI(), getPrefixBaseURI(), getServerURL(), getAction());
     }
 
     @Override
     public Object execute(String path, Object object) throws ActionException {
         Split split = SimonManager.getStopwatch("stopwatch.qleverUpload").start();
         try {
-            switch (actionStatus) {
+            switch (getActionStatus()) {
                 case POST:
                     return putGraph(path, object);
                 case DELETE:
@@ -108,13 +68,6 @@ public class QLeverStoreClient implements IAction {
     }
 
     @Override
-    public void shutDown() throws ActionException {
-        if (client != null) {
-            client.close();
-        }
-    }
-
-    @Override
     public String name() {
         return this.getClass().getName();
     }
@@ -123,7 +76,7 @@ public class QLeverStoreClient implements IAction {
         if (!(object instanceof Node)) {
             return false;
         }
-        String giri = GIRI.build(path, replacedPrefixBaseURI, prefixBaseURI);
+        String giri = GIRI.build(path, getReplacedPrefixBaseURI(), getPrefixBaseURI());
         try {
             byte[] nTriples = toNTriples((Node) object, giri);
             long start = System.currentTimeMillis();
@@ -131,7 +84,9 @@ public class QLeverStoreClient implements IAction {
                     Entity.entity(nTriples, StoreMediaTypes.APPLICATION_N_TRIPLES.getMediaType()));
             int status = response.getStatus();
             response.close();
-            if (status == HttpStatus.SC_OK || status == HttpStatus.SC_CREATED || status == HttpStatus.SC_NO_CONTENT) {
+            if (status == HttpStatus.SC_OK
+                    || status == HttpStatus.SC_CREATED
+                    || status == HttpStatus.SC_NO_CONTENT) {
                 LOG.info("PUT graph <{}>: status {}, {} ms.", giri, status, System.currentTimeMillis() - start);
                 return true;
             }
@@ -147,11 +102,13 @@ public class QLeverStoreClient implements IAction {
 
     private boolean deleteGraph(String path) {
         try {
-            String giri = GIRI.build(path, replacedPrefixBaseURI, prefixBaseURI);
+            String giri = GIRI.build(path, getReplacedPrefixBaseURI(), getPrefixBaseURI());
             Response response = request(giri).delete();
             int status = response.getStatus();
             response.close();
-            if (status == HttpStatus.SC_OK || status == HttpStatus.SC_NO_CONTENT || status == HttpStatus.SC_NOT_FOUND) {
+            if (status == HttpStatus.SC_OK
+                    || status == HttpStatus.SC_NO_CONTENT
+                    || status == HttpStatus.SC_NOT_FOUND) {
                 LOG.info("DELETE graph <{}>: status {}", giri, status);
                 return true;
             }
@@ -163,9 +120,9 @@ public class QLeverStoreClient implements IAction {
     }
 
     private Invocation.Builder request(String giri) {
-        return client.target(UriBuilder.fromUri(serverURL).queryParam("graph", giri))
-                     .request()
-                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken);
+        return getClient().target(UriBuilder.fromUri(getServerURL()).queryParam("graph", giri))
+                          .request()
+                          .header(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken());
     }
 
     private String toBaseIRI(String iri) {

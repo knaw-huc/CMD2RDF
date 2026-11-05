@@ -131,7 +131,7 @@ Content-Type: application/n-triples
 
 - `POST` replaces the record's named graph with an HTTP `PUT`; `DELETE` drops it with an HTTP `DELETE`
   (a `404` is treated as success).
-- The graph IRI is always derived from the file path (via `GIRI.build`, shared with `StoreClient`),
+- The graph IRI is always derived from the file path (via `GIRI.build`, shared with `GraphDBStoreClient`),
   not from `xml:base`.
 - Relative IRIs in the RDF/XML are resolved against `urn:x-ost-clarin-skg:<graph IRI>`, with
   characters outside `[A-Za-z0-9._~-]` replaced by `_`.

@@ -88,7 +88,7 @@
 					</class>
 				</action>-->
 				<action>
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.StoreClient">
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.GraphDBStoreClient">
 						<properties>
 							<property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
 							<property name="prefixBaseURI">{prefixBaseURI}</property>
