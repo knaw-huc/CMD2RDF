@@ -12,7 +12,6 @@ import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
-
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -179,7 +178,7 @@ public class StoreClient implements IAction {
 
                 // Build named / context IRI
                 UriBuilder uriBuilder = UriBuilder.fromUri(new URI(serverURL));
-                String giri = getGIRI(path);
+                String giri = GIRI.build(path, replacedPrefixBaseURI, prefixBaseURI);
                 uriBuilder.queryParam(namedGIRIQueryParam, namedGIRIEncloseWithBrackets ? "<" + giri + ">" : giri);
                 WebTarget target = client.target(uriBuilder.build());
 
@@ -221,7 +220,7 @@ public class StoreClient implements IAction {
         UriBuilder uriBuilder;
         try {
             uriBuilder = UriBuilder.fromUri(new URI(serverURL));
-            uriBuilder.queryParam(namedGIRIQueryParam, getGIRI(path));
+            uriBuilder.queryParam(namedGIRIQueryParam, GIRI.build(path, replacedPrefixBaseURI, prefixBaseURI));
             WebTarget target = client.target(uriBuilder.build());
             Response response = target.request().delete();
             int status = response.getStatus();
@@ -238,34 +237,11 @@ public class StoreClient implements IAction {
             }
         } catch (URISyntaxException e) {
             ERROR_LOG.error("ERROR: URISyntaxException, caused by {}", e.getMessage(), e);
-        } catch (ActionException e) {
-            ERROR_LOG.error("ERROR: ActionException, caused by {}", e.getMessage(), e);
+        } catch (GIRIException e) {
+            ERROR_LOG.error("ERROR: GIRIException, caused by {}", e.getMessage(), e);
         }
 
         return false;
-    }
-
-    private String getGIRI(String path) throws ActionException {
-        return getGIRI(path, replacedPrefixBaseURI, prefixBaseURI);
-    }
-
-    static String getGIRI(String path, List<String> replacedPrefixBaseURI, String prefixBaseURI) throws ActionException {
-        String gIRI = null;
-        for (String s:replacedPrefixBaseURI) {
-            if (path.startsWith(s)) {
-                gIRI = path.replace(s, prefixBaseURI)
-                        .replace(".xml", ".rdf")
-                        .replaceAll(" ", "_")
-                        // Same as the stylesheets: urn:/record.rdf -> urn:record.rdf
-                        .replaceFirst("(?i)^(urn:)/+", "$1");
-                break;
-            }
-        }
-        if (gIRI==null) {
-            throw new ActionException("gIRI ERROR: " + path + " is not found as prefix in " + replacedPrefixBaseURI);
-        }
-
-        return gIRI;
     }
 
     private boolean credentialsProvided() {

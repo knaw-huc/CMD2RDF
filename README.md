@@ -10,7 +10,7 @@ The application runs as a batch job that:
 
 1. Scans a directory of CMDI XML files and computes MD5 checksums to detect new/updated/deleted records
 2. Transforms each record through an XSLT pipeline (VLO facets, OST metadata, RDF conversion)
-3. Uploads the resulting RDF to a graph store (currently GraphDB) via HTTP PUT into named graphs
+3. Uploads the resulting RDF to a graph store (GraphDB, or optionally [QLever](#qlever-setup)) via HTTP PUT into named graphs
 4. Converts CLARIN metadata profiles and components to RDF classes. This is not used in the SKG-IF facet only pipeline.
 
 ## Building
@@ -89,6 +89,52 @@ changing graph names in XSLT therefore also requires aligning deletion handling.
 When `prefixBaseURI` is `urn:`, slashes directly after the scheme are dropped, so
 `urn:/record.rdf` becomes `urn:record.rdf`. The stylesheets apply the same rule, so graph IRIs
 from `xml:base` and from the file-path mapping match.
+
+## QLever Setup
+
+As an alternative to GraphDB, records can be uploaded to a [QLever](https://github.com/ad-freiburg/qlever)
+endpoint with `QLeverStoreClient`. An example action is included (commented out) in
+`batch/src/main/resources/cmd2rdf-skgif.xml`:
+
+```xml
+<action>
+    <class name="nl.knaw.dans.cmd2rdf.conversion.action.store.QLeverStoreClient">
+        <properties>
+            <property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
+            <property name="prefixBaseURI">{prefixBaseURI}</property>
+            <property name="serverURL">http://localhost:7001</property>
+            <property name="accessToken">putAccessTokenHere</property>
+            <property name="action">POST</property>
+        </properties>
+    </class>
+</action>
+```
+
+| Property | Description |
+|----------|-------------|
+| `replacedPrefixBaseURI` | Comma-separated path prefix(es) stripped from the file path to build the graph IRI |
+| `prefixBaseURI` | Prefix prepended to the remaining path to build the graph IRI |
+| `serverURL` | QLever endpoint URL |
+| `accessToken` | QLever access token, required for updates; sent as `Authorization: Bearer <token>` |
+| `action` | `POST` to upload records, `DELETE` to drop their graphs |
+
+### How RDF is uploaded to QLever
+
+`QLeverStoreClient` uses the SPARQL 1.1 Graph Store HTTP Protocol. QLever does not accept
+RDF/XML, so each record is first converted to N-Triples with Apache Jena:
+
+```
+PUT http://localhost:7001?graph=urn:path/to/record.rdf
+Authorization: Bearer <accessToken>
+Content-Type: application/n-triples
+```
+
+- `POST` replaces the record's named graph with an HTTP `PUT`; `DELETE` drops it with an HTTP `DELETE`
+  (a `404` is treated as success).
+- The graph IRI is always derived from the file path (via `GIRI.build`, shared with `StoreClient`),
+  not from `xml:base`.
+- Relative IRIs in the RDF/XML are resolved against `urn:x-ost-clarin-skg:<graph IRI>`, with
+  characters outside `[A-Za-z0-9._~-]` replaced by `_`.
 
 ## Running
 
@@ -183,7 +229,7 @@ Log output is configured in `batch/src/main/resources/logback.xml`:
 CMD2RDF/
 ├── batch/          # Batch runner: Launcher, JobProcessor, config parsing
 ├── config/         # XML configuration model and parsing
-├── conversion/     # Core logic: XSLT transforms, StoreClient, checksum DB, utilities
+├── conversion/     # Core logic: XSLT transforms, StoreClient/QLeverStoreClient, checksum DB, utilities
 │   └── src/main/resources/xsl/   # All XSLT stylesheets
 └── batch/src/main/resources/
     ├── cmd2rdf.xml            # Production config
