@@ -4,46 +4,18 @@ import nl.knaw.dans.cmd2rdf.conversion.action.ActionException;
 import nl.knaw.dans.cmd2rdf.conversion.action.ActionStatus;
 import nl.knaw.dans.cmd2rdf.conversion.action.IAction;
 import nl.knaw.dans.cmd2rdf.conversion.util.Misc;
-import org.apache.commons.io.FileUtils;
-import org.glassfish.jersey.client.authentication.HttpAuthenticationFeature;
-import org.javasimon.SimonManager;
-import org.javasimon.Split;
-import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Node;
-
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriBuilder;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.ByteArrayOutputStream;
-import java.math.BigInteger;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * A linked data store REST client that makes use of a REST API to upload content to the store,
- * or delete content from the store.
- */
-public class StoreClient implements IAction {
+public abstract class StoreClient implements IAction {
 
-    private static final Logger ERROR_LOG = LoggerFactory.getLogger("errorlog");
-    private static final Logger LOG = LoggerFactory.getLogger(StoreClient.class);
-    private static final Logger ERROR_FILES_LOG = LoggerFactory.getLogger("errorfiles");
+    private final static Logger LOGGER = LoggerFactory.getLogger(StoreClient.class);
 
-    private static int n;
     private final List<String> replacedPrefixBaseURI = new ArrayList<String>();
     private String userName;
     private String password;
@@ -53,36 +25,68 @@ public class StoreClient implements IAction {
     private String namedGIRIQueryParam;
     private boolean namedGIRIEncloseWithBrackets = false;
     private String prefixBaseURI;
+    private String action;
 
-    private enum ClientParams {
-        REPLACED_PREFIX_BASE_URI("replacedPrefixBaseURI"),
-        PREFIX_BASE_URI("prefixBaseURI"),
-        NAMED_GRAPH_IRI_QUERY_PARAM("namedGraphIRIQueryParam"),
-        SERVER_URL("serverURL"),
-        USER_NAME("username"),
-        PASSWORD("password"),
-        ACTION("action"),
-        DEBUG_STORE_HTTP_REQUEST_RESPONSE("debugStoreHttpRequestResponse"),
-        NAMED_GRAPH_IRI_ENCLOSE_WITH_BRACKETS("namedGraphIRIEncloseWithBrackets");
+    public String getAccessToken() {
+        return accessToken;
+    }
 
-        private final String val;
+    private String accessToken;
 
-        ClientParams(String val) {
-            this.val = val;
-        }
+    public List<String> getReplacedPrefixBaseURI() {
+        return replacedPrefixBaseURI;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public String getServerURL() {
+        return serverURL;
+    }
+
+    public ActionStatus getActionStatus() {
+        return actionStatus;
+    }
+
+    public String getNamedGIRIQueryParam() {
+        return namedGIRIQueryParam;
+    }
+
+    public boolean doNamedGIRIEncloseWithBrackets() {
+        return namedGIRIEncloseWithBrackets;
+    }
+
+    public String getPrefixBaseURI() {
+        return prefixBaseURI;
+    }
+
+    public String getAction() {
+        return action;
     }
 
     @Override
     public void startUp(Map<String, String> vars) throws ActionException {
-        String replacedPrefixBaseURIVar = vars.get(ClientParams.REPLACED_PREFIX_BASE_URI.val);
-        String action = vars.get(ClientParams.ACTION.val);
-        userName = vars.get(ClientParams.USER_NAME.val);
-        password = vars.get(ClientParams.PASSWORD.val);
-        serverURL = vars.get(ClientParams.SERVER_URL.val);
-        namedGIRIQueryParam = vars.get(ClientParams.NAMED_GRAPH_IRI_QUERY_PARAM.val);
-        namedGIRIEncloseWithBrackets = Boolean.parseBoolean(vars.get(ClientParams.NAMED_GRAPH_IRI_ENCLOSE_WITH_BRACKETS.val));
-        prefixBaseURI = vars.get(ClientParams.PREFIX_BASE_URI.val);
-        String prefixBaseURI = vars.get(ClientParams.PREFIX_BASE_URI.val);
+        String replacedPrefixBaseURIVar = vars.get(StoreClientParams.REPLACED_PREFIX_BASE_URI.getKey());
+        action = vars.get(StoreClientParams.ACTION.getKey());
+        userName = vars.get(StoreClientParams.USER_NAME.getKey());
+        password = vars.get(StoreClientParams.PASSWORD.getKey());
+        serverURL = vars.get(StoreClientParams.SERVER_URL.getKey());
+        namedGIRIQueryParam = vars.get(StoreClientParams.NAMED_GRAPH_IRI_QUERY_PARAM.getKey());
+        namedGIRIEncloseWithBrackets =
+                Boolean.parseBoolean(vars.get(StoreClientParams.NAMED_GRAPH_IRI_ENCLOSE_WITH_BRACKETS.getKey()));
+        prefixBaseURI = vars.get(StoreClientParams.PREFIX_BASE_URI.getKey());
+        accessToken = vars.get(StoreClientParams.ACCESS_TOKEN.getKey());
+        namedGIRIEncloseWithBrackets =
+                Boolean.parseBoolean(vars.get(StoreClientParams.NAMED_GRAPH_IRI_ENCLOSE_WITH_BRACKETS.getKey()));
 
         if (replacedPrefixBaseURIVar == null || replacedPrefixBaseURIVar.isEmpty()) {
             throw new ActionException("replacedPrefixBaseURI is null or empty");
@@ -106,39 +110,15 @@ public class StoreClient implements IAction {
         actionStatus = Misc.convertToActionStatus(action);
 
         client = ClientBuilder.newClient();
-        if (credentialsProvided()) {
-            LOG.info("Using provided credentials for user '{}' for HTTP Basic authentication", userName);
-            HttpAuthenticationFeature authFeature = HttpAuthenticationFeature.basic(userName, password);
-            client.register(authFeature);
-        }
         client.register(new BodyLoggingFilter());
 
-        LOG.debug("StoreClient variables: ");
-        LOG.debug("replacedPrefixBaseURI: {}", replacedPrefixBaseURI);
-        LOG.debug("prefixBaseURI: {}", prefixBaseURI);
-        LOG.debug("serverURL: {}", serverURL);
-        if (credentialsProvided()) {
-            LOG.debug("userName: {}", userName);
-            LOG.debug("password: {}", password);
-        }
-        LOG.debug("action: {}", action);
-        LOG.debug("namedGIRIParam: {}", namedGIRIQueryParam != null ? namedGIRIQueryParam : "N/A");
-        LOG.debug("Start StoreRESTClient....");
-    }
-
-    @Override
-    public Object execute(String path, Object object) throws ActionException {
-        Split split = SimonManager.getStopwatch("stopwatch.storeUpload").start();
-        boolean status = false;
-        switch(actionStatus) {
-            case POST: status = uploadRdfToStore(path, object);
-                break;
-            case DELETE: status = deleteRdfFromStore(path);
-                break;
-            default:
-        }
-        split.stop();
-        return status;
+        LOGGER.debug("StoreClient variables: ");
+        LOGGER.debug("replacedPrefixBaseURI: {}", replacedPrefixBaseURI);
+        LOGGER.debug("prefixBaseURI: {}", prefixBaseURI);
+        LOGGER.debug("serverURL: {}", serverURL);
+        LOGGER.debug("userName: {}", userName);
+        LOGGER.debug("action: {}", action);
+        LOGGER.debug("namedGIRIParam: {}", namedGIRIQueryParam != null ? namedGIRIQueryParam : "N/A");
     }
 
     @Override
@@ -146,130 +126,6 @@ public class StoreClient implements IAction {
         if (client != null) {
             client.close();
         }
-    }
-
-    @Override
-    public String name() {
-        return this.getClass().getName();
-    }
-
-    private boolean uploadRdfToStore(String path, Object object) throws ActionException {
-        if (object instanceof Node) {
-            String fileName = path.replace(".xml", ".rdf");
-
-            LOG.info("Upload '{}'.", fileName);
-            Node node = (Node)object;
-            DOMSource source = new DOMSource(node);
-            ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            StreamResult result = new StreamResult(bos);
-
-            try {
-                LOG.info("START transformation from DOMSource to RDF");
-                long startTrans = System.currentTimeMillis();
-                TransformerFactory.newInstance().newTransformer().transform(source,result);
-                Period p = new Period(System.currentTimeMillis() - startTrans);
-                LOG.info("END transformation from DOMSource to RDF. Duration: {} minutes, {} secs, {} ms.",
-                        p.getMinutes(), p.getSeconds(), p.getMillis());
-
-                byte[] bytes = bos.toByteArray();
-                LOG.info("{} has BYTES SIZE : {}", fileName,
-                            FileUtils.byteCountToDisplaySize(BigInteger.valueOf(bytes.length)));
-
-                long startUpload = System.currentTimeMillis();
-
-                // Build named / context IRI
-                UriBuilder uriBuilder = UriBuilder.fromUri(new URI(serverURL));
-                String giri = getGIRI(path);
-                uriBuilder.queryParam(namedGIRIQueryParam, namedGIRIEncloseWithBrackets ? "<" + giri + ">" : giri);
-                WebTarget target = client.target(uriBuilder.build());
-
-                // Do request
-                Response response = target.request().put(
-                        Entity.entity(bytes, StoreMediaTypes.APPLICATION_RDF_XML.getMediaType()));
-
-                int status = response.getStatus();
-                LOG.info("'{}' is uploaded to store.\nResponse status: {}",
-                        path.replace(".xml", ".rdf"), status);
-                if ((status == Response.Status.CREATED.getStatusCode())
-                        || (status == Response.Status.OK.getStatusCode())
-                        || (status == Response.Status.NO_CONTENT.getStatusCode())) {
-                    n++;
-                    LOG.info("[{}] is CREATED. Duration: {} milliseconds.", n, System.currentTimeMillis() - startUpload);
-                    return true;
-                } else {
-                    LOG.error(">>>>>>>>>> ERROR: {}", status);
-                    ERROR_FILES_LOG.info(path.replace(".rdf", ".xml"));
-                }
-            } catch (TransformerConfigurationException e) {
-                ERROR_LOG.error("ERROR: TransformerConfigurationException, caused by {}", e.getMessage(), e);
-            } catch (TransformerException e) {
-                ERROR_LOG.error("ERROR: TransformerException, caused by {}", e.getMessage());
-            } catch (TransformerFactoryConfigurationError e) {
-                ERROR_LOG.error("ERROR: TransformerFactoryConfigurationError, caused by {}", e.getMessage(), e);
-            } catch (URISyntaxException e) {
-                ERROR_LOG.error("ERROR: URISyntaxException, caused by {}", e.getMessage(), e);
-            } catch (IllegalArgumentException e) {
-                ERROR_LOG.error("ERROR: IllegalArgumentException, caused by {}", e.getMessage(), e);
-            }
-            throw new ActionException("Unknown input (" + path + ", " + object + ")");
-        }
-
-        return false;
-    }
-
-    private boolean deleteRdfFromStore(String path) {
-        UriBuilder uriBuilder;
-        try {
-            uriBuilder = UriBuilder.fromUri(new URI(serverURL));
-            uriBuilder.queryParam(namedGIRIQueryParam, getGIRI(path));
-            WebTarget target = client.target(uriBuilder.build());
-            Response response = target.request().delete();
-            int status = response.getStatus();
-            LOG.info("Delete {} from store.\nResponse status: {}",
-                    path.replace(".xml", ".rdf"), status);
-            if ((status == Response.Status.CREATED.getStatusCode())
-                    || (status == Response.Status.OK.getStatusCode())
-                    || (status == Response.Status.NO_CONTENT.getStatusCode())) {
-                n++;
-                LOG.info("[{}] is DELETED.", n);
-                return true;
-            } else {
-                ERROR_LOG.error(">>>>>>>>>> ERROR: {}\t{}", status, path);
-            }
-        } catch (URISyntaxException e) {
-            ERROR_LOG.error("ERROR: URISyntaxException, caused by {}", e.getMessage(), e);
-        } catch (ActionException e) {
-            ERROR_LOG.error("ERROR: ActionException, caused by {}", e.getMessage(), e);
-        }
-
-        return false;
-    }
-
-    private String getGIRI(String path) throws ActionException {
-        return getGIRI(path, replacedPrefixBaseURI, prefixBaseURI);
-    }
-
-    static String getGIRI(String path, List<String> replacedPrefixBaseURI, String prefixBaseURI) throws ActionException {
-        String gIRI = null;
-        for (String s:replacedPrefixBaseURI) {
-            if (path.startsWith(s)) {
-                gIRI = path.replace(s, prefixBaseURI)
-                        .replace(".xml", ".rdf")
-                        .replaceAll(" ", "_")
-                        // Same as the stylesheets: urn:/record.rdf -> urn:record.rdf
-                        .replaceFirst("(?i)^(urn:)/+", "$1");
-                break;
-            }
-        }
-        if (gIRI==null) {
-            throw new ActionException("gIRI ERROR: " + path + " is not found as prefix in " + replacedPrefixBaseURI);
-        }
-
-        return gIRI;
-    }
-
-    private boolean credentialsProvided() {
-        return userName != null && !userName.isEmpty() && password != null && !password.isEmpty();
     }
 
 }

@@ -7,7 +7,8 @@ import javax.ws.rs.core.MediaType;
  */
 public enum StoreMediaTypes {
 
-    APPLICATION_RDF_XML("application", "rdf+xml");
+    APPLICATION_RDF_XML("application", "rdf+xml"),
+    APPLICATION_N_TRIPLES("application", "n-triples");
 
     private final MediaType mediaType;
 

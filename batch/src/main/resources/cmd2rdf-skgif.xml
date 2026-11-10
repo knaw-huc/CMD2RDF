@@ -76,8 +76,19 @@
 						</properties>
 					</class>
 				</action>
+				<!--<action>
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.QLeverStoreClient">
+						<properties>
+							<property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
+							<property name="prefixBaseURI">{prefixBaseURI}</property>
+							<property name="serverURL">http://localhost:7001</property>
+							<property name="accessToken">putAccessTokenHere</property>
+							<property name="action">POST</property>
+						</properties>
+					</class>
+				</action>-->
 				<action>
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.StoreClient">
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.GraphDBStoreClient">
 						<properties>
 							<property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
 							<property name="prefixBaseURI">{prefixBaseURI}</property>

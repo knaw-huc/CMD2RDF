@@ -119,7 +119,7 @@
 				</action>
 				-->
 				<action>
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.StoreClient">
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.GraphDBStoreClient">
 						<properties>
 							<property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
 							<property name="prefixBaseURI">{prefixBaseURI}</property>
@@ -213,7 +213,7 @@
 				</action>
 				-->
 				<action>
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.StoreClient">
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.GraphDBStoreClient">
 						<properties>
 							<property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
 							<property name="prefixBaseURI">{prefixBaseURI}</property>
@@ -309,7 +309,7 @@
 				</action>
 				-->
                 <action>
-                    <class name="nl.knaw.dans.cmd2rdf.conversion.action.store.StoreClient">
+                    <class name="nl.knaw.dans.cmd2rdf.conversion.action.store.GraphDBStoreClient">
                         <properties>
                             <property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
                             <property name="prefixBaseURI">{prefixBaseURI}</property>
@@ -351,7 +351,7 @@
 					</class>
 				</action>
 				<action>
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.StoreClient">
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.GraphDBStoreClient">
 						<properties>
 							<property name="replacedPrefixBaseURI">{profilesCacheDir}</property>
 							<property name="prefixBaseURI">https://catalog.clarin.eu/ds/cmd2rdf/graph/profile</property>
@@ -374,7 +374,7 @@
 					</class>
 				</action>
 				<action>
-					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.StoreClient">
+					<class name="nl.knaw.dans.cmd2rdf.conversion.action.store.GraphDBStoreClient">
 						<properties>
 							<property name="replacedPrefixBaseURI">{xmlSourceDir}</property>
 							<property name="prefixBaseURI">{prefixBaseURI}</property>
